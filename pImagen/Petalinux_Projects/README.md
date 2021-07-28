@@ -33,6 +33,10 @@ En mi caso solo quiero guardar en la DDR una imagen de 640x480 RGB (8 bits por c
 
 <img src="https://github.com/Fuschetto97/Tesis/blob/main/pImagen/Petalinux_Projects/imagenes/res1-2.png" alt="Hardware" />
 
+### Captura de Frames sobre HTTP
+
+Una vez que la transferencia VDMA corre, se puede levantar un servidor PNG con muy pocas lineas sobre python para servir esto sobre un navegador.  
+
 ## Resultados 
 
 <img src="https://github.com/Fuschetto97/Tesis/blob/main/pImagen/Petalinux_Projects/imagenes/res1-1.png" alt="Hardware" width="700" height="400"/>
@@ -42,3 +46,29 @@ En mi caso solo quiero guardar en la DDR una imagen de 640x480 RGB (8 bits por c
 ## Conclusiones
     
 ## Referencias
+
+* [Zynq-7000 SoC Technical Reference Manual](https://www.xilinx.com/support/documentation/user_guides/ug585-Zynq-7000-TRM.pdf) 
+* [AXI Video Direct Memory Access](https://www.xilinx.com/support/documentation/ip_documentation/axi_vdma/v6_2/pg020_axi_vdma.pdf) 
+* [Video Test Pattern Generator v8.0](https://www.xilinx.com/support/documentation/ip_documentation/v_tpg/v8_0/pg103-v-tpg.pdf) 
+* [Video capture with VDMA - LauriBlog](https://lauri.xn--vsandi-pxa.com/hdl/zynq/xilinx-video-capture.html) 
+
+## Notas
+
+* Navegador http://192.168.100.130/80 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
