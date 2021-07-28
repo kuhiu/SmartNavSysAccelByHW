@@ -4,4 +4,4 @@
 ## Linux-VDMA-TPG-PNG.Server
 
 
-<img src="https://github.com/Fuschetto97/Tesis/blob/main/pImagen/Petalinux_Projects/imagenes/tpg.png" alt="Hardware" width="500"/>
+<img src="https://github.com/Fuschetto97/Tesis/blob/main/pImagen/Petalinux_Projects/imagenes/tpg.png" alt="Hardware" width="1000"/>
