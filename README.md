@@ -6,10 +6,7 @@
 ** Sistema de control difuso ** <br />
 ** Aceleracion de operaciones por logica programable ** <br />
 
-## Videos
-### Clases
-
-Primer Cuatrimestre:
+## Links
 
 * [Modulo - Procesamiento de imagenes](-)
 * [Modulo - Sistema de control difuso](-)
