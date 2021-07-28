@@ -1,6 +1,5 @@
 <h1 align="center"> Implementación y entrenamiento (y quiza compresión) de una Red Neuronal Convolucional SqueezeNet </h1> 
 
-<img src="a.jpg" alt="Hardware" width="500"/>
 
 ## Introduccion 
 
@@ -63,10 +62,18 @@ En la figura se puede ver la arquitectura de la SqueezeNet. Comienza con una cap
 
 
 
+Otra gran ventaja de esta red es que es susceptible de compresión. En donde combinando grandes técnicas de compresión como "Deep Compression" y la arquitectura de la SqueezeNet se logran reducciones de modelo de hasta 510x veces.
 
+El objetivo de este trabajo es entonces lograr el entrenamiento de una SqueezeNet comprimida, con un dataset propio y escribir su implementación en C para poder implementarla en una placa de desarrollo Zybo sobre un SoC Zynq-7000. Con la motivación de estudiar su posible implementación, o acelerado en la FPGA del mismo SoC. 
 
+# DESARROLLO 
 
+# RESULTADOS 
 
+# Conclusiones
+    
+# Referencias
+    
 
 
 
