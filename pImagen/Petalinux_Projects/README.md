@@ -59,6 +59,10 @@ Aqui se puede ver la Zybo corriendo con Petalinux, el TPG (Test Patttern Generat
 
 * Navegador http://192.168.100.130/80 
 
+## Trabajo futuro 
+
+* Quitar el generador arbitrario y escribir el wrapper (verilog) de la OV7670, el Driver del wrapper para Linux.
+
 
 
 
