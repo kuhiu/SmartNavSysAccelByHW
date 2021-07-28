@@ -4,6 +4,7 @@
 # Unignore all with extensions
 
 !Drivers/
+!imagenes/
 !*.c
 !*.py
 !*.md
