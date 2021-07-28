@@ -42,6 +42,29 @@ Este modulo permite alcanzar las 3 estrategias. Un "Fire Module" se compone de u
 <img src="https://github.com/Fuschetto97/Tesis/blob/main/pImagen/SqueezeNet/imagenes/squeezenet.png" alt="Hardware" width="500"/>
 
 
+Se exponen 3 hiperparámetros dentro del modulo s1x1, e1x1 y e3x3. En donde: 
+
+* s1x1: Cantidad de filtros en la capa de compresión (todos 1x1). 
+* e1x1: Cantidad de filtros en la capa de expansión (todos 1x1).  
+* e3x3: Cantidad de filtros en la capa de expansión (todos 3x3).
+
+
+Cuando usamos un "Fire Module" configuramos s1x1 para que sea menor que (e1x1 + e3x3) por lo que la capa de compresión ayuda a limitar el numero de canales de entrada a los filtros 3x3 *Estrategia 3*.
+
+
+## Macroarchitecture
+
+La macro-arquitectura se refiere a la organización del nivel de organización del sistema de múltiples módulos dentro de la arquitectura completa de la CNN.
+
+
+En la figura se puede ver la arquitectura de la SqueezeNet. Comienza con una capa de convolución independiente (conv1) seguida de 8 "Fire Modules" y termina con otra capa de convolución independiente. Gradualmente se aumenta el numero de filtros por "Fire Module" desde el principio de la red al final. Ademas realiza un max-pooling con un stride de 2 despues de las layers conv1, fire4, fire8 y conv10. Las ubicaciones de estos pooling hacen referencia a la *Estrategia 3*.
+
+<img src="https://github.com/Fuschetto97/Tesis/blob/main/pImagen/SqueezeNet/imagenes/squeezenetmacro.png" alt="Hardware" width="500"/>
+
+
+
+
+
 
 
 
