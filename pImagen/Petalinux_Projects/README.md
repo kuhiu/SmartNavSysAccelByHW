@@ -15,7 +15,7 @@ Fueron algunas de las opciones.
 
 Camara de arduino          		|  Camara USB
 :--------------------------------------:|:----------------------------------------:
-Muy economica		   		|  Cara
+Muy economica (~400$)		        |  Cara (~3000$)
 Requiere algunos dias de desarrollo 	|  Se conecta y se usa,  no funciona si no se consigue su Driver
 Al requerirse un wrapper sobre la FPGA y luego un Driver para el wrapper de la FPGA sobre Linux permite un pre-procesado al tener la imagen que pasar por dentro de la logica programable antes de llegar a la memoria RAM del procesador.   |  La imagen es obtenida por USB directamente sobre la RAM del procesador. 
 
