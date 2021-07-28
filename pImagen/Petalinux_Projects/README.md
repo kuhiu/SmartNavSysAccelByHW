@@ -42,10 +42,6 @@ Una vez que la transferencia VDMA corre, se puede levantar un servidor PNG con m
 Aqui se puede ver la Zybo corriendo con Petalinux, el TPG (Test Patttern Generator), el VDMA y el servidor sobre la red LAN de mi casa. 
 
 <img src="https://github.com/Fuschetto97/Tesis/blob/main/pImagen/Petalinux_Projects/imagenes/res1-1.png" alt="Hardware" width="700" height="400"/>
-
-
-
-## Conclusiones
     
 ## Referencias
 
@@ -54,6 +50,7 @@ Aqui se puede ver la Zybo corriendo con Petalinux, el TPG (Test Patttern Generat
 * [Video Test Pattern Generator v8.0](https://www.xilinx.com/support/documentation/ip_documentation/v_tpg/v8_0/pg103-v-tpg.pdf) 
 * [Video capture with VDMA - LauriBlog](https://lauri.xn--vsandi-pxa.com/hdl/zynq/xilinx-video-capture.html) 
 * [The png Module](https://pypng.readthedocs.io/en/latest/png.html) 
+* [AXI GPIO](https://www.xilinx.com/support/documentation/ip_documentation/axi_gpio/v2_0/pg144-axi-gpio.pdf)
 
 ## Notas
 

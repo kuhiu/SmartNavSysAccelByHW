@@ -3,5 +3,5 @@
 ## Links
 
 * [Modulo - Procesamiento de imagenes](https://github.com/Fuschetto97/Tesis/tree/main/pImagen)
-* [Modulo - Sistema de control difuso](-)
+* [Modulo - Sistema de control difuso](https://github.com/Fuschetto97/Tesis/tree/main/FuzzyControl)
 
