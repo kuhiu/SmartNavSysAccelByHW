@@ -1,7 +1,6 @@
 <h1 align="center"> Modulo: Procesamiento de imagenes </h1> 
 
 
-## Linux-VDMA-TPG-PNG.Server
+* [Zybo - Implementacion](https://github.com/Fuschetto97/Tesis/tree/main/pImagen/Petalinux_Projects)
+* [PC - Implementacion](https://github.com/Fuschetto97/Tesis/tree/main/pImagen/SqueezeNet)
 
-
-<img src="a.jpg" alt="Hardware" width="500"/>
