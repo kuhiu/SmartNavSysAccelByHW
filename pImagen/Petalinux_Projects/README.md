@@ -20,11 +20,16 @@ Por cuestiones economicas y de aprendizaje se decidio realizar una prueba con el
 
 ## Desarrollo "Linux-VDMA-TPG-PNG.Server" [Tiempo = 2 semanas]
 
-Como hacer que todo funcione bien en el primer intento es casi imposible, se propone sustituir la camara por un generador arbitrario de imagenes llamado "Test Pattern Generator". 
-
 <img src="https://github.com/Fuschetto97/Tesis/blob/main/pImagen/Petalinux_Projects/imagenes/tpg.png" alt="Hardware" width="1000" height="300"/>
 
+Como hacer que todo funcione bien en el primer intento es casi imposible, se propone sustituir la camara por un generador arbitrario de imagenes llamado "Test Pattern Generator". 
+
 <img src="https://github.com/Fuschetto97/Tesis/blob/main/pImagen/Petalinux_Projects/imagenes/mapaDirecciones.png" alt="Hardware" width="1000" height="300"/>
+
+En este caso el registro de control y estado del VDMA se encuentran mapeados en 0x4400_0000 usando AXI_LITE y esa direccion de memoria se puede escribir para iniciar una transferencia DMA. Por supuesto que se necesita escribir un Driver sobre Linux. 
+Como mi objetivo es transferir una imagen desde el generador arbitrario a la memoria DDR del procesador la transferencia MMS2 queda deshabilitada y la S2MM del controlador VDMA tiene acceso a todo el rango de memoria fisica (512 mb de la Zybo). Para tranquilidad del lector, solo una pequena seccion de esta memoria sera utilizada para almacenar la imagen. 
+
+En mi caso solo quiero guardar en la DDR una imagen de 640x480 RGB (8 bits por color) por lo tanto se necesitaran aproximadamente 7.5 mBytes de memoria RAM.
 
 <img src="https://github.com/Fuschetto97/Tesis/blob/main/pImagen/Petalinux_Projects/imagenes/res1-2.png" alt="Hardware" />
 
