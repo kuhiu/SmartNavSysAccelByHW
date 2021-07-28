@@ -25,7 +25,7 @@ Fueron algunas de las opciones.
 
 Solarized dark             |  Solarized Ocean
 :-------------------------:|:-------------------------:
-![](https://...Dark.png)  |  ![](https://...Ocean.png)
+![](https://github.com/Fuschetto97/Tesis/blob/main/pImagen/Petalinux_Projects/imagenes/res1-1.png)  |  ![](https://github.com/Fuschetto97/Tesis/blob/main/pImagen/Petalinux_Projects/imagenes/res1-2.png)
 
 
 # Conclusiones
