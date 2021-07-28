@@ -15,3 +15,37 @@ Dado cierto nivel de precisión es muy útil tener una arquitectura de CNN (conv
 * Cuando se habla de entrenamiento distribuido, la carga de trabajo para entrenar el modelo se divide y se comparte entre varios procesadores llamados nodos de trabajo para acelerar y/o paralelizar el entrenamiento. En estos casos tener redes mas pequeñas ayuda a que este tipo de entrenamiento sea aun mas eficiente con la ventaja de que la performance de la red no se ve afectada.
 
 * Empresas como Tesla copian periódicamente nuevos modelos de sus servidores a los productos de sus clientes (autos), al trabajar con redes mas pequeñas el gasto de exportar estos modelos se vería relativamente disminuido.
+
+
+## SqueezeNet Architecture
+    
+El objetivo general del paper de la SqueezeNet fue lograr un modelo que tenga muy pocos parámetros y al mismo tiempo mantenga la precisión, para lograr esto lo que se hizo fue a partir de un modelo dado se lo logro comprimir con ciertas perdidas. 
+
+
+* Estrategia 1: Remplazar los filtros 3x3 con filtros 1x1. Estos tienen 9 veces menos parámetros.
+* Estrategia 2: Siendo la cantidad total de parámetros en una CNN con filtros de 3x3 = (números de canales de entrada)*(numero de filtros)*(3x3) se busca reducir estos, reduciendo los números de canales de entrada, usando capas de compresión que se describen mas adelante.
+* Estrategia 3: Disminuir la resolución al final de la red para que las capas de convolución tengan mapas de activación grandes. Normalmente la reducción de resolución se diseña en arquitecturas de CCN al establecer el step>1 en algunas de las capas de convolución o agrupación.
+
+
+## Microarchitecture
+
+La micro-arquitectura hace referencia a las capas individuales y los módulos. La operación de convolución ha sido utilizada por al menos 25 años en las CNN. 
+Cuando el desarrollo de las CNN se aplica a imágenes típicamente los filtros de la CNN tienen 3 canales en su primer layer (ej,RGB) y en cada layer siguiente los filtros tienen el mismo numero de canales que el numero de filtros que tuvo la layer anterior. 
+Al diseñar CNN muy profundos, se vuelve tedioso el hecho de estar seleccionando manualmente las dimensiones del filtro, para abordar esto se propuse varios bloques de construcción de nivel superior, o módulos, que luego se combinan para formar una red completa. 
+
+
+## The Fire module
+
+Este modulo permite alcanzar las 3 estrategias. Un "Fire Module" se compone de una capa de convolución de compresión (solo tiene filtros de 1x1) que se alimenta a una capa de expansión que tiene una mezcla de filtros de convolución de 1x1 y 3x3 ver figura. El uso de los filtros 1x1 en este modulo es con el propósito de satisfacer la *Estrategia 1*. 
+
+
+
+
+
+
+
+
+
+
+
+
