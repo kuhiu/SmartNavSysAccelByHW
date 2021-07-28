@@ -39,7 +39,7 @@ Al diseñar CNN muy profundos, se vuelve tedioso el hecho de estar seleccionando
 Este modulo permite alcanzar las 3 estrategias. Un "Fire Module" se compone de una capa de convolución de compresión (solo tiene filtros de 1x1) que se alimenta a una capa de expansión que tiene una mezcla de filtros de convolución de 1x1 y 3x3 ver figura. El uso de los filtros 1x1 en este modulo es con el propósito de satisfacer la *Estrategia 1*. 
 
 
-
+<img src="https://github.com/Fuschetto97/Tesis/blob/main/pImagen/SqueezeNet/imagenes/squeezenet.png" alt="Hardware" width="500"/>
 
 
 
