@@ -1,7 +1,7 @@
 <h1 align="center"> Implementación y entrenamiento (y quiza compresión) de una Red Neuronal Convolucional SqueezeNet </h1> 
 
 
-## Introduccion 
+# Introduccion 
 
 A lo largo de los años se ha logrado ir aumentando la precisión de las redes neuronales convolucionales con distintos tipos de arquitecturas a tal punto en el que hoy en día se pueden encontrar distintas arquitecturas que cumplan un nivel de precisión que se necesite.
 
