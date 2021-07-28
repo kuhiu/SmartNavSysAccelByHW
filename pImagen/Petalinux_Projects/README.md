@@ -13,6 +13,13 @@ Camara de arduino          |  Camara USB
 
 Fueron algunas de las opciones. 
 
+Camara de arduino          		|  Camara USB
+:--------------------------------------:|:----------------------------------------:
+Muy economica		   		|  Cara
+Requiere algunos dias de desarrollo 	|  Se conecta y se usa
+
+
+
 <img src="https://github.com/Fuschetto97/Tesis/blob/main/pImagen/Petalinux_Projects/imagenes/tpg.png" alt="Hardware" width="1000" height="300"/>
 
 # Desarrollo 
