@@ -11,7 +11,7 @@
 
 # Resultados 
 
-<img src="https://github.com/Fuschetto97/Tesis/blob/main/pImagen/Petalinux_Projects/imagenes/res1-1.png" alt="Hardware" width="1000" height="400"/>
+<img src="https://github.com/Fuschetto97/Tesis/blob/main/pImagen/Petalinux_Projects/imagenes/res1-1.png" alt="Hardware" width="700" height="400"/>
 
 <img src="https://github.com/Fuschetto97/Tesis/blob/main/pImagen/Petalinux_Projects/imagenes/res1-2.png" alt="Hardware" />
 
