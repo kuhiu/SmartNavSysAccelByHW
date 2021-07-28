@@ -23,6 +23,10 @@ Fueron algunas de las opciones.
 
 <img src="https://github.com/Fuschetto97/Tesis/blob/main/pImagen/Petalinux_Projects/imagenes/res1-2.png" alt="Hardware" />
 
+Solarized dark             |  Solarized Ocean
+:-------------------------:|:-------------------------:
+![](https://...Dark.png)  |  ![](https://...Ocean.png)
+
 
 # Conclusiones
     
