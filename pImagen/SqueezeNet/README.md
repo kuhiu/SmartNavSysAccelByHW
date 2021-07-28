@@ -66,9 +66,9 @@ Otra gran ventaja de esta red es que es susceptible de compresión. En donde com
 
 El objetivo de este trabajo es entonces lograr el entrenamiento de una SqueezeNet comprimida, con un dataset propio y escribir su implementación en C para poder implementarla en una placa de desarrollo Zybo sobre un SoC Zynq-7000. Con la motivación de estudiar su posible implementación, o acelerado en la FPGA del mismo SoC. 
 
-# DESARROLLO 
+# Desarrollo 
 
-# RESULTADOS 
+# Resultados 
 
 # Conclusiones
     
