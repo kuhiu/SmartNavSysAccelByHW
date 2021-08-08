@@ -6,7 +6,7 @@
 * [Desarrollo Linux-VDMA-ov7670(camara)-PNG.Server Tiempo = 5 dias] (https://github.com/Fuschetto97/Tesis/blob/main/pImagen/Petalinux_Projects/README_Des2.md)
 * [asdasd] (https://github.com/Fuschetto97/Tesis/blob/main/pImagen/Petalinux_Projects/README_Des2.md)
 
-* [The png Module](https://pypng.readthedocs.io/en/latest/png.html) 
+.. [asdasd] https://github.com/Fuschetto97/Tesis/blob/main/pImagen/Petalinux_Projects/README_Des2.md
 
 
 
