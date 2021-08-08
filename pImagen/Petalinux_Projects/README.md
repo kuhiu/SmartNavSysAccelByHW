@@ -61,7 +61,9 @@ Aqui se puede ver la Zybo corriendo con Petalinux, el TPG (Test Patttern Generat
 * Quitar el generador arbitrario y escribir el wrapper (verilog) de la OV7670, el Driver del wrapper para Linux.
 
 
+## Desarrollo "Linux-VDMA-ov7670(camara)-PNG.Server" [Tiempo = 5 dias]
 
+<img src="https://github.com/Fuschetto97/Tesis/blob/main/pImagen/Petalinux_Projects/imagenes/ov7670.png" alt="Hardware" width="1000" height="300"/>
 
 
 

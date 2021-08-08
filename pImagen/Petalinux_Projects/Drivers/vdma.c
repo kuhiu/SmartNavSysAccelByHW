@@ -78,7 +78,7 @@ static int driver_remove (struct platform_device *pdev);
 #define BASE_FRAME_BUFFER                               (uint32_t) 0x01000000
 #define WIDTH         640
 #define HEIGHT        480
-#define PIXEL_LENGHT    3                          
+#define PIXEL_LENGHT    4                        
 
 
 /*************************************************************************************************/
@@ -190,7 +190,7 @@ void set_registers (volatile void *base, uint32_t offset, uint32_t mask, uint32_
 
 int vdma_start(void){
 
-  int interrupt_frame_count = 125;
+  int interrupt_frame_count = 1;
 
   pr_info("El estado es... %08X\n", ioread32(vdma_handle.base_addr_ctrl+OFFSET_VDMA_S2MM_STATUS_REGISTER));
 

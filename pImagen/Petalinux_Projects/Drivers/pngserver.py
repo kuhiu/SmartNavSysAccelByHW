@@ -3,13 +3,13 @@ import os, png, mmap, BaseHTTPServer
 FRAMEBUFFER_OFFSET  = 0x01000000
 WIDTH = 640
 HEIGHT = 480
-PIXEL_SIZE = 3
+PIXEL_SIZE = 4
 
 fh = os.open("/dev/mem", os.O_SYNC | os.O_RDONLY ) # Disable cache, read-only
 mm = mmap.mmap(fh, WIDTH*HEIGHT*PIXEL_SIZE, mmap.MAP_SHARED, mmap.PROT_READ, offset=FRAMEBUFFER_OFFSET)
 class MyHandler(BaseHTTPServer.BaseHTTPRequestHandler):
     def do_GET(s):
-        writer = png.Writer(WIDTH, HEIGHT, alpha=False, greyscale=False, bitdepth=8)
+        writer = png.Writer(WIDTH, HEIGHT, alpha=True, greyscale=False, bitdepth=8)
         s.send_response(200)
         s.send_header("Content-type", "image/png")
         s.end_headers()
