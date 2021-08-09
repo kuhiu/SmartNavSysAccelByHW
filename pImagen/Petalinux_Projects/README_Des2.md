@@ -52,14 +52,21 @@ Los puertos pmod son conectores hembra de 2x6, en angulo recto, espaciados cada 
 
 #### PMOD Standard 
 
+Conectados al Zynq PL a traves de resistencias en series de 200 ohm. Estas evitan cortocircuitos que pueden ocurrir si el usuario usa como salida accidentalmente una señal que debiera utilizarse como entrada. La desventaja de esta proteccion adicional es que estas resistencias limitan la velocidad maxima de conmutacion de datos de estos pines. En caso de no necesitar alta velocidad, entonces es recomendable utilizar estos puertos para prevenir daños en el dispositivo. 
 
+#### MIO PMOD 
 
+El puerto MIO Pmod está conectado al bus MIO en el Zynq PS a través de resistencias en serie de 200 Ohm, al igual que el standard. Dado que estas señales estan conectadas a la interfaz MIO solo se puede acceder a ellas a traves del controlador periferico PS. Los núcleos GPIO, UART, I2C y SPI pueden usarse para controlar dispositivos conectados a este Pmod.
 
+#### Dual Analog/Digital Pmod (XADC Pmod) 
 
+El puerto pmod etiquetado como "XADC" esta conectado a los pines de entrada analogica auxiliar del PL (Este puerto puede utilizarse tambien para meter entradas analogicas diferenciales al conversor ADC). En el modo de entrada analogica debe limitarse a 1v la entrada. 
 
+Los dispositivos Zynq-7000 AP SoC combinan un convertidor de analógico a digital flexible con lógica programable para abordar una amplia gama de requisitos de monitoreo y adquisición de datos analógicos. El XADC es parte de un tema más amplio de señales mixtas analógicas (AMS) que es una combinación de circuitos analógicos y digitales.
 
+#### High Speed PMOD
 
-
+Los puertos Pmod de alta velocidad utilizan el conector Pmod estándar, pero sus señales de datos se enrutan como impedancia pares diferenciales emparejados para velocidades máximas de conmutación. Los Pmods no ofrecen protección contra cortocircuitos, pero permiten velocidades de conmutación mucho más rápidas. Las señales se emparejan con las señales adyacentes en la misma fila: pines 1 y 2, pines 3 y 4, pines 7 y 8 y pines 9 y 10.
 
 
 
