@@ -1,11 +1,11 @@
 # Ignore all 
 * 
 
-# Unignore all with extensions
-
 !Drivers/
 !imagenes/
-!*ov7670/ov7670.srcs/
+!ov7670/ov7670.srcs/*/*/*/
+# Unignore all with extensions
+
 !*.c
 !*.py
 !*.md
