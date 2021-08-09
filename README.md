@@ -8,5 +8,5 @@
 
 ## Estado actual de la implementacion
 
-<img src="https://github.com/Fuschetto97/Tesis/imagenes/estado.png" alt="Hardware" />
+<img src="https://github.com/Fuschetto97/Tesis/blob/main/imagenes/estado.jpeg" alt="Hardware" />
 
