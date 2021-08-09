@@ -77,6 +77,9 @@ https://github.com/laurivosandi/hdl/tree/master/zynq
 
 <img src="https://github.com/Fuschetto97/Tesis/blob/main/pImagen/Petalinux_Projects/imagenes/ov7670_res.png" alt="Hardware" />
 
+### Referencias
+
+
 ### Trabajo futuro
 
 * Escribir mi propio capturador de la imagen.
