@@ -5,3 +5,8 @@
 * [Modulo - Procesamiento de imagenes](https://github.com/Fuschetto97/Tesis/tree/main/pImagen)
 * [Modulo - Sistema de control difuso](https://github.com/Fuschetto97/Tesis/tree/main/FuzzyControl)
 
+
+## Estado actual de la implementacion
+
+<img src="https://github.com/Fuschetto97/Tesis/imagenes/estado.png" alt="Hardware" />
+
