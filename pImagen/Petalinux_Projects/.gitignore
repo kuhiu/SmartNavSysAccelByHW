@@ -5,6 +5,7 @@
 
 !Drivers/
 !imagenes/
+!ov7670/
 !*.c
 !*.py
 !*.md
