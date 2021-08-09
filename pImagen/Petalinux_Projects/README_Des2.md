@@ -71,11 +71,17 @@ Los puertos Pmod de alta velocidad utilizan el conector Pmod estándar, pero sus
 
 ### Módulo de adquisición de imagen
 
-
+https://github.com/laurivosandi/hdl/tree/master/zynq
 
 ### Resultados
 
 <img src="https://github.com/Fuschetto97/Tesis/blob/main/pImagen/Petalinux_Projects/imagenes/ov7670_res.png" alt="Hardware" />
+
+### Trabajo futuro
+
+* Escribir mi propio capturador de la imagen.
+* Quitar el controlador SCCB de la FPGA y utilizar el del procesador para ahorrar recursos.
+* Utilizar el DSP del ov7670 para mejorar la calidad de la imagen.
 
 
 
