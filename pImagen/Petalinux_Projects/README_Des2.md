@@ -69,7 +69,7 @@ Los dispositivos Zynq-7000 AP SoC combinan un convertidor de analógico a digita
 Los puertos Pmod de alta velocidad utilizan el conector Pmod estándar, pero sus señales de datos se enrutan como impedancia pares diferenciales emparejados para velocidades máximas de conmutación. Los Pmods no ofrecen protección contra cortocircuitos, pero permiten velocidades de conmutación mucho más rápidas. Las señales se emparejan con las señales adyacentes en la misma fila: pines 1 y 2, pines 3 y 4, pines 7 y 8 y pines 9 y 10.
 
 
-
+### Módulo de adquisición de imagen
 
 
 
