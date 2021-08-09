@@ -38,3 +38,33 @@ De la misma forma podemos encontrar dos formatos mas RGB555 y RGB565 (formato co
 
 <img src="https://github.com/Fuschetto97/Tesis/blob/main/pImagen/Petalinux_Projects/imagenes/ov7670_555.png" alt="Hardware" />
 <img src="https://github.com/Fuschetto97/Tesis/blob/main/pImagen/Petalinux_Projects/imagenes/ov7670_565.png" alt="Hardware" />
+
+### Conexion del OV7670 a la Zybo
+
+<img src="https://github.com/Fuschetto97/Tesis/blob/main/pImagen/Petalinux_Projects/imagenes/pmod.png" alt="Hardware" />
+
+Los puertos pmod son conectores hembra de 2x6, en angulo recto, espaciados cada 100 mil. El puerto pmod de 12 pines proporciona dos señales VCC de 3,3v, dos señales de tierra y ocho logicas. Los pines VCC y Ground pueden suministrar hasta 1 A de corriente, pero se debe tener cuidado no exceder ninguno de los presupuestos de energía de los reguladores a bordo o la fuente de alimentación externa.
+
+<img src="https://github.com/Fuschetto97/Tesis/blob/main/pImagen/Petalinux_Projects/imagenes/pmod_tipos_1.png" alt="Hardware" />
+
+<img src="https://github.com/Fuschetto97/Tesis/blob/main/pImagen/Petalinux_Projects/imagenes/pmod_tipos_2.png" alt="Hardware" />
+
+
+### PMOD Standard 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
