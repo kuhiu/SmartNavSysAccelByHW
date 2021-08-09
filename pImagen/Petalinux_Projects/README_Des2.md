@@ -18,7 +18,7 @@ El ov7670 es un sensor de imagen CMOS de bajo voltaje que proporciona la funcion
 * Image Scaler: Este bloque controla todas las salidas y los datos con el formato requerido. 
 * SCCB Interface: Bus de Control de Camara Serial, permite controlar toda la configuracion del sensor.
 
-### Pinout y formatos de color 
+### Pinout  
 
 <img src="https://github.com/Fuschetto97/Tesis/blob/main/pImagen/Petalinux_Projects/imagenes/ov7670_pin.png" alt="Hardware" />
  
@@ -28,6 +28,13 @@ Señales de sincronizacion (VSYNC, HREF, PCLK)
 * VREF: Señal de sincronizacion vertical. Indica cuando comienza o termina un frame.
 * PCLK: Clk de salida del modulo, sincroniza el wrapper de obtencion de la imagen, indica cuando leer el dato de los pines de salida. 
 
+### Formatos de color
+
+El sensor dispone de distintos tipos de formatos de color, uno de ellos es el RGB444 el cual utiliza 12 bits para almacenar la informacion de cada pixel, a su vez la informacion es entregada en 2 bytes (deshechar los sobrantes) y en 2 ciclos de pclk.
+
 <img src="https://github.com/Fuschetto97/Tesis/blob/main/pImagen/Petalinux_Projects/imagenes/ov7670_444.png" alt="Hardware" />
+
+De la misma forma podemos encontrar dos formatos mas RGB555 y RGB565 (formato completo, 2 bytes).
+
 <img src="https://github.com/Fuschetto97/Tesis/blob/main/pImagen/Petalinux_Projects/imagenes/ov7670_555.png" alt="Hardware" />
 <img src="https://github.com/Fuschetto97/Tesis/blob/main/pImagen/Petalinux_Projects/imagenes/ov7670_565.png" alt="Hardware" />

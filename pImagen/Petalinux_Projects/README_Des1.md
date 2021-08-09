@@ -8,7 +8,7 @@ Camara de arduino          |  Camara USB
 
 Fueron algunas de las opciones. 
 
-Camara de arduino          		|  Camara USB
+OV7670         				|  Camara USB
 :--------------------------------------:|:----------------------------------------:
 Muy economica (~400$)		        |  Cara (~3500$)
 Requiere algunos dias de desarrollo 	|  Se conecta y se usa,  no funciona si no se consigue su Driver
