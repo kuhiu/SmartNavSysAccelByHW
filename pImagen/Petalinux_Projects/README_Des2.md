@@ -79,6 +79,13 @@ https://github.com/laurivosandi/hdl/tree/master/zynq
 
 ### Referencias
 
+* [Zybo Z7 Board Reference Manual](https://reference.digilentinc.com/_media/reference/programmable-logic/zybo-z7/zybo-z7_rm.pdf)
+* [Zybo Z7 Board Schematic](https://reference.digilentinc.com/_media/reference/programmable-logic/zybo-z7/zybo_z7_sch-public.pdf)
+* [Zybo Z7 Packing and Pinout](https://www.xilinx.com/support/documentation/user_guides/ug865-Zynq-7000-Pkg-Pinout.pdf)
+* [Zynq 7010 Package](https://www.xilinx.com/support/packagefiles/z7packages/xc7z010clg400pkg.txt)
+* [Lauri github](https://github.com/laurivosandi/hdl/tree/master/zynq)
+* [Lauri Blog](https://lauri.xn--vsandi-pxa.com/hdl/zynq/zybo-ov7670-to-vga.html)
+
 
 ### Trabajo futuro
 
