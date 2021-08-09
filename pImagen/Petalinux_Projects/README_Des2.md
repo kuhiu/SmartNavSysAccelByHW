@@ -50,7 +50,26 @@ Los puertos pmod son conectores hembra de 2x6, en angulo recto, espaciados cada 
 <img src="https://github.com/Fuschetto97/Tesis/blob/main/pImagen/Petalinux_Projects/imagenes/pmod_tipos_2.png" alt="Hardware" />
 
 
-### PMOD Standard 
+#### PMOD Standard 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+### Resultados
+
+<img src="https://github.com/Fuschetto97/Tesis/blob/main/pImagen/Petalinux_Projects/imagenes/ov7670_res.png" alt="Hardware" />
+
 
 
 
