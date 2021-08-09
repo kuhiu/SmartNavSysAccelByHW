@@ -28,4 +28,6 @@ Señales de sincronizacion (VSYNC, HREF, PCLK)
 * VREF: Señal de sincronizacion vertical. Indica cuando comienza o termina un frame.
 * PCLK: Clk de salida del modulo, sincroniza el wrapper de obtencion de la imagen, indica cuando leer el dato de los pines de salida. 
 
+<img src="https://github.com/Fuschetto97/Tesis/blob/main/pImagen/Petalinux_Projects/imagenes/ov7670_444.png" alt="Hardware" />
+<img src="https://github.com/Fuschetto97/Tesis/blob/main/pImagen/Petalinux_Projects/imagenes/ov7670_555.png" alt="Hardware" />
 <img src="https://github.com/Fuschetto97/Tesis/blob/main/pImagen/Petalinux_Projects/imagenes/ov7670_565.png" alt="Hardware" />
