@@ -1,9 +1,8 @@
 # Ignore all 
 * 
-
+!sources_save/
 !Drivers/
 !imagenes/
-!ov7670/*.*
 
 
 # Unignore all with extensions
