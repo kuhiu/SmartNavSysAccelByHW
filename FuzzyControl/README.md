@@ -270,11 +270,11 @@ En el caso de una implementación en hardware con sensores que presenten alineal
 
 
 REFERENCIAS
-[1] Ing. Morris William Diaz Saravia. Tesis. Diseño de prototipo de vehículo autónomo utilizando redes neuronales.
-[2] Prof. Lotfi A. Zadeh (1965). Fuzzy Sets-Information and Control.
-[3] Majura F. Selekwaa Damion D. Dunlapb Dongqing Shib Emmanuel G. Collins Jr. «“Robot navigation in very cluttered environments by preference-based fuzzy behaviors ». En:Elsevier B.V.(2007)..
-[4] Babak Karasfi Danial Nakhaeinia. “Application of Fuzzy Logic in Mobile Robot Navigation”.Año: 2012.
-[3] Mohamed Slim Masmoudi Hajer Omrane y col. «“Fuzzy Logic Based Control for Autonomous Mobile Robot Navigation”». En:-(2016)
-[6] Apunte de cátedra Introducción a la Inteligencia Artificial “Fuzzy Control” (2021), Juan Carlos Gómez Claudio Abel Verrastro. Universidad Tecnológica Nacional.
-[7] Tune Fuzzy Robot Obstacle Avoidance System Using Custom CostFunction. https://www.mathworks.com/help/fuzzy/tune-fuzzy-systems-usingcustom-cost-function.html
+* [1] Ing. Morris William Diaz Saravia. Tesis. Diseño de prototipo de vehículo autónomo utilizando redes neuronales.
+* [2] Prof. Lotfi A. Zadeh (1965). Fuzzy Sets-Information and Control.
+* [3] Majura F. Selekwaa Damion D. Dunlapb Dongqing Shib Emmanuel G. Collins Jr. «“Robot navigation in very cluttered environments by preference-based fuzzy behaviors ». En:Elsevier B.V.(2007)..
+* [4] Babak Karasfi Danial Nakhaeinia. “Application of Fuzzy Logic in Mobile Robot Navigation”.Año: 2012.
+* [3] Mohamed Slim Masmoudi Hajer Omrane y col. «“Fuzzy Logic Based Control for Autonomous Mobile Robot Navigation”». En:-(2016)
+* [6] Apunte de cátedra Introducción a la Inteligencia Artificial “Fuzzy Control” (2021), Juan Carlos Gómez Claudio Abel Verrastro. Universidad Tecnológica Nacional.
+ *[7] Tune Fuzzy Robot Obstacle Avoidance System Using Custom CostFunction. https://www.mathworks.com/help/fuzzy/tune-fuzzy-systems-usingcustom-cost-function.html
 
