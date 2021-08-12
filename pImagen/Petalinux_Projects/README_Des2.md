@@ -77,6 +77,8 @@ https://github.com/laurivosandi/hdl/tree/master/zynq
 
 <img src=./imagenes/ov7670_res.png alt="Hardware" />
 
+<img src=./imagenes/report2.png alt="Hardware" />
+
 ### Referencias
 
 * [Zybo Z7 Board Reference Manual](https://reference.digilentinc.com/_media/reference/programmable-logic/zybo-z7/zybo-z7_rm.pdf)
