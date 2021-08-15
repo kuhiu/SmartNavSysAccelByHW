@@ -1,8 +1,8 @@
 import os, png, mmap, BaseHTTPServer
 
 FRAMEBUFFER_OFFSET  = 0x01000000
-WIDTH = 640
-HEIGHT = 480
+WIDTH = 320
+HEIGHT = 240
 PIXEL_SIZE = 4
 
 fh = os.open("/dev/mem", os.O_SYNC | os.O_RDONLY ) # Disable cache, read-only

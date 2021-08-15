@@ -252,9 +252,7 @@ static int driver_probe (struct platform_device *pdev)
         pr_err("No se pudo conseguir ioremap memory\n");
         return -ENODEV;
     }
-
     
-
     pr_info("Chau! Salgo de driver probed! \n");
 
     return 0;

@@ -32,17 +32,8 @@ __attribute__((section("__versions"))) = {
 	{ 0x5ad2433, "i2c_put_adapter" },
 	{ 0x5857ad53, "i2c_new_device" },
 	{ 0x355d00b8, "i2c_get_adapter" },
-	{ 0x8f678b07, "__stack_chk_guard" },
-	{ 0xf9a482f9, "msleep" },
-	{ 0x183ff70a, "i2c_transfer" },
-	{ 0x5f754e5a, "memset" },
-	{ 0xb9757c96, "cdev_add" },
-	{ 0xfad496fc, "cdev_init" },
-	{ 0xdb7305a1, "__stack_chk_fail" },
-	{ 0xe3ec2f2b, "alloc_chrdev_region" },
+	{ 0x8d00b031, "i2c_smbus_write_byte_data" },
 	{ 0xefd6cf06, "__aeabi_unwind_cpp_pr0" },
-	{ 0x6091b333, "unregister_chrdev_region" },
-	{ 0xd1f18866, "cdev_del" },
 	{ 0x7c32d0f0, "printk" },
 };
 

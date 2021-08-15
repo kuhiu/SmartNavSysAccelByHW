@@ -7,6 +7,11 @@
 /* Defines */
 #define I2C_BUS             0
 #define OV7670_I2C_ADDRESS  0x42
+#define DEVICE_NAME         "ov7670"
+#define DEVICE_CLASS_NAME   "ov7670"
+#define DEVICE_PARENT       NULL
+#define BASE_MINOR          0
+#define MINOR_COUNT         1
 
 
 /* Registers */
@@ -105,10 +110,16 @@
 #define REG_COM17	        0x42    /* Control 17 */
 #define COM17_AECWIN	    0xc0	/* AEC window - must match COM4 */
 #define COM17_CBAR	        0x08	/* DSP Color bar */
-#define SATCTR              0xC9    /* Saturation control */
+
+ssize_t driver_write(struct file *file, const char *buffer, size_t count, loff_t *offset);
 
 static struct state {
     struct i2c_client *client;
+
+    dev_t devtype;          // numero mayor y menor
+    struct class *devclass; // class_create()
+    struct device *dev;     // device_create()
+    struct cdev chardev;    // cdev_add()
 } state;
 
 
@@ -119,70 +130,55 @@ struct regval_list {
 
 
 static struct i2c_board_info ov7670_i2c_board_info = {
-    I2C_BOARD_INFO("ov7670", OV7670_I2C_ADDRESS>>1)
+    I2C_BOARD_INFO("ov7670", OV7670_I2C_ADDRESS)
 };
 
 static struct i2c_client *ov7670_client;
 
 
 static struct regval_list ov7670_default_regs[] = {
-    { REG_COM7,  0x80 }, // COM7   Reset
-	{ REG_COM7,  0x80 }, // COM7   Reset
-    { REG_COM7,  0x14 }, // QVGA   Size y RGB output
-	{ REG_CLKRC, 0x40 }, // CLKRC  External clk
-	{ REG_COM3,  0x04 }, // DCW    enable
-   	{ REG_COM14, 0x19 }, // Manual scaling enable y PCLK divider 2
-    //{ 0x70, 0x3A }, // QVGA
-    //{ 0x71, 0x35 }, // QVGA
-    { 0x72,     0x11 }, // QVGA
-    { 0x73,     0xF1 }, // QVGA
-    //{ 0xA2, 0x02 }, // QVGA
-
-    { 0x8C,     0x00 }, // RGB444 Set RGB format
-   	{ 0x04,     0x00 }, // COM1   no CCIR601
- 	{ 0x40,     0x10 }, // COM15  Full 0-255 output, RGB 565
-	{ 0x3a,     0x04 }, // TSLB   Set UV ordering,  do not auto-reset window
-	{ 0x14,     0x38 }, // COM9  - AGC Celling
-	{ 0x4f,     0xb3 }, // MTX1  - colour conversion matrix
-	{ 0x50,     0xb3 }, // MTX2  - colour conversion matrix
-	{ 0x51,     0x00 }, // MTX3  - colour conversion matrix
-	{ 0x52,     0x3d }, // MTX4  - colour conversion matrix
-	{ 0x53,     0xa7 }, // MTX5  - colour conversion matrix
-	{ 0x54,     0xe4 }, // MTX6  - colour conversion matrix
-	{ 0x58,     0x9e }, // MTXS  - Matrix sign and auto contrast
-	{ 0x3d,     0xc0 }, // COM13 - Turn on GAMMA and UV Auto adjust
-	{ 0x11,     0x00 }, // CLKRC  Prescaler - Fin/(1+1)
-	
-    //{ REG_HSTART, 0x16 }, // HSTART HREF start (high 8 bits)
-	//{ REG_HSTOP,  0x04 }, // HSTOP  HREF stop (high 8 bits)
-	//{ REG_HREF,   0x24 }, // HREF   Edge offset and low 3 bits of HSTART and HSTOP
-	//{ REG_VSTART, 0x02 }, // VSTART VSYNC start (high 8 bits)
-	//{ REG_VSTOP,  0x7A }, // VSTOP  VSYNC stop (high 8 bits) 
-	//{ REG_VREF,   0x0A }, // VREF   VSYNC low two bits
-    
-    { REG_HSTART, 0x16 }, // HSTART HREF start (high 8 bits)
-	{ REG_HSTOP,  0x04 }, // HSTOP  HREF stop (high 8 bits)
-	{ REG_HREF,   0x24 }, // HREF   Edge offset and low 3 bits of HSTART and HSTOP
-	{ REG_VSTART, 0x03 }, // VSTART VSYNC start (high 8 bits)
-	{ REG_VSTOP,  0x7B }, // VSTOP  VSYNC stop (high 8 bits) 
-	{ REG_VREF,   0x08 }, // VREF   VSYNC low two bits
-
-    { REG_COM5, 0x61 }, // COM5(0x0E) 0x61
-    { REG_COM6, 0x4b }, // COM6(0x0F) 0x4B 
-    { 0x16,     0x02 },       // Reserved ??
-    { REG_MVFP, 0x37 }, // MVFP (0x1E) 0x07  -- FLIP AND MIRROR IMAGE 0x3x
-    { 0x21,     0x02 },
-    { 0x22,     0x91 },
-    { 0x29,     0x07 },
-    { 0x33,     0x0b },   
-    { 0x35,     0x0b },
-    { 0x37,     0x1d },             
-    { 0x38,     0x71 },
-    { 0x39,     0x2a },             
-    { REG_COM12,0x78 },  // COM12 (0x3C) 0x78
+    { 0x12, 0x80 }, // COM7   Reset
+	{ 0x12, 0x80 }, // COM7   Reset
+	{ 0x12, 0x04 }, // COM7   Size & RGB output
+	{ 0x11, 0x40 }, // CLKRC  Prescaler - Fin/(1+1)
+	{ 0x0C, 0x00 }, // COM3   Lots of stuff, enable scaling, all others off
+	{ 0x3E, 0x00 }, // COM14  PCLK scaling off
+   	{ 0x8C, 0x00 }, // RGB444 Set RGB format
+   	{ 0x04, 0x00 }, // COM1   no CCIR601
+ 	{ 0x40, 0x10 }, // COM15  Full 0-255 output, RGB 565
+	{ 0x3a, 0x04 }, // TSLB   Set UV ordering,  do not auto-reset window
+	{ 0x14, 0x38 }, // COM9  - AGC Celling
+	{ 0x4f, 0xb3 }, // MTX1  - colour conversion matrix
+	{ 0x50, 0xb3 }, // MTX2  - colour conversion matrix
+	{ 0x51, 0x00 }, // MTX3  - colour conversion matrix
+	{ 0x52, 0x3d }, // MTX4  - colour conversion matrix
+	{ 0x53, 0xa7 }, // MTX5  - colour conversion matrix
+	{ 0x54, 0xe4 }, // MTX6  - colour conversion matrix
+	{ 0x58, 0x9e }, // MTXS  - Matrix sign and auto contrast
+	{ 0x3d, 0xc0 }, // COM13 - Turn on GAMMA and UV Auto adjust
+	{ 0x11, 0x00 }, // CLKRC  Prescaler - Fin/(1+1)
+	{ 0x17, 0x11 }, // HSTART HREF start (high 8 bits)
+	{ 0x18, 0x61 }, // HSTOP  HREF stop (high 8 bits)
+	{ 0x32, 0xA4 }, // HREF   Edge offset and low 3 bits of HSTART and HSTOP
+	{ 0x19, 0x03 }, // VSTART VSYNC start (high 8 bits)
+	{ 0x1A, 0x7b }, // VSTOP  VSYNC stop (high 8 bits) 
+	{ 0x03, 0x0a }, // VREF   VSYNC low two bits
+    { 0x0e, 0x61 }, // COM5(0x0E) 0x61
+    { 0x0f, 0x4b }, // COM6(0x0F) 0x4B 
+    { 0x16, 0x02 }, //
+    { 0x1e, 0x37 }, // MVFP (0x1E) 0x07  -- FLIP AND MIRROR IMAGE 0x3x
+    { 0x21, 0x02 },
+    { 0x22, 0x91 },
+    { 0x29, 0x07 },
+    { 0x33, 0x0b },   
+    { 0x35, 0x0b },
+    { 0x37, 0x1d },             
+    { 0x38, 0x71 },
+    { 0x39, 0x2a },             
+    { 0x3c, 0x78 }, // COM12 (0x3C) 0x78
     { 0x4d, 0x40 },                   
     { 0x4e, 0x20 },
-    { 0x69, 0x00 },       // GFIX (0x69) 0x00                 
+    { 0x69, 0x00 }, // GFIX (0x69) 0x00                 
     { 0x6b, 0x4a },
     { 0x74, 0x10 }, 
     { 0x8d, 0x4f },
@@ -197,13 +193,67 @@ static struct regval_list ov7670_default_regs[] = {
     { 0xb2, 0x0e },
     { 0xb3, 0x82 },
     { 0xb8, 0x0a },
+	{ 0xFF, 0xFF }, //mark end of ROM
+};
 
-    // DSP processing
-    //{ REG_COM11, 0x80}, // Modo nocturno, 
-    { REG_EDGE, 0x07 }, // Edge Enhancement adj
-    //{ SATCTR,    }, // 
-    { REG_COM16, 0x10}, // De-noise 
-	{ 0xFF, 0xFF }, // Mark end of ROM
+
+static int driver_open(struct inode *inode, struct file *file) 
+{
+    //unsigned int maj = imajor(inode);
+    unsigned int min = iminor(inode);
+    struct state *state_devp;
+
+    pr_info(DEVICE_NAME": Hola! Entre a open! \n");
+
+    /* Consigue la estructura per-device que contiene cdev */
+    state_devp = container_of(inode->i_cdev, struct state , chardev);
+
+    /* Facilita el acceso a state_devp desde el resto de los ptos de entrada */
+    file->private_data = state_devp;
+
+    if (min < 0)
+    {
+        pr_err (DEVICE_NAME": Device not found\n");
+        return -ENODEV; /* No such device */
+    }
+
+
+
+    return 0;
+}
+
+
+ssize_t driver_write(struct file *file, const char *buffer, size_t count, loff_t *offset)
+{
+    struct state *dev = file->private_data;
+    int i, test;
+
+    pr_info("ov7670_probe: Configuro ov7670!\n");
+
+    while( ov7670_default_regs[i].reg_num != 0xFF ){
+        test = i2c_smbus_read_byte_data(dev->client , ov7670_default_regs[i].reg_num);
+        pr_info("Test: %d !\n", test);
+        i = i + 1;
+    }
+
+    return 0;
+}
+
+
+/*************************************************************************************************/
+/******************************** Estructura file_operations *************************************/
+/**
+    @brief Implementacion de las funciones del driver open, read, write, close, ioctl, cada driver
+    tiene su propia file_operations
+**/
+
+static const struct file_operations driver_file_op = {
+  .owner = THIS_MODULE,
+  .open = driver_open,
+  .write = driver_write,
+  //.read = driver_read,
+  //.release = driver_release,
+  //.unlocked_ioctl = driver_ioctl,
 };
 
 
@@ -215,9 +265,61 @@ static int ov7670_probe(struct i2c_client *client, const struct i2c_device_id *i
 
     pr_info("ov7670_probe: Hola, entre a probe!\n");
 
+    pr_info("my_pdrv_init: Intento allocar cdev\n");
+    if (alloc_chrdev_region(&state.devtype, BASE_MINOR, MINOR_COUNT, DEVICE_NAME) != 0) 
+    {
+        pr_err(DEVICE_NAME": alloc_chrdev_region: Error no es posible asignar numero mayor\n");
+        return -EBUSY;  // Device or resource busy 
+    }
+    pr_info("my_pdrv_init: Cdev struct allocada\n");
+
+
+    /* Procedemos a registrar el dispositivo en el sistema */
+    pr_info("my_pdrv_init: Procedo a registrar el dispositivo en el sistema\n");
+
+    /* Para inicializarla se puede inicializar a mano o bien una vez definida file_operations...  */
+    pr_info("%my_pdrv_init: Cargo cdev struct\n");
+    cdev_init(&state.chardev, &driver_file_op);
+
+    /* Para agregarla al sistema */
+    pr_info("my_pdrv_init: Procedo a agregar la estructura cdev al sistema\n");
+    if (cdev_add(&state.chardev, state.devtype, MINOR_COUNT) != 0) 
+    {
+        pr_err(DEVICE_NAME": cdev_add: No se pude agregar el cdev\n");
+        unregister_chrdev_region(state.devtype, MINOR_COUNT);
+        return -EPERM;    // -1
+    }
+    pr_info("my_pdrv_init: Estructura cdev agregada al sistema\n");
+
+    /* Voy a crear la clase */
+    pr_info("my_pdrv_init: Voy a crear la clase \n");
+    state.devclass = class_create(THIS_MODULE, DEVICE_CLASS_NAME);
+    if (IS_ERR(state.devclass)) 
+    {
+        pr_err(DEVICE_NAME": class_create: No se pudo crear la clase\n");
+        unregister_chrdev_region(state.devtype, MINOR_COUNT);
+        cdev_del(&state.chardev);
+        return PTR_ERR(state.devclass);   // Handling null pointer cap2 Linux Drivers Development
+    }
+    pr_info("my_pdrv_init: Clase creada \n");
+
+    /* Voy a crear el dispositivo */
+    pr_info("my_pdrv_init: Voy a crear el dispositivo \n");
+    state.dev = device_create(state.devclass, DEVICE_PARENT, state.devtype, NULL, DEVICE_NAME);
+    if (IS_ERR(state.dev)) 
+    {
+        pr_err(DEVICE_NAME": device_create: No se pudo crear el dispositivo\n");
+        unregister_chrdev_region(state.devtype, MINOR_COUNT);
+        cdev_del(&state.chardev);
+        class_destroy(state.devclass);  // Destruyo la clase creada en el paso previo
+        return PTR_ERR(state.dev);
+    }
+    pr_info("my_pdrv_init: Dispositivo creado \n");
+
+
     if (client->addr != id->driver_data) {
         pr_info("ov7670_probe: Direccion equivada (es: %d)!\n", client->addr);
-        //return -ENODEV;
+        return -ENODEV;
     }
 
     memset(&state, 0, sizeof(state));
@@ -226,19 +328,6 @@ static int ov7670_probe(struct i2c_client *client, const struct i2c_device_id *i
 
     dev->client = client;
 
-    while( ov7670_default_regs[i].reg_num != 0xFF ){
-        test = i2c_smbus_write_byte_data(client , ov7670_default_regs[i].reg_num, ov7670_default_regs[i].value);
-        pr_info("Test: %d %d!\n", test, i);
-        i = i + 1;
-        //mdelay(10);
-    }
-
-    while( ov7670_default_regs[i].reg_num != 0xFF ){
-        test = i2c_smbus_write_byte_data(client , ov7670_default_regs[i].reg_num, ov7670_default_regs[i].value);
-        pr_info("Test: %d %d!\n", test, i);
-        i = i + 1;
-        //mdelay(10);
-    }
     pr_info("ov7670_probe: Termine!\n");
 
     return 0;
@@ -249,8 +338,14 @@ static int ov7670_remove(struct i2c_client *client)
     struct usense_device_descr *dev = i2c_get_clientdata(client);
     pr_info("Hola! Entre a ov7670_remove! \n");
 
-    if(dev)
+    if(dev){
         i2c_set_clientdata(client, NULL);
+
+        pr_info("my_pdrv_remove: Quito cdev del sistema!\n");
+        cdev_del(&state.chardev);       
+        pr_info("my_pdrv_remove: Desaloco cdev!\n");
+        unregister_chrdev_region(state.devtype, MINOR_COUNT);
+    }
 
     return 0;
 }

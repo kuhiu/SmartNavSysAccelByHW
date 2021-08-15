@@ -76,8 +76,10 @@ static int driver_remove (struct platform_device *pdev);
 /***************************************** mem map   *********************************************/
 /*************************************************************************************************/
 #define BASE_FRAME_BUFFER                               (uint32_t) 0x01000000
-#define WIDTH         640
-#define HEIGHT        480
+//#define WIDTH         640
+//#define HEIGHT        480
+#define WIDTH           320
+#define HEIGHT          240
 #define PIXEL_LENGHT    4                        
 
 
@@ -286,7 +288,7 @@ static int driver_open(struct inode *inode, struct file *file)
 
   //pr_info("El primer pixel es= %s \n", buff);
 
-  for (i=0;i<640*480;i++){
+  for (i=0;i<320*240;i++){
      iowrite32((uint32_t)0xFFFFFFFF, (vdma_handle.base_addr_fb + i*4) );
   }
 
