@@ -105,7 +105,9 @@
 #define REG_COM17	        0x42    /* Control 17 */
 #define COM17_AECWIN	    0xc0	/* AEC window - must match COM4 */
 #define COM17_CBAR	        0x08	/* DSP Color bar */
-#define SATCTR              0xC9    /* Saturation control */
+#define REG_SATCTR          0xC9    /* Saturation control */
+#define REG_BRIGHT          0x55    /* Brillo */
+#define REG_CONTRAST        0x56    /* Contraste */
 
 static struct state {
     struct i2c_client *client;
@@ -143,13 +145,22 @@ static struct regval_list ov7670_default_regs[] = {
  	{ 0x40,     0x10 }, // COM15  Full 0-255 output, RGB 565
 	{ 0x3a,     0x04 }, // TSLB   Set UV ordering,  do not auto-reset window
 	{ 0x14,     0x38 }, // COM9  - AGC Celling
-	{ 0x4f,     0xb3 }, // MTX1  - colour conversion matrix
-	{ 0x50,     0xb3 }, // MTX2  - colour conversion matrix
-	{ 0x51,     0x00 }, // MTX3  - colour conversion matrix
-	{ 0x52,     0x3d }, // MTX4  - colour conversion matrix
-	{ 0x53,     0xa7 }, // MTX5  - colour conversion matrix
-	{ 0x54,     0xe4 }, // MTX6  - colour conversion matrix
-	{ 0x58,     0x9e }, // MTXS  - Matrix sign and auto contrast
+
+	//{ 0x4f,     0xb3 }, // MTX1  - colour conversion matrix
+	//{ 0x50,     0xb3 }, // MTX2  - colour conversion matrix
+	//{ 0x51,     0x00 }, // MTX3  - colour conversion matrix
+	//{ 0x52,     0x2d }, // MTX4  - colour conversion matrix
+	//{ 0x53,     0xa7 }, // MTX5  - colour conversion matrix
+	//{ 0x54,     0xe4 }, // MTX6  - colour conversion matrix
+	//{ 0x58,     0x9e }, // MTXS  - Matrix sign and auto contrast
+    { 0x4f,     0xA0 },
+    { 0x50,     0xA0 },
+    { 0x51,     0x00 },
+    { 0x52,     0x22 },
+    { 0x53,     0x5E },
+    { 0x54,     0x80 },
+    { 0x58,     0x9e },
+
 	{ 0x3d,     0xc0 }, // COM13 - Turn on GAMMA and UV Auto adjust
 	{ 0x11,     0x00 }, // CLKRC  Prescaler - Fin/(1+1)
 	
@@ -170,7 +181,7 @@ static struct regval_list ov7670_default_regs[] = {
     { REG_COM5, 0x61 }, // COM5(0x0E) 0x61
     { REG_COM6, 0x4b }, // COM6(0x0F) 0x4B 
     { 0x16,     0x02 },       // Reserved ??
-    { REG_MVFP, 0x37 }, // MVFP (0x1E) 0x07  -- FLIP AND MIRROR IMAGE 0x3x
+    { REG_MVFP, 0x3B }, // MVFP (0x1E) 0x07  -- FLIP AND MIRROR IMAGE 0x3x
     { 0x21,     0x02 },
     { 0x22,     0x91 },
     { 0x29,     0x07 },
@@ -199,11 +210,17 @@ static struct regval_list ov7670_default_regs[] = {
     { 0xb8, 0x0a },
 
     // DSP processing
+    //{ REG_BLUE, 0xFF},
+    //{ REG_RED,  0xFF},
+    //{ REG_GAIN,  0xFF},
     //{ REG_COM11, 0x80}, // Modo nocturno, 
-    { REG_EDGE, 0x07 }, // Edge Enhancement adj
-    //{ SATCTR,    }, // 
-    { REG_COM16, 0x10}, // De-noise 
-	{ 0xFF, 0xFF }, // Mark end of ROM
+    { REG_EDGE,     0xF0 },   // Edge Enhancement adj
+    { REG_SATCTR,   0x00}, // 
+    //{ 0x77, 0x},
+    { REG_COM16,    0x10 }, // De-noise
+    { REG_BRIGHT,   0x20 }, 
+    //{ REG_CONTRAST, 0x50 },
+	{ 0xFF,         0xFF }, // Mark end of ROM
 };
 
 

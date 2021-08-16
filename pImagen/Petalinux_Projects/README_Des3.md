@@ -57,8 +57,8 @@ Resolucion qvga (320x240).
 
 #### Resultados - DSP ov7670 
 
-<img src=./imagenes/test_normal.png alt="Hardware" /> <img src=./imagenes/test_denoise.png alt="Hardware" />
- 
+<img src=./imagenes/sinfiltro.png alt="Hardware" /> <img src=./imagenes/test_denoise.png alt="Hardware" />
+
 Normal / De-noise 
 
 <img src=./imagenes/test_edgeengan.png alt="Hardware" /> <img src=./imagenes/test_edgeengan2.png alt="Hardware" />
@@ -69,6 +69,18 @@ Edge Enhanced
 
 Normal / Edge Enhanced + de-noise
 
+#### Otros
+
+<img src=./imagenes/final.png alt="Hardware" /> <img src=./imagenes/final2.png alt="Hardware" />
+
+<img src=./imagenes/final3.png alt="Hardware" /> <img src=./imagenes/final4.png alt="Hardware" />
+
+<img src=./imagenes/final5.png alt="Hardware" />
+
+
+<img src=./imagenes/night.png alt="Hardware" /> <img src=./imagenes/night_withmode.png alt="Hardware" />
+
+<img src=./imagenes/finall.png alt="Hardware" />
 
 ### Referencias
 
