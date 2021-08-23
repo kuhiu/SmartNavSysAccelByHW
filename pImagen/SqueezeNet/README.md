@@ -38,7 +38,7 @@ Al diseñar CNN muy profundos, se vuelve tedioso el hecho de estar seleccionando
 Este modulo permite alcanzar las 3 estrategias. Un "Fire Module" se compone de una capa de convolución de compresión (solo tiene filtros de 1x1) que se alimenta a una capa de expansión que tiene una mezcla de filtros de convolución de 1x1 y 3x3 ver figura. El uso de los filtros 1x1 en este modulo es con el propósito de satisfacer la *Estrategia 1*. 
 
 
-<img src="https://github.com/Fuschetto97/Tesis/blob/main/pImagen/SqueezeNet/imagenes/squeezenet.png" alt="Hardware" width="500"/>
+<img src="./imagenes/squeezenet.png" alt="Hardware" width="500"/>
 
 
 Se exponen 3 hiperparámetros dentro del modulo s1x1, e1x1 y e3x3. En donde: 
@@ -58,7 +58,7 @@ La macro-arquitectura se refiere a la organización del nivel de organización d
 
 En la figura se puede ver la arquitectura de la SqueezeNet. Comienza con una capa de convolución independiente (conv1) seguida de 8 "Fire Modules" y termina con otra capa de convolución independiente. Gradualmente se aumenta el numero de filtros por "Fire Module" desde el principio de la red al final. Ademas realiza un max-pooling con un stride de 2 despues de las layers conv1, fire4, fire8 y conv10. Las ubicaciones de estos pooling hacen referencia a la *Estrategia 3*.
 
-<img src="https://github.com/Fuschetto97/Tesis/blob/main/pImagen/SqueezeNet/imagenes/squeezenetmacro.png" alt="Hardware" width="500"/>
+<img src="./imagenes/squeezenetmacro.png" alt="Hardware" width="500"/>
 
 
 

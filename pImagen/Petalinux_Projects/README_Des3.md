@@ -1,4 +1,4 @@
-## Desarrollo "i2c controller handling SCCB" [Tiempo = x dias]
+## Desarrollo "i2c controller handling SCCB" [Tiempo = 4 dias]
 
 ### Introduccion 
 
