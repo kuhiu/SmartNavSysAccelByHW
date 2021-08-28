@@ -14,6 +14,8 @@
 4) pwm en FPGA y su driver (probar ILA si es necesario)
 5) Movimiento de robot (calculo de distancia)
 
+## Probables
+
 1) Escribir en C la red 
 2) Escribir el sistema de control difuso en C 
 4) Desarrollo en la FPGA
