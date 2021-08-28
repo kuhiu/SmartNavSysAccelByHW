@@ -12,9 +12,9 @@
 2) Escribir el sistema de control difuso en python
 3) Aplicaciones (1 y 2)
 4) pwm en FPGA y su driver (probar ILA si es necesario)
-5) Movimiento de robot (calculo de distancia)
+5) Movimiento de robot (calculo de distancia recorrida)
 
-## Probables
+### Probables
 
 1) Escribir en C la red 
 2) Escribir el sistema de control difuso en C 
