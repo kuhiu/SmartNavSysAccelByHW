@@ -24,3 +24,5 @@
 ## Estado actual de la implementacion
 
 <img src=./imagenes/estado2.jpeg height=500 width=300 alt="Hardware" /> <img src=./imagenes/estado3.jpeg alt="Hardware" />
+<img src=./imagenes/estado4.jpeg height=500 width=500 alt="Hardware" />
+
