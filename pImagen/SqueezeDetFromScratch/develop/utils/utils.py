@@ -13,6 +13,8 @@ import numpy as np
 import time
 import tensorflow as tf
 import keras.backend as K
+from keras import backend as K2
+
 
 
 def iou(box1, box2):
@@ -276,13 +278,13 @@ def boxes_from_deltas(pred_box_delta, config):
 
     # as we only predict the deltas, we need to transform the anchor box values before computing the loss
 
-    box_center_x = K.identity(
+    box_center_x = tf.identity(
         anchor_x + delta_x * anchor_w)
-    box_center_y = K.identity(
+    box_center_y = tf.identity(
         anchor_y + delta_y * anchor_h)
-    box_width = K.identity(
+    box_width = tf.identity(
         anchor_w * safe_exp(delta_w, config.EXP_THRESH))
-    box_height = K.identity(
+    box_height = tf.identity(
         anchor_h * safe_exp(delta_h, config.EXP_THRESH))
 
     # tranform into a real box with four coordinates
@@ -396,7 +398,7 @@ def slice_predictions(y_pred, config):
 
     # number of confidence scores, one for each anchor + class probs
     num_confidence_scores = config.ANCHOR_PER_GRID + num_class_probs
-
+    #print("What error is here: \n", num_confidence_scores )
     # slice the confidence scores and put them trough a sigmoid for probabilities
     pred_conf = K.sigmoid(
         K.reshape(
@@ -406,6 +408,8 @@ def slice_predictions(y_pred, config):
     )
 
     # slice remaining bounding box_deltas
+    #print("What error is here: \n", y_pred[:, :, :, num_confidence_scores:] )
+    #print("What error is here: \n", [config.BATCH_SIZE, config.ANCHORS, 4])
     pred_box_delta = K.reshape(
         y_pred[:, :, :, num_confidence_scores:],
         [config.BATCH_SIZE, config.ANCHORS, 4]

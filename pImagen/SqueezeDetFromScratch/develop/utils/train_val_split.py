@@ -32,7 +32,6 @@ def train_eval_split(img_file =  "images.txt" ,
 
     with open(img_file) as imgs:
         img_names = imgs.read().splitlines()
-    #print("img_names es \n", img_names)
     imgs.close()
     with open(gt_file) as gts:
         gt_names = gts.read().splitlines()
@@ -40,7 +39,7 @@ def train_eval_split(img_file =  "images.txt" ,
 
 
 
-    shuffle = 0
+    shuffle = 1
 
     if shuffle:
         # permutate images
