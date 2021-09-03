@@ -1,7 +1,7 @@
 #include "sqz.h"
 
 
-void process_png_file(int *img) {
+void process_png_file(float *img) {
     int x, y, z;
     for(y = 0; y < img_height; y++) {
         png_bytep row = row_pointers[y];
@@ -76,7 +76,7 @@ void read_png_file(char *filename) {
 }
 
 
-int ReLu(int input) {
+float ReLu(float input) {
     if(input <= 0)
         return 0;
     else 
@@ -84,11 +84,11 @@ int ReLu(int input) {
 }
 
 
-void convolucion2d (int *input, int input_shape_width, int input_shape_height, int input_depth, 
-                    int *kernel, int kernel_size, 
-                    int *bias, 
+void convolucion2d (float *input, int input_shape_width, int input_shape_height, int input_depth, 
+                    float *kernel, int kernel_size, 
+                    float *bias, 
                     int stride,
-                    int *conv2d_1, int output_conv1_width, int output_conv1_height, int filtros) 
+                    float *conv2d_1, int output_conv1_width, int output_conv1_height, int filtros) 
 {
     int i, j, k, l, c, v;
 
@@ -104,7 +104,7 @@ void convolucion2d (int *input, int input_shape_width, int input_shape_height, i
                     {
                         for ( l = 0; l < kernel_size; ++l)       // Columnas del kernel 
                         {
-                            *(conv2d_1 + j + i*output_conv1_width + c*output_conv1_width*output_conv1_height) += *(input + input_shape_width*(k + stride*i) + (l + stride*j + input_shape_width*input_shape_height*v) ) * *(kernel + l + k*kernel_size + c*kernel_size*kernel_size);
+                            *(conv2d_1 + j + i*output_conv1_width + c*output_conv1_width*output_conv1_height) += *(input + input_shape_width*(k + stride*i) + (l + stride*j + input_shape_width*input_shape_height*v) ) * *(kernel + l + k*kernel_size + v*kernel_size*kernel_size + c*input_depth*kernel_size*kernel_size);
                             //printf("acum: %d\n", *(input + input_shape_width*(k + stride*i) + (l + stride*j + input_shape_width*input_shape_height*v) ));
                             //usleep(300000);
                         }    
@@ -123,8 +123,7 @@ void convolucion2d (int *input, int input_shape_width, int input_shape_height, i
     //printVector(conv2d_1, output_conv1_width, output_conv1_height, filtros);
 }
 
-
-void printVector(int *in, int in_width, int in_height, int depth)
+void printVector(float *in, int in_width, int in_height, int depth)
 {
     int i,j,k;
 
@@ -132,7 +131,7 @@ void printVector(int *in, int in_width, int in_height, int depth)
         printf("depth %d: \n", k);
         for (i = 0; i < in_height; i++) {      // Columnas
             for (j = 0; j < in_width; j++) {   // Filas
-                printf(" %d", *(in + j + i*in_width + k*in_height*in_width) );
+                printf(" %.2f", *(in + j + i*in_width + k*in_height*in_width) );
             }
             printf("\n");
         }
@@ -141,8 +140,8 @@ void printVector(int *in, int in_width, int in_height, int depth)
 }
 
 
-void padding(   int *input, int input_shape_width, int input_shape_height, int input_depth, 
-                int *output,
+void padding(   float *input, int input_shape_width, int input_shape_height, int input_depth, 
+                float *output,
                 int pad_along_width, int pad_along_height) 
 {
     int i, j, k;
@@ -175,8 +174,8 @@ void padding(   int *input, int input_shape_width, int input_shape_height, int i
 }
 
 void maxPool2d( int pool_size, int stride, 
-                int *in, int input_shape_width, int input_shape_height, int input_depth, 
-                int *max_pool, int pool_width, int pool_height,
+                float *in, int input_shape_width, int input_shape_height, int input_depth, 
+                float *max_pool, int pool_width, int pool_height,
                 int pad_type )
 {
     int i, j, k, l, c;
@@ -186,7 +185,7 @@ void maxPool2d( int pool_size, int stride,
     // New shape
     int new_height, new_width;
     // Vectores 
-    int *in_padded = NULL;
+    float *in_padded = NULL;
 
     if (pad_type == 0)
         printf("No agrego pads \n");
@@ -194,7 +193,7 @@ void maxPool2d( int pool_size, int stride,
     {
         new_width = input_shape_width+1;
         new_height = input_shape_height+1;
-        in_padded = (int*) calloc( new_width*new_height*3 , sizeof(int) );
+        in_padded = (float*) calloc( new_width*new_height*3 , sizeof(float) );
         padding (   in, input_shape_width, input_shape_height, 3,
                     in_padded,
                     1, 1); 
@@ -230,17 +229,17 @@ void maxPool2d( int pool_size, int stride,
 } 
 
 
-void fire_layer (   int *input, int input_shape_width, int input_shape_height, int input_depth, 
-                    int *output, int output_shape_width, int output_shape_height, int output_depth,
-                    int *kernel_s1x1, int *bias_s1x1, int s1x1, 
-                    int *kernel_e1x1, int *bias_e1x1, int e1x1, 
-                    int *kernel_e3x3, int *bias_e3x3, int e3x3      ) 
+void fire_layer (   float *input, int input_shape_width, int input_shape_height, int input_depth, 
+                    float *output, int output_shape_width, int output_shape_height, int output_depth,
+                    float *kernel_s1x1, float *bias_s1x1, int s1x1, 
+                    float *kernel_e1x1, float *bias_e1x1, int e1x1, 
+                    float *kernel_e3x3, float *bias_e3x3, int e3x3      ) 
 {
     int i, j, k, offset;
-    int *conv2d_s1x1 = (int*) calloc( input_shape_width*input_shape_height*s1x1, sizeof(int) );
-    int *conv2d_e1x1 = (int*) calloc( input_shape_width*input_shape_height*e1x1, sizeof(int) );
-    int *conv2d_e3x3 = (int*) calloc( input_shape_width*input_shape_height*e3x3, sizeof(int) );
-    int *input_padded = NULL;
+    float *conv2d_s1x1 = (float*) calloc( input_shape_width*input_shape_height*s1x1, sizeof(float) );
+    float *conv2d_e1x1 = (float*) calloc( input_shape_width*input_shape_height*e1x1, sizeof(float) );
+    float *conv2d_e3x3 = (float*) calloc( input_shape_width*input_shape_height*e3x3, sizeof(float) );
+    float *input_padded = NULL;
 
     printf("Conv1 de fire\n");
     convolucion2d(  input, input_shape_width, input_shape_height, input_depth,          // Entrada: pointer, ancho, alto, profundidad
@@ -256,7 +255,7 @@ void fire_layer (   int *input, int input_shape_width, int input_shape_height, i
                     1,                                                                  // Stride                                    
                     conv2d_e1x1, input_shape_width, input_shape_height, e1x1);          // Salida: pointer, ancho, alto, profundidad
 
-    input_padded =  (int*) calloc( (input_shape_width+2)*(input_shape_height+2)*s1x1,sizeof(int) );
+    input_padded =  (float*) calloc( (input_shape_width+2)*(input_shape_height+2)*s1x1,sizeof(float) );
 
     printf("Padeo\n");
     padding(        conv2d_s1x1, input_shape_width, input_shape_height, s1x1,           // Entrada: pointer, ancho, alto, profundidad
@@ -292,48 +291,48 @@ void fire_layer (   int *input, int input_shape_width, int input_shape_height, i
 
 
 
-int * weight_load(FILE * fd, int  i_width, int i_height, int i_depth, int i_filters)
+float * weight_load(FILE * fd, int  i_width, int i_height, int i_depth, int i_filters)
 {
     int i,j,k,l;
     size_t len = 0;
     char param[100];
     char * line = NULL;
-    int *array = NULL;
+    float *array = NULL;
 
-    array = (int*) malloc( ( i_width*i_height*i_depth*i_filters ) * sizeof(int));
+    array = (float*) malloc( ( i_width*i_height*i_depth*i_filters ) * sizeof(float));
 
-    for( l=0 ; l<i_filters ; l++){
-        for( k=0 ; k<i_depth ; k++){
-            for( j=0 ; j<i_height ; j++){
-                for( i=0 ; i<i_width ; i++){
+    for( j=0 ; j<i_height ; j++){
+        for( i=0 ; i<i_width ; i++){
+            for( k=0 ; k<i_depth ; k++){
+                for( l=0 ; l<i_filters ; l++){
                     getline(&line, &len, fd);
                     sscanf(line, "%s\n", param);
                     //printf("Voy a guardar: %s %d\n", param, atoi(param));
-                    *(array + i + i_width*j + i_width*i_height*k + i_depth*i_width*i_height*l) = atoi(param);
+                    *(array + i + i_width*j + i_width*i_height*k + i_depth*i_width*i_height*l) = atof(param);
                     //sleep(1);
-                } 
+                }
             }
-        }
+        } 
     }
 
     return array;
 
 }
 
-int * bias_load(FILE * fd, int i_depth)
+float * bias_load(FILE * fd, int i_depth)
 {
     int i;
     size_t len = 0;
     char param[100];
     char * line = NULL;
-    int *array = NULL;
+    float *array = NULL;
 
-    array = (int*) malloc( i_depth * sizeof(int));
+    array = (float*) malloc( i_depth * sizeof(float));
 
     for( i=0 ; i<i_depth ; i++){
         getline(&line, &len, fd);
         sscanf(line, "%s\n", param);
-        *(array + i ) = atoi(param);
+        *(array + i ) = atof(param);
     }
 
     return array;

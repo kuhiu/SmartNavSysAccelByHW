@@ -34,14 +34,14 @@
 #define FIRE3_e3x3              2
 
 void read_png_file(char *filename);
-void process_png_file(int *img);
-void convolucion2d (int *input, int input_shape_width, int input_shape_height, int input_depth, int *kernel, int kernel_size, int *bias, int stride, int *conv2d_1, int output_conv1_width, int output_conv1_height, int filtros); 
-void printVector(int *in, int in_width, int in_height, int depth);
-void maxPool2d( int pool_size, int stride, int *in, int input_shape_width, int input_shape_height, int input_depth, int *max_pool, int pool_width, int pool_height,int padding );
-void fire_layer(int *, int, int, int, int*, int, int, int, int *, int*, int, int*, int*, int, int*, int*, int); 
-void padding(int *input, int input_shape_width, int input_shape_height, int input_depth, int *output, int pad_along_width, int pad_along_height);
-int * weight_load(FILE * fd, int  i_width, int i_height, int i_depth, int i_filters);
-int * bias_load(FILE * fd, int i_depth);
+void process_png_file(float *img);
+void convolucion2d (float *input, int input_shape_width, int input_shape_height, int input_depth, float *kernel, int kernel_size, float *bias, int stride, float *conv2d_1, int output_conv1_width, int output_conv1_height, int filtros); 
+void printVector(float *in, int in_width, int in_height, int depth);
+void maxPool2d( int pool_size, int stride, float *in, int input_shape_width, int input_shape_height, int input_depth, float *max_pool, int pool_width, int pool_height,int padding );
+void fire_layer(float *, int, int, int, float*, int, int, int, float *, float*, int, float*, float*, int, float*, float*, int); 
+void padding(float *input, int input_shape_width, int input_shape_height, int input_depth, float *output, int pad_along_width, int pad_along_height);
+float * weight_load(FILE * fd, int  i_width, int i_height, int i_depth, int i_filters);
+float * bias_load(FILE * fd, int i_depth);
 
 // Read png lib
 extern int img_width, img_height;

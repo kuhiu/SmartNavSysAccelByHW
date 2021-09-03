@@ -21,36 +21,36 @@ int main(void)
     size_t len = 0;
 
     // Imagen de entrada
-    int *img        = NULL;
-    int *img_padded = NULL;
+    float *img        = NULL;
+    float *img_padded = NULL;
 
     // Conv1
-    int *kernel   = NULL;
-    int *bias     = NULL;
-    int *conv2d_1 = NULL;
+    float *kernel   = NULL;
+    float *bias     = NULL;
+    float *conv2d_1 = NULL;
     int output_conv1_width, output_conv1_height;
 
     // maxpool
     int pool_width, pool_height;
-    int *max_pool = NULL;
+    float *max_pool = NULL;
 
     // fire 2 layer
-    int *fire_2 = NULL;
-    int *fire_2_kernel_s1x1 = NULL;
-    int *fire_2_bias_s1x1 = NULL;
-    int *fire_2_kernel_e1x1 = NULL;
-    int *fire_2_bias_e1x1 = NULL;
-    int *fire_2_kernel_e3x3 = NULL;
-    int *fire_2_bias_e3x3 = NULL;
+    float *fire_2 = NULL;
+    float *fire_2_kernel_s1x1 = NULL;
+    float *fire_2_bias_s1x1 = NULL;
+    float *fire_2_kernel_e1x1 = NULL;
+    float *fire_2_bias_e1x1 = NULL;
+    float *fire_2_kernel_e3x3 = NULL;
+    float *fire_2_bias_e3x3 = NULL;
  
     // fire 3 layer
-    int *fire_3 = NULL;
-    int *fire_3_kernel_s1x1 = NULL;
-    int *fire_3_bias_s1x1 = NULL;
-    int *fire_3_kernel_e1x1 = NULL;
-    int *fire_3_bias_e1x1 = NULL;
-    int *fire_3_kernel_e3x3 = NULL;
-    int *fire_3_bias_e3x3 = NULL;
+    float *fire_3 = NULL;
+    float *fire_3_kernel_s1x1 = NULL;
+    float *fire_3_bias_s1x1 = NULL;
+    float *fire_3_kernel_e1x1 = NULL;
+    float *fire_3_bias_e1x1 = NULL;
+    float *fire_3_kernel_e3x3 = NULL;
+    float *fire_3_bias_e3x3 = NULL;
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////        Leo la imagen       ////////////////////////////////////////////////////////
@@ -58,7 +58,7 @@ int main(void)
     printf("Leo el header de la imagen\n");
     read_png_file("test4.png");
     printf("Termino read_png_file\n");
-    img = (int*) malloc( img_width*img_height*3*sizeof(int) );
+    img = (float*) malloc( img_width*img_height*3*sizeof(float) );
     printf("Leo la Imagen\n");
     process_png_file(img);
 
@@ -71,19 +71,19 @@ int main(void)
     //kernel = (int*) malloc( CONV1_KERNEL_SIZE*CONV1_KERNEL_SIZE*CONV1_FILTERS*sizeof(int) );
     //bias   = (int*) malloc( 1*1*CONV1_FILTERS*sizeof(int) );
     // Fire2
-    fire_2_kernel_s1x1 = (int*) malloc( 1*1*FIRE2_s1x1*sizeof(int) );  
-    fire_2_bias_s1x1   = (int*) malloc( 1*1*FIRE2_s1x1*sizeof(int) ); 
-    fire_2_kernel_e1x1 = (int*) malloc( 1*1*FIRE2_e1x1*sizeof(int) ); 
-    fire_2_bias_e1x1   = (int*) malloc( 1*1*FIRE2_e1x1*sizeof(int) );  
-    fire_2_kernel_e3x3 = (int*) malloc( 3*3*FIRE2_e3x3*sizeof(int) ); 
-    fire_2_bias_e3x3   = (int*) malloc( 1*1*FIRE2_e3x3*sizeof(int) ); 
+    fire_2_kernel_s1x1 = (float*) malloc( 1*1*FIRE2_s1x1*sizeof(float) );  
+    fire_2_bias_s1x1   = (float*) malloc( 1*1*FIRE2_s1x1*sizeof(float) ); 
+    fire_2_kernel_e1x1 = (float*) malloc( 1*1*FIRE2_e1x1*sizeof(float) ); 
+    fire_2_bias_e1x1   = (float*) malloc( 1*1*FIRE2_e1x1*sizeof(float) );  
+    fire_2_kernel_e3x3 = (float*) malloc( 3*3*FIRE2_e3x3*sizeof(float) ); 
+    fire_2_bias_e3x3   = (float*) malloc( 1*1*FIRE2_e3x3*sizeof(float) ); 
     // Fire3
-    fire_3_kernel_s1x1 = (int*) malloc( 1*1*FIRE3_s1x1*sizeof(int) );  
-    fire_3_bias_s1x1   = (int*) malloc( 1*1*FIRE3_s1x1*sizeof(int) ); 
-    fire_3_kernel_e1x1 = (int*) malloc( 1*1*FIRE3_e1x1*sizeof(int) ); 
-    fire_3_bias_e1x1   = (int*) malloc( 1*1*FIRE3_e1x1*sizeof(int) );  
-    fire_3_kernel_e3x3 = (int*) malloc( 3*3*FIRE3_e3x3*sizeof(int) ); 
-    fire_3_bias_e3x3   = (int*) malloc( 1*1*FIRE3_e3x3*sizeof(int) ); 
+    fire_3_kernel_s1x1 = (float*) malloc( 1*1*FIRE3_s1x1*sizeof(float) );  
+    fire_3_bias_s1x1   = (float*) malloc( 1*1*FIRE3_s1x1*sizeof(float) ); 
+    fire_3_kernel_e1x1 = (float*) malloc( 1*1*FIRE3_e1x1*sizeof(float) ); 
+    fire_3_bias_e1x1   = (float*) malloc( 1*1*FIRE3_e1x1*sizeof(float) );  
+    fire_3_kernel_e3x3 = (float*) malloc( 3*3*FIRE3_e3x3*sizeof(float) ); 
+    fire_3_bias_e3x3   = (float*) malloc( 1*1*FIRE3_e3x3*sizeof(float) ); 
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Leo txt para kernel conv1
@@ -92,7 +92,7 @@ int main(void)
     getline(&line, &len, fd);
     //printf("line: %s\n", line);
     sscanf(line, " (%[^','], %[^','], %[^','], %[^','])\n", s_width, s_height, s_depth, s_filters);
-    i_width = atoi(s_width); i_height = atoi(s_height); i_depth = atoi(s_depth); i_filters = atoi(s_filters);
+    i_width = atof(s_width); i_height = atof(s_height); i_depth = atof(s_depth); i_filters = atof(s_filters);
     printf("Las dimensiones del kernel son: %dx%dx%dx%d \n", i_width, i_height, i_depth, i_filters);
     
     kernel = weight_load(fd, i_width, i_height, i_depth, i_filters);
@@ -103,7 +103,7 @@ int main(void)
         for( k=0 ; k<i_depth ; k++){
             for( j=0 ; j<i_height ; j++){
                 for( i=0 ; i<i_width ; i++){
-                    printf("%d ", *(kernel + i + i_width*j + i_width*i_height*k + i_depth*i_width*i_height*l));
+                    printf("%f ", *(kernel + i + i_width*j + i_width*i_height*k + i_depth*i_width*i_height*l));
                 } 
             }
         }
@@ -120,6 +120,12 @@ int main(void)
     printf("Las dimensiones de las bias es: %d \n", i_depth);
 
     bias = bias_load(fd, i_depth);
+
+    // Test
+    printf("Bias: \n");
+    for (i = 0; i < 64; i++) 
+        printf(" %f", *(bias + i) );
+    printf("\n");
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Cargo el kernel
@@ -182,15 +188,12 @@ int main(void)
 //            *(bias + i) = 2+i; 
 //    }
 //    
-    printf("Bias: \n");
-    for (i = 0; i < 64; i++) 
-        printf(" %d", *(bias + i) );
-    printf("\n");
+
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////          SqueezeDet        ////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    img_padded = (int*) calloc( (img_width+1)*(img_height+1)*3 , sizeof(int) );
+    img_padded = (float*) calloc( (img_width+1)*(img_height+1)*3 , sizeof(float) );
     padding(    img, img_width, img_height, 3,
                 img_padded,
                 1, 1); 
@@ -199,7 +202,7 @@ int main(void)
     output_conv1_width  = (((IMG_WIDTH  - CONV1_KERNEL_SIZE + CONV1_PAD)/CONV1_STRIDE) + 1); 
     output_conv1_height = (((IMG_HEIGHT - CONV1_KERNEL_SIZE + CONV1_PAD)/CONV1_STRIDE) + 1);
     printf("Conv1 output size: %dx%dx%d \n", output_conv1_width, output_conv1_height, CONV1_FILTERS);
-    conv2d_1 = (int*) calloc( output_conv1_width*output_conv1_height*CONV1_FILTERS, sizeof(int) );
+    conv2d_1 = (float*) calloc( output_conv1_width*output_conv1_height*CONV1_FILTERS, sizeof(float) );
 
     printf("Conv2D_1... \n");
     convolucion2d(  img_padded, (img_width+1), (img_height+1), 3,                           // Entrada: pointer, ancho, alto, profundidad
@@ -207,6 +210,9 @@ int main(void)
                     bias,                                                                   // Bias: pointer
                     2,                                                                      // Stride
                     conv2d_1, output_conv1_width, output_conv1_height, CONV1_FILTERS );     // Salida: pointer, ancho, alto, profundidad
+    
+    printf("TEST: Conv2D_1: \n");
+    printVector(conv2d_1, output_conv1_width, output_conv1_height, CONV1_FILTERS );
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     printf("Creo puntero para pool_1 \n");
