@@ -9,6 +9,10 @@ from keras.models import Model
 from keras import optimizers
 from create_config import load_dict
 import cv2
+import h5py
+import sys
+
+filename = "model.50-3.31.hdf5"
 
 
 sess = tf.InteractiveSession()
@@ -33,14 +37,17 @@ class SqueezeDet():
         #builds the Keras model from config
         #return: squeezeDet in Keras
         """
-        input_layer = Input(shape=( 70, 70, 3), name="input")
+        input_layer = Input(shape=( 240, 320, 3), name="input")
 
-        conv1 = Conv2D(filters=2, kernel_size=(3, 3), strides=(2, 2), padding="valid", activation='relu',
-                        use_bias=True, kernel_initializer=TruncatedNormal(stddev=0.001),
-                        kernel_regularizer=l2(0.001),  name="conv1")(input_layer)
+        conv1 = Conv2D(filters=64, kernel_size=(3, 3), strides=(2, 2), padding="SAME", activation='relu',
+                        use_bias=True,  name="conv1")(input_layer)
 
 
         pool1 = MaxPool2D(pool_size=(3,3), strides=(2, 2), padding='SAME', name="pool1")(conv1)
+
+        #fire2 = self._fire_layer(name="fire2", input = pool1, s1x1=2, e1x1=2, e3x3=2)
+
+        #fire3 = self._fire_layer(name='fire3', input = fire2, s1x1=2, e1x1=2, e3x3=2)
 
         model = Model(inputs=input_layer, outputs=pool1)
         
@@ -113,6 +120,36 @@ class SqueezeDet():
         # print(model.summary())
 
         # return model
+
+    def _fire_layer(self, name, input, s1x1, e1x1, e3x3, stdd=0.01):
+            """
+            wrapper for fire layer constructions
+
+            :param name: name for layer
+            :param input: previous layer
+            :param s1x1: number of filters for squeezing
+            :param e1x1: number of filter for expand 1x1
+            :param e3x3: number of filter for expand 3x3
+            :param stdd: standard deviation used for intialization
+            :return: a keras fire layer
+            """
+
+            sq1x1 = Conv2D(
+                name = name + '/squeeze1x1', filters=s1x1, kernel_size=(1, 1), strides=(1, 1), use_bias=True,
+                padding='SAME', kernel_initializer=TruncatedNormal(stddev=stdd), activation="relu",
+                kernel_regularizer=l2(self.config.WEIGHT_DECAY))(input)
+
+            ex1x1 = Conv2D(
+                name = name + '/expand1x1', filters=e1x1, kernel_size=(1, 1), strides=(1, 1), use_bias=True,
+                padding='SAME',  kernel_initializer=TruncatedNormal(stddev=stdd), activation="relu",
+                kernel_regularizer=l2(self.config.WEIGHT_DECAY))(sq1x1)
+
+            ex3x3 = Conv2D(
+                name = name + '/expand3x3',  filters=e3x3, kernel_size=(3, 3), strides=(1, 1), use_bias=True,
+                padding='SAME', kernel_initializer=TruncatedNormal(stddev=stdd), activation="relu",
+                kernel_regularizer=l2(self.config.WEIGHT_DECAY))(sq1x1)
+
+            return concatenate([ex1x1, ex3x3], axis=3)
 
 
     #wrapper for padding, written in tensorflow. If you want to change to theano you need to rewrite this!
@@ -211,12 +248,6 @@ class SqueezeDet():
         return total_loss
 
 
-
-
-
-
-
-
 CONFIG = "squeeze.config"
 
 #create config object
@@ -237,29 +268,124 @@ SqueezeDet.model.compile(optimizer=sgd, loss=[SqueezeDet.loss])
 #    print("i y pesos son: \n", i,weights)
 #    print("pesos forma: \n", weights.shape)
 
+######################################################################################################################
 kernel_conv1_load=[]
+kernel_fire2_load_s11=[]
+kernel_fire2_load_e11=[]
+kernel_fire2_load_e33=[]
 
-kernel_conv1 =  np.array ([     [ [[1, 1], [1, 1], [1, 1]], [[1, 1], [1, 1], [1, 1]], [[1, 1], [1, 1], [1, 1]]  ],
-                                [ [[2, 2], [2, 2], [2, 2]], [[2, 2], [2, 2], [2, 2]], [[2, 2], [2, 2], [2, 2]]  ],
-                                [ [[3, 3], [3, 3], [3, 3]], [[3, 3], [3, 3], [3, 3]], [[3, 3], [3, 3], [3, 3]]  ]
-                                                                                                                    ]) 
+kernel_fire3_load_s11=[]
+kernel_fire3_load_e11=[]
+kernel_fire3_load_e33=[]
 
-bias_conv1 = np.array ([2, 3])
+######################################################################################################################
+f = h5py.File(filename, "r")
 
-#kernel_conv1 = np.reshape(kernel_conv1, [3, 3, 1, 2])
-print("kernel_conv1: \n", kernel_conv1.shape)
+bias = []
+weights = []
+
+try:
+    if len(f.items())==0:
+        print("ARCHIVO VACIO\n") 
+
+    for layer, g in f.items():
+        #for key, value in g.attrs.items():
+        #    print("      {}: {}".format(key, value))
+
+        for p_name in g.keys():
+            param = g[p_name]
+            subkeys = param.keys()
+            for k_name in param.keys():
+                param2 = param[k_name]
+                if ( (k_name == "fire3") or (k_name == "fire2") or (k_name == "fire4") or (k_name == "fire5") or (k_name == "fire6") or (k_name == "fire7") or (k_name == "fire8") or (k_name == "fire9") ):
+                    for fire_name in param2.keys():
+                        param3 = param2[fire_name]
+                        for key2 in param3.keys():
+                            r = open("../../SqueezeNet/squeezedet-keras-master/main/model/parametros/" + k_name + ":" + fire_name + ":" + key2 + ".txt", "r")
+
+                            r.close()
+
+                        #print("         {}/{}: ".format(fire_name, param2.get(fire_name).keys() ))
+                elif ( p_name == "conv2d_1" ):
+                    r = open("../../SqueezeNet/squeezedet-keras-master/main/model/parametros/" + p_name + ":" + k_name + ".txt", "r")
+                    if ( k_name == "kernel:0" ):
+                        kernel_conv1 = param.get(k_name)[:] 
+                    if ( k_name == "bias:0" ):
+                        bias_conv1 = param.get(k_name)[:]
+                    r.close()
+finally:
+    f.close()
 
 
+#kernel_conv1 =  np.array ([     [ [[1, 1], [1, 1], [1, 1]], [[1, 1], [1, 1], [1, 1]], [[1, 1], [1, 1], [1, 1]]  ],
+#                                [ [[2, 2], [2, 2], [2, 2]], [[2, 2], [2, 2], [2, 2]], [[2, 2], [2, 2], [2, 2]]  ],
+#                                [ [[3, 3], [3, 3], [3, 3]], [[3, 3], [3, 3], [3, 3]], [[3, 3], [3, 3], [3, 3]]  ]       ]) 
+#bias_conv1 = np.array ([2, 3])
+
+print("kernel_conv1 \n", kernel_conv1)
+print("bias_conv1 \n", bias_conv1)
 kernel_conv1_load.append(kernel_conv1)
 kernel_conv1_load.append(bias_conv1)
+######################################################################################################################
+kernel_fire2_s11 =  np.array ([     [ [ [1, 1], [1, 1] ] ]  ])
 
-#kernel_conv1_load = np.reshape(kernel_conv1_load, [3, 3, 1, 2])
+bias_fire2_s11 = np.array ([2, 3])
 
+kernel_fire2_e11 =  np.array ([     [ [ [1, 1], [1, 1] ] ]  ])
+bias_fire2_e11 = np.array ([2, 3])
+
+kernel_fire2_e33 =   np.array ([    [ [[1, 1], [1, 1]], [[1, 1], [1, 1]], [[1, 1], [1, 1]]  ],
+                                    [ [[2, 2], [2, 2]], [[2, 2], [2, 2]], [[2, 2], [2, 2]]  ],
+                                    [ [[3, 3], [3, 3]], [[3, 3], [3, 3]], [[3, 3], [3, 3]]  ]   ]) 
+
+bias_fire2_e33 = np.array ([2, 3])
+
+kernel_fire2_load_s11.append(kernel_fire2_s11)
+kernel_fire2_load_s11.append(bias_fire2_s11)
+
+kernel_fire2_load_e11.append(kernel_fire2_e11)
+kernel_fire2_load_e11.append(bias_fire2_e11)
+
+kernel_fire2_load_e33.append(kernel_fire2_e33)
+kernel_fire2_load_e33.append(bias_fire2_e33)
+######################################################################################################################
+kernel_fire3_s11 =  np.array ([     [ [ [1, 1], [1, 1], [1, 1], [1, 1] ] ]  ])
+print("kernel_fire3_s11 shape: \n", kernel_fire3_s11.shape)
+bias_fire3_s11 = np.array ([2, 3])
+
+kernel_fire3_e11 =  np.array ([     [ [ [1, 1], [1, 1] ] ]  ])
+bias_fire3_e11 = np.array ([2, 3])
+
+kernel_fire3_e33 =   np.array ([    [ [[1, 1], [1, 1]], [[1, 1], [1, 1]], [[1, 1], [1, 1]]  ],
+                                    [ [[2, 2], [2, 2]], [[2, 2], [2, 2]], [[2, 2], [2, 2]]  ],
+                                    [ [[3, 3], [3, 3]], [[3, 3], [3, 3]], [[3, 3], [3, 3]]  ]   ]) 
+bias_fire3_e33 = np.array ([2, 3])
+
+
+kernel_fire3_load_s11.append(kernel_fire3_s11)
+kernel_fire3_load_s11.append(bias_fire3_s11)
+
+kernel_fire3_load_e11.append(kernel_fire3_e11)
+kernel_fire3_load_e11.append(bias_fire3_e11)
+
+kernel_fire3_load_e33.append(kernel_fire3_e33)
+kernel_fire3_load_e33.append(bias_fire3_e33)
+######################################################################################################################
 SqueezeDet.model.layers[1].set_weights(kernel_conv1_load)
 
-####################################################################
+#SqueezeDet.model.layers[3].set_weights(kernel_fire2_load_s11)
+#SqueezeDet.model.layers[4].set_weights(kernel_fire2_load_e11)
+#SqueezeDet.model.layers[5].set_weights(kernel_fire2_load_e33)
+#
+#SqueezeDet.model.layers[7].set_weights(kernel_fire3_load_s11)
+#SqueezeDet.model.layers[8].set_weights(kernel_fire3_load_e11)
+#SqueezeDet.model.layers[9].set_weights(kernel_fire3_load_e33)
+
+######################################################################################################################
+
+######################################################################################################################
 # Input
-####################################################################
+######################################################################################################################
 #in_image  = np.array ([ [ 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0 ],
 #                        [ 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0 ],
 #                        [ 3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0 ],
@@ -267,46 +393,22 @@ SqueezeDet.model.layers[1].set_weights(kernel_conv1_load)
 #                        [ 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0 ],
 #                        [ 6.0, 6.0, 6.0, 6.0, 6.0, 6.0, 6.0 ],
 #                        [ 7.0, 7.0, 7.0, 7.0, 7.0, 7.0, 7.0 ],  ])
-
-in_image = cv2.imread("test.png",flags=cv2.IMREAD_UNCHANGED).astype(np.float32, copy=False)
+######################################################################################################################
+in_image = cv2.imread("./sqzdet/test4.png",flags=cv2.IMREAD_UNCHANGED).astype(np.float32, copy=False)
+in_image = cv2.cvtColor(in_image, cv2.COLOR_BGRA2RGB)
 #in_image = cv2.cvtColor(in_image, cv2.COLOR_BGRA2RGBA)
 #in_image = cv2.imread("test.png").astype(np.float32, copy=False)
-in_image = cv2.cvtColor(in_image, cv2.COLOR_BGRA2RGB)
-#print("in_image shape = \n", in_image[0][0])
-#print("in_image shape = \n", in_image[0][1])
-#print("in_image shape = \n", in_image[0][2])
-#print("in_image shape = \n", in_image.shape)
-print("in_image  = \n", in_image)
-in_image = np.reshape(in_image, [1, 70, 70, 3])
+print("in_image shape  = \n", in_image.shape)
+in_image = np.reshape(in_image, [1, 240, 320, 3])
+#print("in_image  = \n", in_image)
 
 intermediate_layer_model = Model(inputs=SqueezeDet.model.input, outputs=SqueezeDet.model.get_layer("pool1").output)
 intermediate_output = intermediate_layer_model.predict( in_image )
-print( " shape = \n", intermediate_output.shape )
-print( " output = \n", intermediate_output )
-#cv2.imwrite('cv2_conv1_python.png',intermediate_output)
+print( " pool1 shape = \n", intermediate_output.shape )
+print( " pool1 output = \n", intermediate_output )
 
 
 
 
 
-
-
-
-
-
-""" ####################################################################
-# Conv1
-####################################################################
-input_layer = Input(shape=( 7, 7, 1), name="input")
-conv1 = Conv2D(filters=64, kernel_size=(3, 3), strides=(2, 2), padding="SAME", activation='relu',
-                use_bias=True, kernel_initializer=TruncatedNormal(stddev=0.001),
-                kernel_regularizer=l2(0.001))(input_layer)
-#conv1 = tf.keras.layers.Conv2D( filters=1, kernel_size=(3, 3), strides=(2, 2), padding="valid", use_bias=False) (in_image)
-print( "Conv2D \n", ( conv1(in_image) ) )
-####################################################################
-# MaxPool1
-####################################################################
-max_pool_2d = tf.keras.layers.MaxPooling2D(pool_size=(3, 3), strides=(2, 2), padding='valid') (in_image)
-
-print ( "max_pool_2d \n", sess.run( max_pool_2d )) """
 
