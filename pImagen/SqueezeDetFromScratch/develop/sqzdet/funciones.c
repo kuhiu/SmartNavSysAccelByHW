@@ -123,19 +123,23 @@ void convolucion2d (float *input, int input_shape_width, int input_shape_height,
     //printVector(conv2d_1, output_conv1_width, output_conv1_height, filtros);
 }
 
-void printVector(float *in, int in_width, int in_height, int depth)
+void printVector(float *in, int i_width, int i_height, int i_depth, int i_filters)
 {
-    int i,j,k;
+    int i,j,k,l;
 
-    for (k = 0; k < depth; k++){
-        printf("depth %d: \n", k);
-        for (i = 0; i < in_height; i++) {      // Columnas
-            for (j = 0; j < in_width; j++) {   // Filas
-                printf(" %.2f", *(in + j + i*in_width + k*in_height*in_width) );
+    for( l=0 ; l<i_filters ; l++){
+        for( k=0 ; k<i_depth ; k++){
+            printf("depth: %d\n", k);
+            for( j=0 ; j<i_height ; j++){
+                for( i=0 ; i<i_width ; i++){
+                    printf("%f ", *(in + i + i_width*j + i_width*i_height*k + i_depth*i_width*i_height*l));
+                } 
+                printf("\n");
             }
-            printf("\n");
         }
     }
+    printf("\n");
+
     return;
 }
 
@@ -154,12 +158,12 @@ void padding(   float *input, int input_shape_width, int input_shape_height, int
     pad_bottom = pad_along_height - pad_top;
     pad_left = pad_along_width / 2;
     pad_right = pad_along_width - pad_left;
-    printf("TEST: pads: %d, %d, %d, %d\n", pad_top, pad_bottom, pad_left, pad_right);
+    //printf("TEST: pads: %d, %d, %d, %d\n", pad_top, pad_bottom, pad_left, pad_right);
 
     new_width  = input_shape_width+pad_along_width;
     new_height = input_shape_height+pad_along_height;
 
-    printf("TEST: new_width: %d, new_height: %d \n", new_width, new_height);
+    //printf("TEST: new_width: %d, new_height: %d \n", new_width, new_height);
 
     for(k = 0; k < input_depth; k++)
     {
@@ -193,8 +197,8 @@ void maxPool2d( int pool_size, int stride,
     {
         new_width = input_shape_width+1;
         new_height = input_shape_height+1;
-        in_padded = (float*) calloc( new_width*new_height*3 , sizeof(float) );
-        padding (   in, input_shape_width, input_shape_height, 3,
+        in_padded = (float*) calloc( new_width*new_height*input_depth , sizeof(float) );
+        padding (   in, input_shape_width, input_shape_height, input_depth,
                     in_padded,
                     1, 1); 
         //printf("input_padding\n"); 
@@ -241,14 +245,23 @@ void fire_layer (   float *input, int input_shape_width, int input_shape_height,
     float *conv2d_e3x3 = (float*) calloc( input_shape_width*input_shape_height*e3x3, sizeof(float) );
     float *input_padded = NULL;
 
-    printf("Conv1 de fire\n");
+  //printf("Ejecutando Conv1 de fire\n");
     convolucion2d(  input, input_shape_width, input_shape_height, input_depth,          // Entrada: pointer, ancho, alto, profundidad
                     kernel_s1x1, 1,                                                     // Kernel: pointer, size                            
                     bias_s1x1,                                                          // Bias: pointer                                        
                     1,                                                                  // Stride                                           
                     conv2d_s1x1, input_shape_width, input_shape_height, s1x1);          // Salida: pointer, ancho, alto, profundidad
 
-    printf("Conv2 de fire\n");
+    //printf("kernel_s1x1: \n");
+    //printVector(kernel_s1x1, 1, 1, 1, 64);
+    //printf("bias_s1x1: \n");
+    //printVector(bias_s1x1, 1, 1, 1, 64);
+    //printf("input: \n");
+    //printVector(input, input_shape_width, input_shape_height, 1, 1);
+    //printf("conv2d_s1x1: \n");
+    //printVector(conv2d_s1x1, input_shape_width, input_shape_height, 1, 1);
+
+    //printf("Ejecutando Conv2 de fire\n");
     convolucion2d(  conv2d_s1x1, input_shape_width, input_shape_height, s1x1,           // Entrada: pointer, ancho, alto, profundidad                    
                     kernel_e1x1, 1,                                                     // Kernel: pointer, size                             
                     bias_e1x1,                                                          // Bias: pointer                                         
@@ -257,19 +270,19 @@ void fire_layer (   float *input, int input_shape_width, int input_shape_height,
 
     input_padded =  (float*) calloc( (input_shape_width+2)*(input_shape_height+2)*s1x1,sizeof(float) );
 
-    printf("Padeo\n");
+    //printf("Ejecutando Padeo\n");
     padding(        conv2d_s1x1, input_shape_width, input_shape_height, s1x1,           // Entrada: pointer, ancho, alto, profundidad
                     input_padded,                                                       // Salida: pointer
                     2, 2);                                                              // padd to add along width and height
 
-    printf("Conv3 de fire\n");
+    //printf("Ejecutando Conv3 de fire\n");
     convolucion2d(  input_padded, (input_shape_width+2), (input_shape_height+2), s1x1,  // Entrada: pointer, ancho, alto, profundidad   
                     kernel_e3x3, 3,                                                     // Kernel: pointer, size                       
                     bias_e3x3,                                                          // Bias: pointer                                           
                     1,                                                                  // Stride                                                  
                     conv2d_e3x3, input_shape_width, input_shape_height, e3x3);          // Salida: pointer, ancho, alto, profundidad
 
-    
+    // Concatenacion
     for (k = 0; k < e1x1; k++){
         for (i = 0; i < input_shape_height; i++) {      // Columnas
             for (j = 0; j < input_shape_width; j++) {   // Filas

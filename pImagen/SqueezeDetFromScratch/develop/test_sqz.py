@@ -46,15 +46,13 @@ class SqueezeDet():
         pool1 = MaxPool2D(pool_size=(3,3), strides=(2, 2), padding='SAME', name="pool1")(conv1)
 
         fire2 = self._fire_layer(name="fire2", input = pool1, s1x1=16, e1x1=64, e3x3=64)
+        fire3 = self._fire_layer(name='fire3', input = fire2, s1x1=16, e1x1=64, e3x3=64)
 
-        #fire2 = self._fire_layer(name="fire2", input = pool1, s1x1=2, e1x1=2, e3x3=2)
+        pool3 = MaxPool2D(pool_size=(3, 3), strides=(2, 2), padding='SAME', name='pool3')(fire3)
 
-        #fire3 = self._fire_layer(name='fire3', input = fire2, s1x1=2, e1x1=2, e3x3=2)
 
-        model = Model(inputs=input_layer, outputs=fire2)
-        
+        model = Model(inputs=input_layer, outputs=pool3)
         print(model.summary())
-
         return model
 
         # input_layer = Input(shape=( self.config.IMAGE_HEIGHT, self.config.IMAGE_WIDTH, self.config.N_CHANNELS), name="input")
@@ -138,8 +136,7 @@ class SqueezeDet():
 
             sq1x1 = Conv2D(
                 name = name + '/squeeze1x1', filters=s1x1, kernel_size=(1, 1), strides=(1, 1), use_bias=True,
-                padding='SAME', kernel_initializer=TruncatedNormal(stddev=stdd), activation="relu",
-                kernel_regularizer=l2(self.config.WEIGHT_DECAY))(input)
+                padding='SAME', activation="relu")(input)
 
             ex1x1 = Conv2D(
                 name = name + '/expand1x1', filters=e1x1, kernel_size=(1, 1), strides=(1, 1), use_bias=True,
@@ -262,25 +259,8 @@ sgd = optimizers.SGD(lr=0.01, decay=0, momentum=0.9, nesterov=False, clipnorm=1.
 
 SqueezeDet.model.compile(optimizer=sgd, loss=[SqueezeDet.loss])
 
-#print("Los pesos son: \n", ( SqueezeDet.model.get_weights()[0].shape ) )
-#print("Los pesos son: \n", ( SqueezeDet.model.get_weights()[0] ) )
-#print("Las bias son: \n", ( SqueezeDet.model.get_weights()[1] ) )
-
-#for i, weights in enumerate( SqueezeDet.model.get_weights() ):
-#    print("i y pesos son: \n", i,weights)
-#    print("pesos forma: \n", weights.shape)
-
 ######################################################################################################################
-kernel_conv1_load=[]
-kernel_fire2_load_s11=[]
-kernel_fire2_load_e11=[]
-kernel_fire2_load_e33=[]
 
-kernel_fire3_load_s11=[]
-kernel_fire3_load_e11=[]
-kernel_fire3_load_e33=[]
-
-######################################################################################################################
 f = h5py.File(filename, "r")
 
 bias = []
@@ -327,6 +307,68 @@ try:
                                     bias_fire2_e33 = param3.get(key2)[:]
                                 r.close()
                         #print("         {}/{}: ".format(fire_name, param2.get(fire_name).keys() ))
+                if ( (k_name == "fire3") ):
+                    for fire_name in param2.keys():
+                        param3 = param2[fire_name]
+                        if ( fire_name == "squeeze1x1"):
+                            for key2 in param3.keys():
+                                r = open("../../SqueezeNet/squeezedet-keras-master/main/model/parametros/" + k_name + ":" + fire_name + ":" + key2 + ".txt", "r")
+                                if ( key2 == "kernel:0" ):
+                                    kernel_fire3_s11 = param3.get(key2)[:] 
+                                if ( key2 == "bias:0" ):
+                                    bias_fire3_s11 = param3.get(key2)[:]
+                                r.close()
+                        elif ( fire_name == "expand1x1"):
+                            for key2 in param3.keys():
+                                r = open("../../SqueezeNet/squeezedet-keras-master/main/model/parametros/" + k_name + ":" + fire_name + ":" + key2 + ".txt", "r")
+                                if ( key2 == "kernel:0" ):
+                                    kernel_fire3_e11 = param3.get(key2)[:] 
+                                if ( key2 == "bias:0" ):
+                                    bias_fire3_e11 = param3.get(key2)[:]
+                                r.close()
+                        elif ( fire_name == "expand3x3"):
+                            for key2 in param3.keys():
+                                r = open("../../SqueezeNet/squeezedet-keras-master/main/model/parametros/" + k_name + ":" + fire_name + ":" + key2 + ".txt", "r")
+                                if ( key2 == "kernel:0" ):
+                                    kernel_fire3_e33 = param3.get(key2)[:] 
+                                if ( key2 == "bias:0" ):
+                                    bias_fire3_e33 = param3.get(key2)[:]
+                                r.close()
+                        #print("         {}/{}: ".format(fire_name, param2.get(fire_name).keys() ))
+                if ( (k_name == "fire4") ):
+                    for fire_name in param2.keys():
+                        param3 = param2[fire_name]
+                        if ( fire_name == "squeeze1x1"):
+                            for key2 in param3.keys():
+                                r = open("../../SqueezeNet/squeezedet-keras-master/main/model/parametros/" + k_name + ":" + fire_name + ":" + key2 + ".txt", "r")
+                                if ( key2 == "kernel:0" ):
+                                    kernel_fire4_s11 = param3.get(key2)[:] 
+                                if ( key2 == "bias:0" ):
+                                    bias_fire4_s11 = param3.get(key2)[:]
+                                r.close()
+                        elif ( fire_name == "expand1x1"):
+                            for key2 in param3.keys():
+                                r = open("../../SqueezeNet/squeezedet-keras-master/main/model/parametros/" + k_name + ":" + fire_name + ":" + key2 + ".txt", "r")
+                                if ( key2 == "kernel:0" ):
+                                    kernel_fire4_e11 = param3.get(key2)[:] 
+                                if ( key2 == "bias:0" ):
+                                    bias_fire4_e11 = param3.get(key2)[:]
+                                r.close()
+                        elif ( fire_name == "expand3x3"):
+                            for key2 in param3.keys():
+                                r = open("../../SqueezeNet/squeezedet-keras-master/main/model/parametros/" + k_name + ":" + fire_name + ":" + key2 + ".txt", "r")
+                                if ( key2 == "kernel:0" ):
+                                    kernel_fire4_e33 = param3.get(key2)[:] 
+                                if ( key2 == "bias:0" ):
+                                    bias_fire4_e33 = param3.get(key2)[:]
+                                r.close()
+
+
+
+
+
+
+
                 elif ( p_name == "conv2d_1" ):
                     r = open("../../SqueezeNet/squeezedet-keras-master/main/model/parametros/" + p_name + ":" + k_name + ".txt", "r")
                     if ( k_name == "kernel:0" ):
@@ -338,101 +380,74 @@ finally:
     f.close()
 
 
-#kernel_conv1 =  np.array ([     [ [[1, 1], [1, 1], [1, 1]], [[1, 1], [1, 1], [1, 1]], [[1, 1], [1, 1], [1, 1]]  ],
-#                                [ [[2, 2], [2, 2], [2, 2]], [[2, 2], [2, 2], [2, 2]], [[2, 2], [2, 2], [2, 2]]  ],
-#                                [ [[3, 3], [3, 3], [3, 3]], [[3, 3], [3, 3], [3, 3]], [[3, 3], [3, 3], [3, 3]]  ]       ]) 
-#bias_conv1 = np.array ([2, 3])
-
-print("kernel_conv1  \n", kernel_conv1)
-print("bias_conv1 \n", bias_conv1)
-kernel_conv1_load.append(kernel_conv1)
-kernel_conv1_load.append(bias_conv1)
 ######################################################################################################################
-#kernel_fire2_s11 =  np.array ([     [ [ [1, 1], [1, 1] ] ]  ])
-#
-#bias_fire2_s11 = np.array ([2, 3])
-#
-#kernel_fire2_e11 =  np.array ([     [ [ [1, 1], [1, 1] ] ]  ])
-#bias_fire2_e11 = np.array ([2, 3])
-#
-#kernel_fire2_e33 =   np.array ([    [ [[1, 1], [1, 1]], [[1, 1], [1, 1]], [[1, 1], [1, 1]]  ],
-#                                    [ [[2, 2], [2, 2]], [[2, 2], [2, 2]], [[2, 2], [2, 2]]  ],
-#                                    [ [[3, 3], [3, 3]], [[3, 3], [3, 3]], [[3, 3], [3, 3]]  ]   ]) 
-#
-#bias_fire2_e33 = np.array ([2, 3])
+kernel_conv1_load=[]
 
-#print("kernel_fire2_s11 \n", kernel_fire2_s11)
-#print("bias_fire2_s11 \n", bias_fire2_s11)
+kernel_fire2_load_s11=[]
+kernel_fire2_load_e11=[]
+kernel_fire2_load_e33=[]
 
-kernel_fire2_load_s11.append(kernel_fire2_s11)
-kernel_fire2_load_s11.append(bias_fire2_s11)
+kernel_fire3_load_s11=[]
+kernel_fire3_load_e11=[]
+kernel_fire3_load_e33=[]
 
-kernel_fire2_load_e11.append(kernel_fire2_e11)
-kernel_fire2_load_e11.append(bias_fire2_e11)
+kernel_fire4_load_s11=[]
+kernel_fire4_load_e11=[]
+kernel_fire4_load_e33=[]
 
-kernel_fire2_load_e33.append(kernel_fire2_e33)
-kernel_fire2_load_e33.append(bias_fire2_e33)
+kernel_fire5_load_s11=[]
+kernel_fire5_load_e11=[]
+kernel_fire5_load_e33=[]
 ######################################################################################################################
-kernel_fire3_s11 =  np.array ([     [ [ [1, 1], [1, 1], [1, 1], [1, 1] ] ]  ])
-#print("kernel_fire3_s11 shape: \n", kernel_fire3_s11.shape)
-bias_fire3_s11 = np.array ([2, 3])
-
-kernel_fire3_e11 =  np.array ([     [ [ [1, 1], [1, 1] ] ]  ])
-bias_fire3_e11 = np.array ([2, 3])
-
-kernel_fire3_e33 =   np.array ([    [ [[1, 1], [1, 1]], [[1, 1], [1, 1]], [[1, 1], [1, 1]]  ],
-                                    [ [[2, 2], [2, 2]], [[2, 2], [2, 2]], [[2, 2], [2, 2]]  ],
-                                    [ [[3, 3], [3, 3]], [[3, 3], [3, 3]], [[3, 3], [3, 3]]  ]   ]) 
-bias_fire3_e33 = np.array ([2, 3])
-
-
+kernel_conv1_load.append(kernel_conv1)              #print("kernel_conv1  \n", kernel_conv1)
+kernel_conv1_load.append(bias_conv1)                #print("bias_conv1 \n", bias_conv1)
+######################################################################################################################
+kernel_fire2_load_s11.append(kernel_fire2_s11)      #print("kernel_fire2_s11  \n", kernel_fire2_s11)
+kernel_fire2_load_s11.append(bias_fire2_s11)        #print("bias_fire2_s11 \n", bias_fire2_s11)
+kernel_fire2_load_e11.append(kernel_fire2_e11)      #print("kernel_fire2_e11  \n", kernel_fire2_e11)
+kernel_fire2_load_e11.append(bias_fire2_e11)        #print("bias_fire2_e11 \n", bias_fire2_e11)
+kernel_fire2_load_e33.append(kernel_fire2_e33)      #print("kernel_fire2_e33  \n", kernel_fire2_e33)
+kernel_fire2_load_e33.append(bias_fire2_e33)        #print("bias_fire2_e33 \n", bias_fire2_e33)
+######################################################################################################################
 kernel_fire3_load_s11.append(kernel_fire3_s11)
 kernel_fire3_load_s11.append(bias_fire3_s11)
-
 kernel_fire3_load_e11.append(kernel_fire3_e11)
 kernel_fire3_load_e11.append(bias_fire3_e11)
-
 kernel_fire3_load_e33.append(kernel_fire3_e33)
 kernel_fire3_load_e33.append(bias_fire3_e33)
 ######################################################################################################################
 SqueezeDet.model.layers[1].set_weights(kernel_conv1_load)
 
-#SqueezeDet.model.layers[3].set_weights(kernel_fire2_load_s11)
-#SqueezeDet.model.layers[4].set_weights(kernel_fire2_load_e11)
-#SqueezeDet.model.layers[5].set_weights(kernel_fire2_load_e33)
-#
-#SqueezeDet.model.layers[7].set_weights(kernel_fire3_load_s11)
-#SqueezeDet.model.layers[8].set_weights(kernel_fire3_load_e11)
-#SqueezeDet.model.layers[9].set_weights(kernel_fire3_load_e33)
+SqueezeDet.model.layers[3].set_weights(kernel_fire2_load_s11)
+SqueezeDet.model.layers[4].set_weights(kernel_fire2_load_e11)
+SqueezeDet.model.layers[5].set_weights(kernel_fire2_load_e33)
 
+SqueezeDet.model.layers[7].set_weights(kernel_fire3_load_s11)
+SqueezeDet.model.layers[8].set_weights(kernel_fire3_load_e11)
+SqueezeDet.model.layers[9].set_weights(kernel_fire3_load_e33)
 ######################################################################################################################
+
+
+
+
+
+
+
 
 ######################################################################################################################
 # Input
 ######################################################################################################################
-#in_image  = np.array ([ [ 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0 ],
-#                        [ 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0 ],
-#                        [ 3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0 ],
-#                        [ 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0 ],
-#                        [ 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0 ],
-#                        [ 6.0, 6.0, 6.0, 6.0, 6.0, 6.0, 6.0 ],
-#                        [ 7.0, 7.0, 7.0, 7.0, 7.0, 7.0, 7.0 ],  ])
-######################################################################################################################
 in_image = cv2.imread("./sqzdet/test4.png",flags=cv2.IMREAD_UNCHANGED).astype(np.float32, copy=False)
 in_image = cv2.cvtColor(in_image, cv2.COLOR_BGRA2RGB)
-#in_image = cv2.cvtColor(in_image, cv2.COLOR_BGRA2RGBA)
-#in_image = cv2.imread("test.png").astype(np.float32, copy=False)
+
 print("in_image shape  = \n", in_image.shape)
 in_image = np.reshape(in_image, [1, 240, 320, 3])
-print("in_image  = \n", in_image)
-
-intermediate_layer_model = Model(inputs=SqueezeDet.model.input, outputs=SqueezeDet.model.get_layer("pool1").output)
+#print("in_image  = \n", in_image)
+######################################################################################################################
+# Output
+######################################################################################################################
+intermediate_layer_model = Model(inputs=SqueezeDet.model.input, outputs=SqueezeDet.model.get_layer("pool3").output)
 intermediate_output = intermediate_layer_model.predict( in_image )
-print( " pool1 shape = \n", intermediate_output.shape )
-print( " pool1 output = \n", intermediate_output )
-
-
-
-
-
+print( " pool3 shape = \n", intermediate_output.shape )
+print( " pool3 output = \n", intermediate_output )
 

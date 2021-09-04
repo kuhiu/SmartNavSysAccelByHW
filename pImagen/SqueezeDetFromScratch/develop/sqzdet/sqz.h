@@ -16,27 +16,40 @@
 
 #define CONV1_KERNEL_SIZE       3
 #define CONV1_PAD               1   // Asumo pad_width = pad_height
-#define CONV1_FILTERS           2
+#define CONV1_FILTERS          64
 #define CONV1_ACTIVATION        1     
 #define CONV1_STRIDE            2
 
 #define MAXPOOL1_POOL_SIZE      3 
 #define MAXPOOL1_PAD            1   // Asumo pad_width = pad_height
-#define MAXPOOL1_FILTERS        2     
+#define MAXPOOL1_FILTERS       64     
 #define MAXPOOL1_STRIDE         2 
 
-#define FIRE2_s1x1              2
-#define FIRE2_e1x1              2
-#define FIRE2_e3x3              2
+#define FIRE2_s1x1             16
+#define FIRE2_e1x1             64
+#define FIRE2_e3x3             64
 
-#define FIRE3_s1x1              2
-#define FIRE3_e1x1              2
-#define FIRE3_e3x3              2
+#define FIRE3_s1x1             16
+#define FIRE3_e1x1             64
+#define FIRE3_e3x3             64
+
+#define MAXPOOL3_POOL_SIZE      3 
+#define MAXPOOL3_PAD            1   // Asumo pad_width = pad_height
+#define MAXPOOL3_FILTERS      128     
+#define MAXPOOL3_STRIDE         2 
+
+#define FIRE4_s1x1             32
+#define FIRE4_e1x1            128
+#define FIRE4_e3x3            128
+
+#define FIRE5_s1x1             32
+#define FIRE5_e1x1            128
+#define FIRE5_e3x3            128
 
 void read_png_file(char *filename);
 void process_png_file(float *img);
 void convolucion2d (float *input, int input_shape_width, int input_shape_height, int input_depth, float *kernel, int kernel_size, float *bias, int stride, float *conv2d_1, int output_conv1_width, int output_conv1_height, int filtros); 
-void printVector(float *in, int in_width, int in_height, int depth);
+void printVector(float *kernel, int i_width, int i_height, int i_depth, int i_filters);
 void maxPool2d( int pool_size, int stride, float *in, int input_shape_width, int input_shape_height, int input_depth, float *max_pool, int pool_width, int pool_height,int padding );
 void fire_layer(float *, int, int, int, float*, int, int, int, float *, float*, int, float*, float*, int, float*, float*, int); 
 void padding(float *input, int input_shape_width, int input_shape_height, int input_depth, float *output, int pad_along_width, int pad_along_height);
