@@ -206,7 +206,7 @@ SqueezeDet.model.get_layer("conv12").set_weights(kernel_conv12_load)
 ######################################################################################################################
 # Input
 ######################################################################################################################
-in_image = cv2.imread("./testing/test2.png",flags=cv2.IMREAD_UNCHANGED).astype(np.float32, copy=False)
+in_image = cv2.imread("./testing/test6.png",flags=cv2.IMREAD_UNCHANGED).astype(np.float32, copy=False)
 in_image = cv2.cvtColor(in_image, cv2.COLOR_BGRA2RGB)
 print("in_image shape  = \n", in_image.shape)
 in_image = np.reshape(in_image, [1, 240, 320, 3])
@@ -242,4 +242,4 @@ box_predicted = det_boxes[0][more_probable].astype(int)
 in_image = np.reshape(in_image, [240, 320, 3])
 in_image = cv2.cvtColor(in_image, cv2.COLOR_RGB2BGR)
 cv2.rectangle(in_image, (box_predicted[0], box_predicted[1]) ,(box_predicted[2], box_predicted[3]), (0,0,255), 3)
-cv2.imwrite("./testing/test2MODIF.png", in_image)
+cv2.imwrite("./testing/test6MODIF.png", in_image)
