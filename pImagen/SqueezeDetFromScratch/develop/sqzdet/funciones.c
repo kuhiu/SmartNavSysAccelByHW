@@ -88,6 +88,7 @@ void convolucion2d (float *input, int input_shape_width, int input_shape_height,
                     float *kernel, int kernel_size, 
                     float *bias, 
                     int stride,
+                    int Relu,
                     float *conv2d_1, int output_conv1_width, int output_conv1_height, int filtros) 
 {
     int i, j, k, l, c, v;
@@ -116,7 +117,8 @@ void convolucion2d (float *input, int input_shape_width, int input_shape_height,
                 // Bias
                 *(conv2d_1 + j + i*output_conv1_width + c*output_conv1_width*output_conv1_height) = *(conv2d_1 + j + i*output_conv1_width + c*output_conv1_width*output_conv1_height) + *(bias+c);
                 // Relu
-                *(conv2d_1 + j + i*output_conv1_width + c*output_conv1_width*output_conv1_height) = ReLu( *(conv2d_1 + j + i*output_conv1_width + c*output_conv1_width*output_conv1_height) );
+                if (Relu == 1)
+                    *(conv2d_1 + j + i*output_conv1_width + c*output_conv1_width*output_conv1_height) = ReLu( *(conv2d_1 + j + i*output_conv1_width + c*output_conv1_width*output_conv1_height) );
             }   
         }
     }
@@ -237,7 +239,8 @@ void fire_layer (   float *input, int input_shape_width, int input_shape_height,
                     float *output, int output_shape_width, int output_shape_height, int output_depth,
                     float *kernel_s1x1, float *bias_s1x1, int s1x1, 
                     float *kernel_e1x1, float *bias_e1x1, int e1x1, 
-                    float *kernel_e3x3, float *bias_e3x3, int e3x3      ) 
+                    float *kernel_e3x3, float *bias_e3x3, int e3x3,
+                    int Relu                                            ) 
 {
     int i, j, k, offset;
     float *conv2d_s1x1 = (float*) calloc( input_shape_width*input_shape_height*s1x1, sizeof(float) );
@@ -249,7 +252,8 @@ void fire_layer (   float *input, int input_shape_width, int input_shape_height,
     convolucion2d(  input, input_shape_width, input_shape_height, input_depth,          // Entrada: pointer, ancho, alto, profundidad
                     kernel_s1x1, 1,                                                     // Kernel: pointer, size                            
                     bias_s1x1,                                                          // Bias: pointer                                        
-                    1,                                                                  // Stride                                           
+                    1,                                                                  // Stride 
+                    Relu,                                       
                     conv2d_s1x1, input_shape_width, input_shape_height, s1x1);          // Salida: pointer, ancho, alto, profundidad
 
     //printf("kernel_s1x1: \n");
@@ -265,7 +269,8 @@ void fire_layer (   float *input, int input_shape_width, int input_shape_height,
     convolucion2d(  conv2d_s1x1, input_shape_width, input_shape_height, s1x1,           // Entrada: pointer, ancho, alto, profundidad                    
                     kernel_e1x1, 1,                                                     // Kernel: pointer, size                             
                     bias_e1x1,                                                          // Bias: pointer                                         
-                    1,                                                                  // Stride                                    
+                    1,                                                                  // Stride 
+                    Relu,                                   
                     conv2d_e1x1, input_shape_width, input_shape_height, e1x1);          // Salida: pointer, ancho, alto, profundidad
 
     input_padded =  (float*) calloc( (input_shape_width+2)*(input_shape_height+2)*s1x1,sizeof(float) );
@@ -279,7 +284,8 @@ void fire_layer (   float *input, int input_shape_width, int input_shape_height,
     convolucion2d(  input_padded, (input_shape_width+2), (input_shape_height+2), s1x1,  // Entrada: pointer, ancho, alto, profundidad   
                     kernel_e3x3, 3,                                                     // Kernel: pointer, size                       
                     bias_e3x3,                                                          // Bias: pointer                                           
-                    1,                                                                  // Stride                                                  
+                    1,                                                                  // Stride       
+                    Relu,                                           
                     conv2d_e3x3, input_shape_width, input_shape_height, e3x3);          // Salida: pointer, ancho, alto, profundidad
 
     // Concatenacion
