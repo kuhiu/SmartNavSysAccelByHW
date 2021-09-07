@@ -945,7 +945,7 @@ def boxes_from_deltas_np(pred_box_delta, config):
 ######################################################################################################################
 # Input
 ######################################################################################################################
-in_image = cv2.imread("./sqzdet/test5.png",flags=cv2.IMREAD_UNCHANGED).astype(np.float32, copy=False)
+in_image = cv2.imread("./sqzdet/test2.png",flags=cv2.IMREAD_UNCHANGED).astype(np.float32, copy=False)
 in_image = cv2.cvtColor(in_image, cv2.COLOR_BGRA2RGB)
 
 print("in_image shape  = \n", in_image.shape)
@@ -1015,7 +1015,7 @@ box_predicted = det_boxes[0][more_probable].astype(int)
 in_image = np.reshape(in_image, [240, 320, 3])
 in_image = cv2.cvtColor(in_image, cv2.COLOR_RGB2BGR)
 cv2.rectangle(in_image, (box_predicted[0], box_predicted[1]) ,(box_predicted[2], box_predicted[3]), (0,0,255), 3)
-cv2.imwrite("./sqzdet/test5MODIF.png", in_image)
+cv2.imwrite("./sqzdet/test2MODIF.png", in_image)
 
 
 
