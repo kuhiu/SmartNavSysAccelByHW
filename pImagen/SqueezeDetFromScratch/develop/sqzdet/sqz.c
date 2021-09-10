@@ -130,6 +130,22 @@ int main(void)
     float *fire_11_bias_e1x1    = NULL;
     float *fire_11_kernel_e3x3  = NULL;
     float *fire_11_bias_e3x3    = NULL;
+
+    // Post cnn
+    float *pred_class           = NULL;
+    float *pred_conf            = NULL;
+    float *pred_class_softmax   = NULL;
+    float *pred_conf_sigmod     = NULL;
+    float *prob                 = NULL;
+    float *box_predicted        = NULL;
+    float max=0;
+    int index_Ofmax=0;
+    float delta_x, delta_y, delta_w, delta_h;
+    float *anchors              = NULL; 
+    float box_center_x, box_center_y, box_width, box_height;              
+    int i,j,k,l;
+    float xmax,xmin,ymax,ymin;
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////        Leo la imagen       ////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -138,7 +154,7 @@ int main(void)
     printf("Termino read_png_file\n");
     img = (float*) malloc( img_width*img_height*3*sizeof(float) );
     printf("Leo la Imagen\n");
-    process_png_file(img);
+    get_png_file(img);
 
     //printf("Img: \n");
     //printVector(img, img_width, img_height, 3);
@@ -149,19 +165,13 @@ int main(void)
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////    Leo txt para kernel y bias conv1    ////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    fd = fopen("../../../SqueezeNet/squeezedet-keras-master/main/model/parametros/conv2d_1:kernel:0.txt", "r");
-    getline(&line, &len, fd);
-    //printf("line: %s\n", line);
-    sscanf(line, " (%[^','], %[^','], %[^','], %[^','])\n", s_width, s_height, s_depth, s_filters);
-    i_width = atof(s_width); i_height = atof(s_height); i_depth = atof(s_depth); i_filters = atof(s_filters);
-    printf("CONV2d_1: Las dimensiones del kernel son: %dx%dx%dx%d \n", i_width, i_height, i_depth, i_filters);
-    conv1_kernel = weight_load(fd, i_width, i_height, i_depth, i_filters);
-    // Test
-    //printf("kernel: \n");
-    //printVector(kernel, i_width, i_height, i_depth, i_filters);
-    fclose(fd);
+    conv1_kernel = weight_load2("../../../SqueezeDetTraining/squeezedet-keras-master/main/model/parametros/conv2d_1:kernel:0.txt");
+    if(conv1_kernel == NULL)
+        printf("es null\n");
+    printf("No es null\n");
+    sleep(3);
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    fd = fopen("../../../SqueezeNet/squeezedet-keras-master/main/model/parametros/conv2d_1:bias:0.txt", "r");
+    fd = fopen("../../../SqueezeDetTraining/squeezedet-keras-master/main/model/parametros/conv2d_1:bias:0.txt", "r");
     getline(&line, &len, fd);
     sscanf(line, " (%[^','], )\n", s_width);
     i_width = atoi(s_width);
@@ -174,7 +184,7 @@ int main(void)
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /////////////////////////////    Leo txt para las conv2d y bias de fire_2   ////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    fd = fopen("../../../SqueezeNet/squeezedet-keras-master/main/model/parametros/fire2:squeeze1x1:kernel:0.txt", "r");
+    fd = fopen("../../../SqueezeDetTraining/squeezedet-keras-master/main/model/parametros/fire2:squeeze1x1:kernel:0.txt", "r");
     getline(&line, &len, fd);
     //printf("line: %s\n", line);
     sscanf(line, " (%[^','], %[^','], %[^','], %[^','])\n", s_width, s_height, s_depth, s_filters);
@@ -186,7 +196,7 @@ int main(void)
     //printVector(fire_2_kernel_s1x1, i_width, i_height, i_depth, i_filters);
     fclose(fd);
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    fd = fopen("../../../SqueezeNet/squeezedet-keras-master/main/model/parametros/fire2:expand1x1:kernel:0.txt", "r");
+    fd = fopen("../../../SqueezeDetTraining/squeezedet-keras-master/main/model/parametros/fire2:expand1x1:kernel:0.txt", "r");
     getline(&line, &len, fd);
     //printf("line: %s\n", line);
     sscanf(line, " (%[^','], %[^','], %[^','], %[^','])\n", s_width, s_height, s_depth, s_filters);
@@ -198,7 +208,7 @@ int main(void)
     // printVector(fire_2_kernel_e1x1, i_width, i_height, i_depth, i_filters);
     fclose(fd);
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    fd = fopen("../../../SqueezeNet/squeezedet-keras-master/main/model/parametros/fire2:expand3x3:kernel:0.txt", "r");
+    fd = fopen("../../../SqueezeDetTraining/squeezedet-keras-master/main/model/parametros/fire2:expand3x3:kernel:0.txt", "r");
     getline(&line, &len, fd);
     //printf("line: %s\n", line);
     sscanf(line, " (%[^','], %[^','], %[^','], %[^','])\n", s_width, s_height, s_depth, s_filters);
@@ -210,7 +220,7 @@ int main(void)
     // printVector(fire_2_kernel_e1x1, i_width, i_height, i_depth, i_filters);
     fclose(fd);
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    fd = fopen("../../../SqueezeNet/squeezedet-keras-master/main/model/parametros/fire2:squeeze1x1:bias:0.txt", "r");
+    fd = fopen("../../../SqueezeDetTraining/squeezedet-keras-master/main/model/parametros/fire2:squeeze1x1:bias:0.txt", "r");
     getline(&line, &len, fd);
     sscanf(line, " (%[^','], )\n", s_width);
     i_width = atoi(s_width);
@@ -221,7 +231,7 @@ int main(void)
     //printVector(fire_2_bias_s1x1, i_width, 1, 1, 1);
     fclose(fd);
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    fd = fopen("../../../SqueezeNet/squeezedet-keras-master/main/model/parametros/fire2:expand1x1:bias:0.txt", "r");
+    fd = fopen("../../../SqueezeDetTraining/squeezedet-keras-master/main/model/parametros/fire2:expand1x1:bias:0.txt", "r");
     getline(&line, &len, fd);
     sscanf(line, " (%[^','], )\n", s_width);
     i_width = atoi(s_width);
@@ -232,7 +242,7 @@ int main(void)
     //printVector(fire_2_bias_e1x1, i_width, 1, 1, 1);
     fclose(fd);
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    fd = fopen("../../../SqueezeNet/squeezedet-keras-master/main/model/parametros/fire2:expand3x3:bias:0.txt", "r");
+    fd = fopen("../../../SqueezeDetTraining/squeezedet-keras-master/main/model/parametros/fire2:expand3x3:bias:0.txt", "r");
     getline(&line, &len, fd);
     sscanf(line, " (%[^','], )\n", s_width);
     i_width = atoi(s_width);
@@ -245,7 +255,7 @@ int main(void)
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////    Leo txt para kernel y bias de fire_3   //////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    fd = fopen("../../../SqueezeNet/squeezedet-keras-master/main/model/parametros/fire3:squeeze1x1:kernel:0.txt", "r");
+    fd = fopen("../../../SqueezeDetTraining/squeezedet-keras-master/main/model/parametros/fire3:squeeze1x1:kernel:0.txt", "r");
     getline(&line, &len, fd);
     //printf("line: %s\n", line);
     sscanf(line, " (%[^','], %[^','], %[^','], %[^','])\n", s_width, s_height, s_depth, s_filters);
@@ -257,7 +267,7 @@ int main(void)
     //printVector(fire_2_kernel_s1x1, i_width, i_height, i_depth, i_filters);
     fclose(fd);
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    fd = fopen("../../../SqueezeNet/squeezedet-keras-master/main/model/parametros/fire3:expand1x1:kernel:0.txt", "r");
+    fd = fopen("../../../SqueezeDetTraining/squeezedet-keras-master/main/model/parametros/fire3:expand1x1:kernel:0.txt", "r");
     getline(&line, &len, fd);
     //printf("line: %s\n", line);
     sscanf(line, " (%[^','], %[^','], %[^','], %[^','])\n", s_width, s_height, s_depth, s_filters);
@@ -269,7 +279,7 @@ int main(void)
     // printVector(fire_2_kernel_e1x1, i_width, i_height, i_depth, i_filters);
     fclose(fd);
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    fd = fopen("../../../SqueezeNet/squeezedet-keras-master/main/model/parametros/fire3:expand3x3:kernel:0.txt", "r");
+    fd = fopen("../../../SqueezeDetTraining/squeezedet-keras-master/main/model/parametros/fire3:expand3x3:kernel:0.txt", "r");
     getline(&line, &len, fd);
     //printf("line: %s\n", line);
     sscanf(line, " (%[^','], %[^','], %[^','], %[^','])\n", s_width, s_height, s_depth, s_filters);
@@ -281,7 +291,7 @@ int main(void)
     // printVector(fire_2_kernel_e1x1, i_width, i_height, i_depth, i_filters);
     fclose(fd);
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    fd = fopen("../../../SqueezeNet/squeezedet-keras-master/main/model/parametros/fire3:squeeze1x1:bias:0.txt", "r");
+    fd = fopen("../../../SqueezeDetTraining/squeezedet-keras-master/main/model/parametros/fire3:squeeze1x1:bias:0.txt", "r");
     getline(&line, &len, fd);
     sscanf(line, " (%[^','], )\n", s_width);
     i_width = atoi(s_width);
@@ -292,7 +302,7 @@ int main(void)
     //printVector(fire_2_bias_s1x1, i_width, 1, 1, 1);
     fclose(fd);
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    fd = fopen("../../../SqueezeNet/squeezedet-keras-master/main/model/parametros/fire3:expand1x1:bias:0.txt", "r");
+    fd = fopen("../../../SqueezeDetTraining/squeezedet-keras-master/main/model/parametros/fire3:expand1x1:bias:0.txt", "r");
     getline(&line, &len, fd);
     sscanf(line, " (%[^','], )\n", s_width);
     i_width = atoi(s_width);
@@ -303,7 +313,7 @@ int main(void)
     //printVector(fire_2_bias_e1x1, i_width, 1, 1, 1);
     fclose(fd);
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    fd = fopen("../../../SqueezeNet/squeezedet-keras-master/main/model/parametros/fire3:expand3x3:bias:0.txt", "r");
+    fd = fopen("../../../SqueezeDetTraining/squeezedet-keras-master/main/model/parametros/fire3:expand3x3:bias:0.txt", "r");
     getline(&line, &len, fd);
     sscanf(line, " (%[^','], )\n", s_width);
     i_width = atoi(s_width);
@@ -316,7 +326,7 @@ int main(void)
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////    Leo txt para kernel y bias de fire_4   //////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    fd = fopen("../../../SqueezeNet/squeezedet-keras-master/main/model/parametros/fire4:squeeze1x1:kernel:0.txt", "r");
+    fd = fopen("../../../SqueezeDetTraining/squeezedet-keras-master/main/model/parametros/fire4:squeeze1x1:kernel:0.txt", "r");
     getline(&line, &len, fd);
     //printf("line: %s\n", line);
     sscanf(line, " (%[^','], %[^','], %[^','], %[^','])\n", s_width, s_height, s_depth, s_filters);
@@ -328,7 +338,7 @@ int main(void)
     //printVector(fire_2_kernel_s1x1, i_width, i_height, i_depth, i_filters);
     fclose(fd);
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    fd = fopen("../../../SqueezeNet/squeezedet-keras-master/main/model/parametros/fire4:expand1x1:kernel:0.txt", "r");
+    fd = fopen("../../../SqueezeDetTraining/squeezedet-keras-master/main/model/parametros/fire4:expand1x1:kernel:0.txt", "r");
     getline(&line, &len, fd);
     //printf("line: %s\n", line);
     sscanf(line, " (%[^','], %[^','], %[^','], %[^','])\n", s_width, s_height, s_depth, s_filters);
@@ -340,7 +350,7 @@ int main(void)
     // printVector(fire_2_kernel_e1x1, i_width, i_height, i_depth, i_filters);
     fclose(fd);
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    fd = fopen("../../../SqueezeNet/squeezedet-keras-master/main/model/parametros/fire4:expand3x3:kernel:0.txt", "r");
+    fd = fopen("../../../SqueezeDetTraining/squeezedet-keras-master/main/model/parametros/fire4:expand3x3:kernel:0.txt", "r");
     getline(&line, &len, fd);
     //printf("line: %s\n", line);
     sscanf(line, " (%[^','], %[^','], %[^','], %[^','])\n", s_width, s_height, s_depth, s_filters);
@@ -352,7 +362,7 @@ int main(void)
     // printVector(fire_2_kernel_e1x1, i_width, i_height, i_depth, i_filters);
     fclose(fd);
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    fd = fopen("../../../SqueezeNet/squeezedet-keras-master/main/model/parametros/fire4:squeeze1x1:bias:0.txt", "r");
+    fd = fopen("../../../SqueezeDetTraining/squeezedet-keras-master/main/model/parametros/fire4:squeeze1x1:bias:0.txt", "r");
     getline(&line, &len, fd);
     sscanf(line, " (%[^','], )\n", s_width);
     i_width = atoi(s_width);
@@ -363,7 +373,7 @@ int main(void)
     //printVector(fire_2_bias_s1x1, i_width, 1, 1, 1);
     fclose(fd);
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    fd = fopen("../../../SqueezeNet/squeezedet-keras-master/main/model/parametros/fire4:expand1x1:bias:0.txt", "r");
+    fd = fopen("../../../SqueezeDetTraining/squeezedet-keras-master/main/model/parametros/fire4:expand1x1:bias:0.txt", "r");
     getline(&line, &len, fd);
     sscanf(line, " (%[^','], )\n", s_width);
     i_width = atoi(s_width);
@@ -374,7 +384,7 @@ int main(void)
     //printVector(fire_2_bias_e1x1, i_width, 1, 1, 1);
     fclose(fd);
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    fd = fopen("../../../SqueezeNet/squeezedet-keras-master/main/model/parametros/fire4:expand3x3:bias:0.txt", "r");
+    fd = fopen("../../../SqueezeDetTraining/squeezedet-keras-master/main/model/parametros/fire4:expand3x3:bias:0.txt", "r");
     getline(&line, &len, fd);
     sscanf(line, " (%[^','], )\n", s_width);
     i_width = atoi(s_width);
@@ -387,7 +397,7 @@ int main(void)
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////    Leo txt para kernel y bias de fire_5   //////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    fd = fopen("../../../SqueezeNet/squeezedet-keras-master/main/model/parametros/fire5:squeeze1x1:kernel:0.txt", "r");
+    fd = fopen("../../../SqueezeDetTraining/squeezedet-keras-master/main/model/parametros/fire5:squeeze1x1:kernel:0.txt", "r");
     getline(&line, &len, fd);
     //printf("line: %s\n", line);
     sscanf(line, " (%[^','], %[^','], %[^','], %[^','])\n", s_width, s_height, s_depth, s_filters);
@@ -399,7 +409,7 @@ int main(void)
     //printVector(fire_2_kernel_s1x1, i_width, i_height, i_depth, i_filters);
     fclose(fd);
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    fd = fopen("../../../SqueezeNet/squeezedet-keras-master/main/model/parametros/fire5:expand1x1:kernel:0.txt", "r");
+    fd = fopen("../../../SqueezeDetTraining/squeezedet-keras-master/main/model/parametros/fire5:expand1x1:kernel:0.txt", "r");
     getline(&line, &len, fd);
     //printf("line: %s\n", line);
     sscanf(line, " (%[^','], %[^','], %[^','], %[^','])\n", s_width, s_height, s_depth, s_filters);
@@ -411,7 +421,7 @@ int main(void)
     // printVector(fire_2_kernel_e1x1, i_width, i_height, i_depth, i_filters);
     fclose(fd);
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    fd = fopen("../../../SqueezeNet/squeezedet-keras-master/main/model/parametros/fire5:expand3x3:kernel:0.txt", "r");
+    fd = fopen("../../../SqueezeDetTraining/squeezedet-keras-master/main/model/parametros/fire5:expand3x3:kernel:0.txt", "r");
     getline(&line, &len, fd);
     //printf("line: %s\n", line);
     sscanf(line, " (%[^','], %[^','], %[^','], %[^','])\n", s_width, s_height, s_depth, s_filters);
@@ -423,7 +433,7 @@ int main(void)
     // printVector(fire_2_kernel_e1x1, i_width, i_height, i_depth, i_filters);
     fclose(fd);
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    fd = fopen("../../../SqueezeNet/squeezedet-keras-master/main/model/parametros/fire5:squeeze1x1:bias:0.txt", "r");
+    fd = fopen("../../../SqueezeDetTraining/squeezedet-keras-master/main/model/parametros/fire5:squeeze1x1:bias:0.txt", "r");
     getline(&line, &len, fd);
     sscanf(line, " (%[^','], )\n", s_width);
     i_width = atoi(s_width);
@@ -434,7 +444,7 @@ int main(void)
     //printVector(fire_2_bias_s1x1, i_width, 1, 1, 1);
     fclose(fd);
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    fd = fopen("../../../SqueezeNet/squeezedet-keras-master/main/model/parametros/fire5:expand1x1:bias:0.txt", "r");
+    fd = fopen("../../../SqueezeDetTraining/squeezedet-keras-master/main/model/parametros/fire5:expand1x1:bias:0.txt", "r");
     getline(&line, &len, fd);
     sscanf(line, " (%[^','], )\n", s_width);
     i_width = atoi(s_width);
@@ -445,7 +455,7 @@ int main(void)
     //printVector(fire_2_bias_e1x1, i_width, 1, 1, 1);
     fclose(fd);
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    fd = fopen("../../../SqueezeNet/squeezedet-keras-master/main/model/parametros/fire5:expand3x3:bias:0.txt", "r");
+    fd = fopen("../../../SqueezeDetTraining/squeezedet-keras-master/main/model/parametros/fire5:expand3x3:bias:0.txt", "r");
     getline(&line, &len, fd);
     sscanf(line, " (%[^','], )\n", s_width);
     i_width = atoi(s_width);
@@ -458,7 +468,7 @@ int main(void)
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////    Leo txt para kernel y bias de fire_6   //////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    fd = fopen("../../../SqueezeNet/squeezedet-keras-master/main/model/parametros/fire6:squeeze1x1:kernel:0.txt", "r");
+    fd = fopen("../../../SqueezeDetTraining/squeezedet-keras-master/main/model/parametros/fire6:squeeze1x1:kernel:0.txt", "r");
     getline(&line, &len, fd);
     //printf("line: %s\n", line);
     sscanf(line, " (%[^','], %[^','], %[^','], %[^','])\n", s_width, s_height, s_depth, s_filters);
@@ -470,7 +480,7 @@ int main(void)
     //printVector(fire_2_kernel_s1x1, i_width, i_height, i_depth, i_filters);
     fclose(fd);
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    fd = fopen("../../../SqueezeNet/squeezedet-keras-master/main/model/parametros/fire6:expand1x1:kernel:0.txt", "r");
+    fd = fopen("../../../SqueezeDetTraining/squeezedet-keras-master/main/model/parametros/fire6:expand1x1:kernel:0.txt", "r");
     getline(&line, &len, fd);
     //printf("line: %s\n", line);
     sscanf(line, " (%[^','], %[^','], %[^','], %[^','])\n", s_width, s_height, s_depth, s_filters);
@@ -482,7 +492,7 @@ int main(void)
     // printVector(fire_2_kernel_e1x1, i_width, i_height, i_depth, i_filters);
     fclose(fd);
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    fd = fopen("../../../SqueezeNet/squeezedet-keras-master/main/model/parametros/fire6:expand3x3:kernel:0.txt", "r");
+    fd = fopen("../../../SqueezeDetTraining/squeezedet-keras-master/main/model/parametros/fire6:expand3x3:kernel:0.txt", "r");
     getline(&line, &len, fd);
     //printf("line: %s\n", line);
     sscanf(line, " (%[^','], %[^','], %[^','], %[^','])\n", s_width, s_height, s_depth, s_filters);
@@ -494,7 +504,7 @@ int main(void)
     // printVector(fire_2_kernel_e1x1, i_width, i_height, i_depth, i_filters);
     fclose(fd);
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    fd = fopen("../../../SqueezeNet/squeezedet-keras-master/main/model/parametros/fire6:squeeze1x1:bias:0.txt", "r");
+    fd = fopen("../../../SqueezeDetTraining/squeezedet-keras-master/main/model/parametros/fire6:squeeze1x1:bias:0.txt", "r");
     getline(&line, &len, fd);
     sscanf(line, " (%[^','], )\n", s_width);
     i_width = atoi(s_width);
@@ -505,7 +515,7 @@ int main(void)
     //printVector(fire_2_bias_s1x1, i_width, 1, 1, 1);
     fclose(fd);
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    fd = fopen("../../../SqueezeNet/squeezedet-keras-master/main/model/parametros/fire6:expand1x1:bias:0.txt", "r");
+    fd = fopen("../../../SqueezeDetTraining/squeezedet-keras-master/main/model/parametros/fire6:expand1x1:bias:0.txt", "r");
     getline(&line, &len, fd);
     sscanf(line, " (%[^','], )\n", s_width);
     i_width = atoi(s_width);
@@ -516,7 +526,7 @@ int main(void)
     //printVector(fire_2_bias_e1x1, i_width, 1, 1, 1);
     fclose(fd);
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    fd = fopen("../../../SqueezeNet/squeezedet-keras-master/main/model/parametros/fire6:expand3x3:bias:0.txt", "r");
+    fd = fopen("../../../SqueezeDetTraining/squeezedet-keras-master/main/model/parametros/fire6:expand3x3:bias:0.txt", "r");
     getline(&line, &len, fd);
     sscanf(line, " (%[^','], )\n", s_width);
     i_width = atoi(s_width);
@@ -530,7 +540,7 @@ int main(void)
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////    Leo txt para kernel y bias de fire_7   //////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    fd = fopen("../../../SqueezeNet/squeezedet-keras-master/main/model/parametros/fire7:squeeze1x1:kernel:0.txt", "r");
+    fd = fopen("../../../SqueezeDetTraining/squeezedet-keras-master/main/model/parametros/fire7:squeeze1x1:kernel:0.txt", "r");
     getline(&line, &len, fd);
     //printf("line: %s\n", line);
     sscanf(line, " (%[^','], %[^','], %[^','], %[^','])\n", s_width, s_height, s_depth, s_filters);
@@ -542,7 +552,7 @@ int main(void)
     //printVector(fire_2_kernel_s1x1, i_width, i_height, i_depth, i_filters);
     fclose(fd);
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    fd = fopen("../../../SqueezeNet/squeezedet-keras-master/main/model/parametros/fire7:expand1x1:kernel:0.txt", "r");
+    fd = fopen("../../../SqueezeDetTraining/squeezedet-keras-master/main/model/parametros/fire7:expand1x1:kernel:0.txt", "r");
     getline(&line, &len, fd);
     //printf("line: %s\n", line);
     sscanf(line, " (%[^','], %[^','], %[^','], %[^','])\n", s_width, s_height, s_depth, s_filters);
@@ -554,7 +564,7 @@ int main(void)
     // printVector(fire_2_kernel_e1x1, i_width, i_height, i_depth, i_filters);
     fclose(fd);
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    fd = fopen("../../../SqueezeNet/squeezedet-keras-master/main/model/parametros/fire7:expand3x3:kernel:0.txt", "r");
+    fd = fopen("../../../SqueezeDetTraining/squeezedet-keras-master/main/model/parametros/fire7:expand3x3:kernel:0.txt", "r");
     getline(&line, &len, fd);
     //printf("line: %s\n", line);
     sscanf(line, " (%[^','], %[^','], %[^','], %[^','])\n", s_width, s_height, s_depth, s_filters);
@@ -566,7 +576,7 @@ int main(void)
     // printVector(fire_2_kernel_e1x1, i_width, i_height, i_depth, i_filters);
     fclose(fd);
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    fd = fopen("../../../SqueezeNet/squeezedet-keras-master/main/model/parametros/fire7:squeeze1x1:bias:0.txt", "r");
+    fd = fopen("../../../SqueezeDetTraining/squeezedet-keras-master/main/model/parametros/fire7:squeeze1x1:bias:0.txt", "r");
     getline(&line, &len, fd);
     sscanf(line, " (%[^','], )\n", s_width);
     i_width = atoi(s_width);
@@ -577,7 +587,7 @@ int main(void)
     //printVector(fire_2_bias_s1x1, i_width, 1, 1, 1);
     fclose(fd);
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    fd = fopen("../../../SqueezeNet/squeezedet-keras-master/main/model/parametros/fire7:expand1x1:bias:0.txt", "r");
+    fd = fopen("../../../SqueezeDetTraining/squeezedet-keras-master/main/model/parametros/fire7:expand1x1:bias:0.txt", "r");
     getline(&line, &len, fd);
     sscanf(line, " (%[^','], )\n", s_width);
     i_width = atoi(s_width);
@@ -588,7 +598,7 @@ int main(void)
     //printVector(fire_2_bias_e1x1, i_width, 1, 1, 1);
     fclose(fd);
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    fd = fopen("../../../SqueezeNet/squeezedet-keras-master/main/model/parametros/fire7:expand3x3:bias:0.txt", "r");
+    fd = fopen("../../../SqueezeDetTraining/squeezedet-keras-master/main/model/parametros/fire7:expand3x3:bias:0.txt", "r");
     getline(&line, &len, fd);
     sscanf(line, " (%[^','], )\n", s_width);
     i_width = atoi(s_width);
@@ -602,7 +612,7 @@ int main(void)
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////    Leo txt para kernel y bias de fire_8   //////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    fd = fopen("../../../SqueezeNet/squeezedet-keras-master/main/model/parametros/fire8:squeeze1x1:kernel:0.txt", "r");
+    fd = fopen("../../../SqueezeDetTraining/squeezedet-keras-master/main/model/parametros/fire8:squeeze1x1:kernel:0.txt", "r");
     getline(&line, &len, fd);
     //printf("line: %s\n", line);
     sscanf(line, " (%[^','], %[^','], %[^','], %[^','])\n", s_width, s_height, s_depth, s_filters);
@@ -614,7 +624,7 @@ int main(void)
     //printVector(fire_2_kernel_s1x1, i_width, i_height, i_depth, i_filters);
     fclose(fd);
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    fd = fopen("../../../SqueezeNet/squeezedet-keras-master/main/model/parametros/fire8:expand1x1:kernel:0.txt", "r");
+    fd = fopen("../../../SqueezeDetTraining/squeezedet-keras-master/main/model/parametros/fire8:expand1x1:kernel:0.txt", "r");
     getline(&line, &len, fd);
     //printf("line: %s\n", line);
     sscanf(line, " (%[^','], %[^','], %[^','], %[^','])\n", s_width, s_height, s_depth, s_filters);
@@ -626,7 +636,7 @@ int main(void)
     // printVector(fire_2_kernel_e1x1, i_width, i_height, i_depth, i_filters);
     fclose(fd);
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    fd = fopen("../../../SqueezeNet/squeezedet-keras-master/main/model/parametros/fire8:expand3x3:kernel:0.txt", "r");
+    fd = fopen("../../../SqueezeDetTraining/squeezedet-keras-master/main/model/parametros/fire8:expand3x3:kernel:0.txt", "r");
     getline(&line, &len, fd);
     //printf("line: %s\n", line);
     sscanf(line, " (%[^','], %[^','], %[^','], %[^','])\n", s_width, s_height, s_depth, s_filters);
@@ -638,7 +648,7 @@ int main(void)
     // printVector(fire_2_kernel_e1x1, i_width, i_height, i_depth, i_filters);
     fclose(fd);
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    fd = fopen("../../../SqueezeNet/squeezedet-keras-master/main/model/parametros/fire8:squeeze1x1:bias:0.txt", "r");
+    fd = fopen("../../../SqueezeDetTraining/squeezedet-keras-master/main/model/parametros/fire8:squeeze1x1:bias:0.txt", "r");
     getline(&line, &len, fd);
     sscanf(line, " (%[^','], )\n", s_width);
     i_width = atoi(s_width);
@@ -649,7 +659,7 @@ int main(void)
     //printVector(fire_2_bias_s1x1, i_width, 1, 1, 1);
     fclose(fd);
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    fd = fopen("../../../SqueezeNet/squeezedet-keras-master/main/model/parametros/fire8:expand1x1:bias:0.txt", "r");
+    fd = fopen("../../../SqueezeDetTraining/squeezedet-keras-master/main/model/parametros/fire8:expand1x1:bias:0.txt", "r");
     getline(&line, &len, fd);
     sscanf(line, " (%[^','], )\n", s_width);
     i_width = atoi(s_width);
@@ -660,7 +670,7 @@ int main(void)
     //printVector(fire_2_bias_e1x1, i_width, 1, 1, 1);
     fclose(fd);
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    fd = fopen("../../../SqueezeNet/squeezedet-keras-master/main/model/parametros/fire8:expand3x3:bias:0.txt", "r");
+    fd = fopen("../../../SqueezeDetTraining/squeezedet-keras-master/main/model/parametros/fire8:expand3x3:bias:0.txt", "r");
     getline(&line, &len, fd);
     sscanf(line, " (%[^','], )\n", s_width);
     i_width = atoi(s_width);
@@ -674,7 +684,7 @@ int main(void)
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////    Leo txt para kernel y bias de fire_9   //////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    fd = fopen("../../../SqueezeNet/squeezedet-keras-master/main/model/parametros/fire9:squeeze1x1:kernel:0.txt", "r");
+    fd = fopen("../../../SqueezeDetTraining/squeezedet-keras-master/main/model/parametros/fire9:squeeze1x1:kernel:0.txt", "r");
     getline(&line, &len, fd);
     //printf("line: %s\n", line);
     sscanf(line, " (%[^','], %[^','], %[^','], %[^','])\n", s_width, s_height, s_depth, s_filters);
@@ -686,7 +696,7 @@ int main(void)
     //printVector(fire_2_kernel_s1x1, i_width, i_height, i_depth, i_filters);
     fclose(fd);
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    fd = fopen("../../../SqueezeNet/squeezedet-keras-master/main/model/parametros/fire9:expand1x1:kernel:0.txt", "r");
+    fd = fopen("../../../SqueezeDetTraining/squeezedet-keras-master/main/model/parametros/fire9:expand1x1:kernel:0.txt", "r");
     getline(&line, &len, fd);
     //printf("line: %s\n", line);
     sscanf(line, " (%[^','], %[^','], %[^','], %[^','])\n", s_width, s_height, s_depth, s_filters);
@@ -698,7 +708,7 @@ int main(void)
     // printVector(fire_2_kernel_e1x1, i_width, i_height, i_depth, i_filters);
     fclose(fd);
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    fd = fopen("../../../SqueezeNet/squeezedet-keras-master/main/model/parametros/fire9:expand3x3:kernel:0.txt", "r");
+    fd = fopen("../../../SqueezeDetTraining/squeezedet-keras-master/main/model/parametros/fire9:expand3x3:kernel:0.txt", "r");
     getline(&line, &len, fd);
     //printf("line: %s\n", line);
     sscanf(line, " (%[^','], %[^','], %[^','], %[^','])\n", s_width, s_height, s_depth, s_filters);
@@ -710,7 +720,7 @@ int main(void)
     // printVector(fire_2_kernel_e1x1, i_width, i_height, i_depth, i_filters);
     fclose(fd);
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    fd = fopen("../../../SqueezeNet/squeezedet-keras-master/main/model/parametros/fire9:squeeze1x1:bias:0.txt", "r");
+    fd = fopen("../../../SqueezeDetTraining/squeezedet-keras-master/main/model/parametros/fire9:squeeze1x1:bias:0.txt", "r");
     getline(&line, &len, fd);
     sscanf(line, " (%[^','], )\n", s_width);
     i_width = atoi(s_width);
@@ -721,7 +731,7 @@ int main(void)
     //printVector(fire_2_bias_s1x1, i_width, 1, 1, 1);
     fclose(fd);
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    fd = fopen("../../../SqueezeNet/squeezedet-keras-master/main/model/parametros/fire9:expand1x1:bias:0.txt", "r");
+    fd = fopen("../../../SqueezeDetTraining/squeezedet-keras-master/main/model/parametros/fire9:expand1x1:bias:0.txt", "r");
     getline(&line, &len, fd);
     sscanf(line, " (%[^','], )\n", s_width);
     i_width = atoi(s_width);
@@ -732,7 +742,7 @@ int main(void)
     //printVector(fire_2_bias_e1x1, i_width, 1, 1, 1);
     fclose(fd);
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    fd = fopen("../../../SqueezeNet/squeezedet-keras-master/main/model/parametros/fire9:expand3x3:bias:0.txt", "r");
+    fd = fopen("../../../SqueezeDetTraining/squeezedet-keras-master/main/model/parametros/fire9:expand3x3:bias:0.txt", "r");
     getline(&line, &len, fd);
     sscanf(line, " (%[^','], )\n", s_width);
     i_width = atoi(s_width);
@@ -746,7 +756,7 @@ int main(void)
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////    Leo txt para kernel y bias de fire_10   //////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    fd = fopen("../../../SqueezeNet/squeezedet-keras-master/main/model/parametros/fire10:squeeze1x1:kernel:0.txt", "r");
+    fd = fopen("../../../SqueezeDetTraining/squeezedet-keras-master/main/model/parametros/fire10:squeeze1x1:kernel:0.txt", "r");
     getline(&line, &len, fd);
     //printf("line: %s\n", line);
     sscanf(line, " (%[^','], %[^','], %[^','], %[^','])\n", s_width, s_height, s_depth, s_filters);
@@ -758,7 +768,7 @@ int main(void)
     //printVector(fire_2_kernel_s1x1, i_width, i_height, i_depth, i_filters);
     fclose(fd);
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    fd = fopen("../../../SqueezeNet/squeezedet-keras-master/main/model/parametros/fire10:expand1x1:kernel:0.txt", "r");
+    fd = fopen("../../../SqueezeDetTraining/squeezedet-keras-master/main/model/parametros/fire10:expand1x1:kernel:0.txt", "r");
     getline(&line, &len, fd);
     //printf("line: %s\n", line);
     sscanf(line, " (%[^','], %[^','], %[^','], %[^','])\n", s_width, s_height, s_depth, s_filters);
@@ -770,7 +780,7 @@ int main(void)
     // printVector(fire_2_kernel_e1x1, i_width, i_height, i_depth, i_filters);
     fclose(fd);
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    fd = fopen("../../../SqueezeNet/squeezedet-keras-master/main/model/parametros/fire10:expand3x3:kernel:0.txt", "r");
+    fd = fopen("../../../SqueezeDetTraining/squeezedet-keras-master/main/model/parametros/fire10:expand3x3:kernel:0.txt", "r");
     getline(&line, &len, fd);
     //printf("line: %s\n", line);
     sscanf(line, " (%[^','], %[^','], %[^','], %[^','])\n", s_width, s_height, s_depth, s_filters);
@@ -782,7 +792,7 @@ int main(void)
     // printVector(fire_2_kernel_e1x1, i_width, i_height, i_depth, i_filters);
     fclose(fd);
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    fd = fopen("../../../SqueezeNet/squeezedet-keras-master/main/model/parametros/fire10:squeeze1x1:bias:0.txt", "r");
+    fd = fopen("../../../SqueezeDetTraining/squeezedet-keras-master/main/model/parametros/fire10:squeeze1x1:bias:0.txt", "r");
     getline(&line, &len, fd);
     sscanf(line, " (%[^','], )\n", s_width);
     i_width = atoi(s_width);
@@ -793,7 +803,7 @@ int main(void)
     //printVector(fire_2_bias_s1x1, i_width, 1, 1, 1);
     fclose(fd);
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    fd = fopen("../../../SqueezeNet/squeezedet-keras-master/main/model/parametros/fire10:expand1x1:bias:0.txt", "r");
+    fd = fopen("../../../SqueezeDetTraining/squeezedet-keras-master/main/model/parametros/fire10:expand1x1:bias:0.txt", "r");
     getline(&line, &len, fd);
     sscanf(line, " (%[^','], )\n", s_width);
     i_width = atoi(s_width);
@@ -804,7 +814,7 @@ int main(void)
     //printVector(fire_2_bias_e1x1, i_width, 1, 1, 1);
     fclose(fd);
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    fd = fopen("../../../SqueezeNet/squeezedet-keras-master/main/model/parametros/fire10:expand3x3:bias:0.txt", "r");
+    fd = fopen("../../../SqueezeDetTraining/squeezedet-keras-master/main/model/parametros/fire10:expand3x3:bias:0.txt", "r");
     getline(&line, &len, fd);
     sscanf(line, " (%[^','], )\n", s_width);
     i_width = atoi(s_width);
@@ -818,7 +828,7 @@ int main(void)
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////    Leo txt para kernel y bias de fire_11   //////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    fd = fopen("../../../SqueezeNet/squeezedet-keras-master/main/model/parametros/fire11:squeeze1x1:kernel:0.txt", "r");
+    fd = fopen("../../../SqueezeDetTraining/squeezedet-keras-master/main/model/parametros/fire11:squeeze1x1:kernel:0.txt", "r");
     getline(&line, &len, fd);
     //printf("line: %s\n", line);
     sscanf(line, " (%[^','], %[^','], %[^','], %[^','])\n", s_width, s_height, s_depth, s_filters);
@@ -830,7 +840,7 @@ int main(void)
     //printVector(fire_2_kernel_s1x1, i_width, i_height, i_depth, i_filters);
     fclose(fd);
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    fd = fopen("../../../SqueezeNet/squeezedet-keras-master/main/model/parametros/fire11:expand1x1:kernel:0.txt", "r");
+    fd = fopen("../../../SqueezeDetTraining/squeezedet-keras-master/main/model/parametros/fire11:expand1x1:kernel:0.txt", "r");
     getline(&line, &len, fd);
     //printf("line: %s\n", line);
     sscanf(line, " (%[^','], %[^','], %[^','], %[^','])\n", s_width, s_height, s_depth, s_filters);
@@ -842,7 +852,7 @@ int main(void)
     // printVector(fire_2_kernel_e1x1, i_width, i_height, i_depth, i_filters);
     fclose(fd);
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    fd = fopen("../../../SqueezeNet/squeezedet-keras-master/main/model/parametros/fire11:expand3x3:kernel:0.txt", "r");
+    fd = fopen("../../../SqueezeDetTraining/squeezedet-keras-master/main/model/parametros/fire11:expand3x3:kernel:0.txt", "r");
     getline(&line, &len, fd);
     //printf("line: %s\n", line);
     sscanf(line, " (%[^','], %[^','], %[^','], %[^','])\n", s_width, s_height, s_depth, s_filters);
@@ -854,7 +864,7 @@ int main(void)
     // printVector(fire_2_kernel_e1x1, i_width, i_height, i_depth, i_filters);
     fclose(fd);
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    fd = fopen("../../../SqueezeNet/squeezedet-keras-master/main/model/parametros/fire11:squeeze1x1:bias:0.txt", "r");
+    fd = fopen("../../../SqueezeDetTraining/squeezedet-keras-master/main/model/parametros/fire11:squeeze1x1:bias:0.txt", "r");
     getline(&line, &len, fd);
     sscanf(line, " (%[^','], )\n", s_width);
     i_width = atoi(s_width);
@@ -865,7 +875,7 @@ int main(void)
     //printVector(fire_2_bias_s1x1, i_width, 1, 1, 1);
     fclose(fd);
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    fd = fopen("../../../SqueezeNet/squeezedet-keras-master/main/model/parametros/fire11:expand1x1:bias:0.txt", "r");
+    fd = fopen("../../../SqueezeDetTraining/squeezedet-keras-master/main/model/parametros/fire11:expand1x1:bias:0.txt", "r");
     getline(&line, &len, fd);
     sscanf(line, " (%[^','], )\n", s_width);
     i_width = atoi(s_width);
@@ -876,7 +886,7 @@ int main(void)
     //printVector(fire_2_bias_e1x1, i_width, 1, 1, 1);
     fclose(fd);
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    fd = fopen("../../../SqueezeNet/squeezedet-keras-master/main/model/parametros/fire11:expand3x3:bias:0.txt", "r");
+    fd = fopen("../../../SqueezeDetTraining/squeezedet-keras-master/main/model/parametros/fire11:expand3x3:bias:0.txt", "r");
     getline(&line, &len, fd);
     sscanf(line, " (%[^','], )\n", s_width);
     i_width = atoi(s_width);
@@ -890,7 +900,7 @@ int main(void)
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////    Leo txt para kernel y bias conv12    ///////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    fd = fopen("../../../SqueezeNet/squeezedet-keras-master/main/model/parametros/conv12:kernel:0.txt", "r");
+    fd = fopen("../../../SqueezeDetTraining/squeezedet-keras-master/main/model/parametros/conv12:kernel:0.txt", "r");
     getline(&line, &len, fd);
     //printf("line: %s\n", line);
     sscanf(line, " (%[^','], %[^','], %[^','], %[^','])\n", s_width, s_height, s_depth, s_filters);
@@ -902,7 +912,7 @@ int main(void)
     //printVector(kernel, i_width, i_height, i_depth, i_filters);
     fclose(fd);
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    fd = fopen("../../../SqueezeNet/squeezedet-keras-master/main/model/parametros/conv12:bias:0.txt", "r");
+    fd = fopen("../../../SqueezeDetTraining/squeezedet-keras-master/main/model/parametros/conv12:bias:0.txt", "r");
     getline(&line, &len, fd);
     sscanf(line, " (%[^','], )\n", s_width);
     i_width = atoi(s_width);
@@ -1150,25 +1160,142 @@ int main(void)
     //printf("TEST: conv12_output: \n");
     //printVector(conv12_output, output_conv12_width, output_conv12_height, 54, 1 );
 
-    // Reshape
-    printf("Reshape \n");
-    reshape = (float*) malloc( output_conv12_width*output_conv12_height*CONV12_FILTERS*sizeof(float) );
-    for( int k=0 ; k<output_conv12_width ; k++){
-       for( int i=0 ; i<output_conv12_height ; i++){
-           for( int l=0 ; l<CONV12_FILTERS ; l++){
-                printf(" %f", *(conv12_output + k + output_conv12_width*i + output_conv12_width*output_conv12_height*l));
-                //printf("Voy a guardar: %s %d\n", param, atoi(param));
-                //sleep(1);
-                if( ((l % (6) ) == 5) && (l!=0) ) 
-                    printf(" \n");
-           }
-       }
+
+
+    // Consigo un vector con las predicciones de la clase 
+    pred_class = (float*) malloc( 2700*sizeof(float) );
+     // Consigo un vector con puntuaciones de confianza
+    pred_conf = (float*) malloc( 2700*sizeof(float) );
+    // probabilidad
+    prob = (float*) malloc( 2700*sizeof(float) );
+    // boxes
+    box_predicted = (float*) malloc( 10800*sizeof(float) );
+
+    for(j=0;j<output_conv12_height;j++)
+    {
+        for(i=0;i<output_conv12_width;i++)
+        {
+            for(k=0;k<54;k++)
+            {
+                //*(reshape + l + CONV12_FILTERS*i + output_conv12_height*CONV12_FILTERS*k ) = *(conv12_output + k + output_conv12_width*i + output_conv12_width*output_conv12_height*l);
+                if ( k < 9 )
+                    *(pred_class + k + 9*i + 9*output_conv12_width*j) = *(conv12_output + i + output_conv12_width*j + output_conv12_width*output_conv12_height*k);
+                if ( (k >= 9) && (k < 18))
+                    *(pred_conf + (k - 9) + 9*i + 9*output_conv12_width*j) = *(conv12_output + i + output_conv12_width*j + output_conv12_width*output_conv12_height*k);
+                if ( k >= 18)
+                    *(box_predicted + (k - 18) + 36*i + 36*output_conv12_width*j) = *(conv12_output + i + output_conv12_width*j + output_conv12_width*output_conv12_height*k);
+            }
+        }
     }
+
+    // Los normalizo 
+    pred_class_softmax = softmax(pred_class, 2700, pred_class_softmax); 
+
+    //printf("pred_class_softmax: \n");
+    //printVector(pred_class_softmax, 2700, 1, 1, 1 );
+
+    // Los normalizo 
+    pred_conf_sigmod = sigmoid(pred_conf, 2700, pred_conf_sigmod);
+
+    //printf("pred_conf_sigmod: \n");
+    //printVector(pred_conf_sigmod, 2700, 1, 1, 1 );
+
+    // Probabilidad
+    for(i=0;i<2700;i++)
+        *(prob + i) = *(pred_class_softmax + i) * *(pred_conf_sigmod + i);
+        
+    //printf("prob: \n");
+    //printVector(prob, 2700, 1, 1, 1 );
+
+    // Max prob
+    for(i=0;i<2700;i++)
+    {
+        if( *(prob + i) > max)
+        {
+            max = *(prob + i);
+            index_Ofmax = i;
+        }
+    }
+
+    printf("max prob: %f su index: %d\n", max, index_Ofmax);
+
+    // Search delta max prob
+    //printf("box_predicted: \n");
+    //printVector(box_predicted, 10800, 1, 1, 1 );
+
+    // Boxes from delta
+    delta_x = *(box_predicted + index_Ofmax*4 + 0);
+    delta_y = *(box_predicted + index_Ofmax*4 + 1);
+    delta_w = *(box_predicted + index_Ofmax*4 + 2);
+    delta_h = *(box_predicted + index_Ofmax*4 + 3);
+    //printf(" delta: %fx%fx%fx%f \n", delta_x, delta_y, delta_w, delta_h);
+    
+    // Delta box
+    fd = fopen("./ANCHOR_BOX.txt", "r");
+    getline(&line, &len, fd);
+    sscanf(line, " (%[^','], %[^','])\n", s_width, s_height);
+    i_width = atoi(s_width);  i_height = atoi(s_height);
+    printf("ANCHOR_BOX: Las dimensiones son: %dx%d \n", i_width, i_height);
+    anchors = anchorBox_load(fd, i_width, i_height, anchors);
+    fclose(fd);
+
+    //printf("anchors: \n");
+    //printVector(anchors, 2700, 4, 1, 1 );
+
+    // Consigo los anchors box
+    printf("anchor_x %f\n", *(anchors + 0 + i_height*index_Ofmax));
+
+    box_center_x = *(anchors + 0 + i_height*index_Ofmax) + delta_x * *(anchors + 2 + i_height*index_Ofmax);     //box_center_x = anchor_x + delta_x * anchor_w;
+    box_center_y = *(anchors + 1 + i_height*index_Ofmax) + delta_y * *(anchors + 3 + i_height*index_Ofmax);     //box_center_y = anchor_y + delta_y * anchor_h;
+    box_width    = *(anchors + 2 + i_height*index_Ofmax) * exp(delta_w);                                        //box_width    = anchor_w * safe_exp_np(delta_w, config.EXP_THRESH);
+    box_height   = *(anchors + 3 + i_height*index_Ofmax) * exp(delta_h);                                        //box_height   = anchor_h * safe_exp_np(delta_h, config.EXP_THRESH);
+    //anchor_x = config.ANCHOR_BOX[:, 0] //anchor_y = config.ANCHOR_BOX[:, 1] //anchor_w = config.ANCHOR_BOX[:, 2] //anchor_h = config.ANCHOR_BOX[:, 3]
+    printf(" Boxes: %fx%fx%fx%f \n", box_center_x, box_center_y, box_width, box_height);
+ 
+    // extremos de la caja
+    xmin = box_center_x-box_width/2;
+    ymin = box_center_y-box_height/2;
+    xmax = box_center_x+box_width/2;
+    ymax = box_center_y+box_height/2;
+    printf(" Xs: %f x %f x %f x %f \n", xmin, xmax, ymin, ymax);
+    // Recorto boxes si esta por fuera de la imagen
+    // Escribir...
+
+    // Dibujo la caja
+    process_png_file(img, xmin, xmax, ymin, ymax);
+
+    // Guardo la imagen
+    write_png_file("test5MODIF.png");
 
     return 0;
 }
 
 
 
+
+
+
+
+
+    // Reshape
+//    printf("Reshape \n");
+//    reshape = (float*) malloc( output_conv12_width*output_conv12_height*CONV12_FILTERS*sizeof(float) );
+//    for(  k=0 ; k<output_conv12_width ; k++){
+//       for(  i=0 ; i<output_conv12_height ; i++){
+//            for(  l=0 ; l<CONV12_FILTERS ; l++){
+//                *(reshape + l + CONV12_FILTERS*i + output_conv12_height*CONV12_FILTERS*k ) = *(conv12_output + k + output_conv12_width*i + output_conv12_width*output_conv12_height*l);
+//                //printf(" %f", *(conv12_output + k + output_conv12_width*i + output_conv12_width*output_conv12_height*l));
+//                //*(reshape + k + output_conv12_width*i + l*output_conv12_height*output_conv12_width) = *(conv12_output + k + output_conv12_width*i + output_conv12_width*output_conv12_height*l);
+//                //printf("Voy a guardar: %s %d\n", param, atoi(param));
+//                //sleep(1);
+//                //if( ((l % (6) ) == 5) && (l!=0) ) 
+//                    //*(reshape + l + CONV12_FILTERS*i + output_conv12_height*CONV12_FILTERS*k ) = *(conv12_output + k + output_conv12_width*i + output_conv12_width*output_conv12_height*l);
+//                    //printf(" \n");
+//           }
+//       }
+//    }
+//
+//    printf("Reshape: \n");
+//    printVector(reshape, 6, 2700, 1, 1 );
 
 

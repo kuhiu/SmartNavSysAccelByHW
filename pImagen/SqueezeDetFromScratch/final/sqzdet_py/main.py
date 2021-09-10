@@ -206,7 +206,7 @@ SqueezeDet.model.get_layer("conv12").set_weights(kernel_conv12_load)
 ######################################################################################################################
 # Input
 ######################################################################################################################
-in_image = cv2.imread("./testing/test6.png",flags=cv2.IMREAD_UNCHANGED).astype(np.float32, copy=False)
+in_image = cv2.imread("./testing/test5.png",flags=cv2.IMREAD_UNCHANGED).astype(np.float32, copy=False)
 in_image = cv2.cvtColor(in_image, cv2.COLOR_BGRA2RGB)
 print("in_image shape  = \n", in_image.shape)
 in_image = np.reshape(in_image, [1, 240, 320, 3])
@@ -218,14 +218,30 @@ in_image = np.reshape(in_image, [1, 240, 320, 3])
 intermediate_layer_model = Model(inputs=SqueezeDet.model.input, outputs=SqueezeDet.model.get_layer("reshape_1").output)
 intermediate_output = intermediate_layer_model.predict( in_image )
 
+intermediate_layer_model2 = Model(inputs=SqueezeDet.model.input, outputs=SqueezeDet.model.get_layer("conv1").output)
+intermediate_output2 = intermediate_layer_model2.predict( in_image )
+
+print("intermediate_output2\n", intermediate_output2)
+#r = open("./intermediate_output2" + ".txt", "w")
+#r.write( str( intermediate_output2 ) )
+#r.close()
+
+
+
 [pred_class_probs, pred_conf, pred_box_delta] = slice_predictions_np(intermediate_output)
+
+#print( " pred_class_probs = \n", pred_class_probs )
 
 det_boxes = boxes_from_deltas_np(pred_box_delta, cfg)
 
 ##compute class probabilities
+#print( " pred_conf output = \n", pred_conf )
 probs = pred_class_probs * np.reshape(pred_conf, [1, 2700, 1])
 
-print( " probs output = \n", probs.shape )
+#print( " probs output = \n", probs )
+r = open("./probs" + ".txt", "w")
+r.write( str(  probs ) )
+r.close()
 
 det_probs = np.max(probs, 1)
 det_class = np.argmax(probs, 1)
@@ -235,11 +251,13 @@ print( " det_class output = \n", det_class[0][0] )
 
 more_probable = det_class[0][0]
 
-print( " det_boxes output = \n", det_boxes[0][more_probable] )
+print( " det_boxes output = \n", det_boxes[0] )
 
 box_predicted = det_boxes[0][more_probable].astype(int)
+
+print("box_predicted: \n", box_predicted[0], box_predicted[1], box_predicted[2], box_predicted[3])
 
 in_image = np.reshape(in_image, [240, 320, 3])
 in_image = cv2.cvtColor(in_image, cv2.COLOR_RGB2BGR)
 cv2.rectangle(in_image, (box_predicted[0], box_predicted[1]) ,(box_predicted[2], box_predicted[3]), (0,0,255), 3)
-cv2.imwrite("./testing/test6MODIF.png", in_image)
+cv2.imwrite("./testing/test5MODIF.png", in_image)

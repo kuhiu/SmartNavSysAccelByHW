@@ -1,7 +1,7 @@
 #include "sqz.h"
 
 
-void process_png_file(float *img) {
+void get_png_file(float *img) {
     int x, y, z;
     for(y = 0; y < img_height; y++) {
         png_bytep row = row_pointers[y];
@@ -9,6 +9,27 @@ void process_png_file(float *img) {
             png_bytep px = &(row[x * 4]);
             for(z = 0; z<3; z++)
                 *(img + x + img_width*y + img_height*img_width*z ) = px[z]; 
+        }
+    }
+}
+
+void process_png_file(float *img, int xmin, int xmax, int ymin, int ymax) {
+    int x, y, z;
+    for(y = 0; y < img_height; y++) {
+        png_bytep row = row_pointers[y];
+        for(x = 0; x < img_width; x++) {
+            png_bytep px = &(row[x * 4]);
+            for(z = 0; z<3; z++)
+            {
+                if ( (x > xmin) && (x < (xmin+5)) && (y < ymax) && (y > ymin) )
+                    px[z] = 0; 
+                if ( (x < xmax) && (x > (xmax-5)) && (y < ymax) && (y > ymin))
+                    px[z] = 0;
+                if ( (y > ymin) && (y < (ymin+5)) && (x < xmax) && (x > xmin))
+                    px[z] = 0; 
+                if ( (y < ymax) && (y > (ymax-5)) && (x < xmax) && (x > xmin))
+                    px[z] = 0;
+            }
         }
     }
 }
@@ -75,6 +96,53 @@ void read_png_file(char *filename) {
     png_destroy_read_struct(&png, &info, NULL);
 }
 
+void write_png_file(char *filename) {
+  int y;
+
+  FILE *fp = fopen(filename, "wb");
+  if(!fp) abort();
+
+  png_structp png = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
+  if (!png) abort();
+
+  png_infop info = png_create_info_struct(png);
+  if (!info) abort();
+
+  if (setjmp(png_jmpbuf(png))) abort();
+
+  png_init_io(png, fp);
+
+  // Output is 8bit depth, RGBA format.
+  png_set_IHDR(
+    png,
+    info,
+    img_width, img_height,
+    8,
+    PNG_COLOR_TYPE_RGBA,
+    PNG_INTERLACE_NONE,
+    PNG_COMPRESSION_TYPE_DEFAULT,
+    PNG_FILTER_TYPE_DEFAULT
+  );
+  png_write_info(png, info);
+
+  // To remove the alpha channel for PNG_COLOR_TYPE_RGB format,
+  // Use png_set_filler().
+  //png_set_filler(png, 0, PNG_FILLER_AFTER);
+
+  if (!row_pointers) abort();
+
+  png_write_image(png, row_pointers);
+  png_write_end(png, NULL);
+
+  for(int y = 0; y < img_height; y++) {
+    free(row_pointers[y]);
+  }
+  free(row_pointers);
+
+  fclose(fp);
+
+  png_destroy_write_struct(&png, &info);
+}
 
 float ReLu(float input) {
     if(input <= 0)
@@ -355,4 +423,113 @@ float * bias_load(FILE * fd, int i_depth)
     }
 
     return array;
+}
+
+float * softmax( float *x, int  i_width, float *output)
+{
+    int i;
+    float max=0;
+    float *e_x = (float*) malloc( i_width*sizeof(float) );
+    output = (float*) malloc( i_width*sizeof(float) );
+    // Busco el maximo del vector
+    for (i = 0; i < (i_width); i++)
+    {
+        if ( *(x + i) > max )
+            max = *(x + i);
+    }
+
+    printf("El maximo es: %f \n", max);
+
+    for (i = 0; i < (i_width); i++)
+        *(e_x + i) = exp( *(x + i) - max);
+
+    // Corregir esto cuando tenemos mas de una clase.
+    for (i = 0; i < (i_width); i++)
+        *(output + i) = *(e_x + i) / *(e_x + i);
+
+    //printf("output: \n");
+    //printVector(output, 2700, 1, 1, 1 );
+
+    free(e_x);
+    return output;
+}
+
+float * sigmoid( float *x, int  i_width, float *output)
+{
+    int i;
+    output = (float*) malloc( i_width*sizeof(float) );
+
+    for (i = 0; i < (i_width); i++)
+        *(output + i) = 1/(1+exp(- *(x + i) )) ;
+
+    return output;
+}
+
+
+float * anchorBox_load(FILE * fd, int  i_width, int i_height, float *array)
+{
+    int i,j;
+    size_t len = 0;
+    char param[100];
+    char * line = NULL;
+
+    array = (float*) malloc( ( i_width*i_height) * sizeof(float));
+
+    for( j=0 ; j<i_height ; j++){
+        for( i=0 ; i<i_width ; i++){
+            getline(&line, &len, fd);
+            sscanf(line, "%s\n", param);
+            //printf("Voy a guardar: %s %d\n", param, atoi(param));
+            *(array + i + i_width*j) = atof(param);
+            //sleep(1);
+        } 
+    }
+
+    return array;
+
+}
+
+
+
+float * weight_load2(char *filename)
+{
+    int i,j,k,l;
+    //size_t len = 0;
+    char param[100];
+    //char * line = NULL;
+    float *array = NULL;
+
+
+    // Archivo
+    FILE * fd;
+    char s_width[20], s_height[20], s_depth[20], s_filters[20];
+    int  i_width, i_height, i_depth, i_filters;
+    size_t len = 0;
+    char * line             = NULL;
+
+    fd = fopen(filename, "r");
+    getline(&line, &len, fd);
+    printf("line: %s\n", line);
+    sscanf(line, " (%[^','], %[^','], %[^','], %[^','])\n", s_width, s_height, s_depth, s_filters);
+    i_width = atof(s_width); i_height = atof(s_height); i_depth = atof(s_depth); i_filters = atof(s_filters);
+    printf("CONV2d_1: Las dimensiones del kernel son: %dx%dx%dx%d \n", i_width, i_height, i_depth, i_filters);
+
+    array = (float*) malloc( ( i_width*i_height*i_depth*i_filters ) * sizeof(float));
+
+    for( j=0 ; j<i_height ; j++){
+        for( i=0 ; i<i_width ; i++){
+            for( k=0 ; k<i_depth ; k++){
+                for( l=0 ; l<i_filters ; l++){
+                    getline(&line, &len, fd);
+                    sscanf(line, "%s\n", param);
+                    //printf("Voy a guardar: %s %d\n", param, atoi(param));
+                    *(array + i + i_width*j + i_width*i_height*k + i_depth*i_width*i_height*l) = atof(param);
+                    //sleep(1);
+                }
+            }
+        } 
+    }
+
+    return array;
+
 }

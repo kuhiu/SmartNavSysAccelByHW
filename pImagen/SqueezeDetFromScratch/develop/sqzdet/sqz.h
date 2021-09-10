@@ -6,7 +6,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <png.h>
-
+#include <math.h>
 
 #define FRAMEBUFFER_OFFSET  0x01000000  // Image ram position
 
@@ -94,7 +94,8 @@
 #define CONV12_RELU                 0
 
 void read_png_file(char *filename);
-void process_png_file(float *img);
+void process_png_file(float *img, int xmin, int xmax, int ymin, int ymax);
+void get_png_file(float *img);
 void convolucion2d (float *input, int input_shape_width, int input_shape_height, int input_depth, float *kernel, int kernel_size, float *bias, int stride, int Relu, float *conv2d_1, int output_conv1_width, int output_conv1_height, int filtros); 
 void printVector(float *kernel, int i_width, int i_height, int i_depth, int i_filters);
 void maxPool2d( int pool_size, int stride, float *in, int input_shape_width, int input_shape_height, int input_depth, float *max_pool, int pool_width, int pool_height,int padding );
@@ -102,7 +103,10 @@ void fire_layer(float *, int, int, int, float*, int, int, int, float *, float*, 
 void padding(float *input, int input_shape_width, int input_shape_height, int input_depth, float *output, int pad_along_width, int pad_along_height);
 float * weight_load(FILE * fd, int  i_width, int i_height, int i_depth, int i_filters);
 float * bias_load(FILE * fd, int i_depth);
-
+float * anchorBox_load(FILE * fd, int  i_width, int i_height, float *array);
+float * softmax( float *x, int  i_width, float *output);
+float * sigmoid( float *x, int  i_width, float *output);
+float * weight_load2(char *filename);
 // Read png lib
 extern int img_width, img_height;
 extern png_byte color_type;
