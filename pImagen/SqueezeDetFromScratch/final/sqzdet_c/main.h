@@ -1,3 +1,4 @@
+#include <png.h>
 #include <stdio.h>
 #include <limits.h>
 #include <stdlib.h>
@@ -5,9 +6,12 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-#include <png.h>
 #include <math.h>
-#include <time.h>
+#include <string.h>
+#include <malloc.h>
+#include <sys/time.h>
+
+
 
 #define FRAMEBUFFER_OFFSET  0x01000000  // Image ram position
 
@@ -108,6 +112,7 @@ float *bias_load(char *filename);
 float *anchorBox_load(char *filename);
 float *softmax( float *x, int  i_width);
 float *sigmoid( float *x, int  i_width);
+void *aligned_calloc(size_t nelem, size_t elsize, size_t alignment);
 
 // Read png lib
 extern int img_width, img_height;

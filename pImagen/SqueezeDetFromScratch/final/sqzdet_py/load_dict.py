@@ -6,10 +6,10 @@ from easydict import EasyDict as edict
 def set_anchors(cfg):
     H, W, B = cfg.ANCHORS_HEIGHT, cfg.ANCHORS_WIDTH, cfg.ANCHOR_PER_GRID
 
-    print("cfg.ANCHOR_SEED: \n", cfg.ANCHOR_SEED.shape)
+    #print("cfg.ANCHOR_SEED: \n", cfg.ANCHOR_SEED.shape)
     anchor_shapes = np.reshape( [cfg.ANCHOR_SEED] * H * W, (H, W, B, 2) )
 
-    print("anchor_shapes: \n", anchor_shapes.shape)
+    #print("anchor_shapes: \n", anchor_shapes.shape)
 
     center_x = np.reshape(
         np.transpose(
@@ -21,9 +21,9 @@ def set_anchors(cfg):
         ),
         (H, W, B, 1)
     )
-    print("arr: \n", np.array([np.arange(1, W+1)*float(cfg.IMAGE_WIDTH)/(W)]  *H*B).shape )
+    #print("arr: \n", np.array([np.arange(1, W+1)*float(cfg.IMAGE_WIDTH)/(W)]  *H*B).shape )
     #print("arr2 \n", float(cfg.IMAGE_WIDTH)/(W+1))
-    print("center_x: \n", center_x.shape)
+    #print("center_x: \n", center_x.shape)
 
     center_y = np.reshape(
         np.transpose(
@@ -36,12 +36,12 @@ def set_anchors(cfg):
         (H, W, B, 1)
     )
 
-    print("center_y: \n", center_y.shape)
+    #print("center_y: \n", center_y.shape)
     anchors = np.reshape(
         np.concatenate((center_x, center_y, anchor_shapes), axis=3),
         (-1, 4)
     )
-    print("anchors: \n", anchors.shape)
+    #print("anchors: \n", anchors.shape)
     return anchors, H, W
 
 

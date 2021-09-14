@@ -8,6 +8,16 @@ import cv2
 import numpy as np
 from keras.models import Model
 from post_cnn import slice_predictions_np, softmax, sigmoid, safe_exp_np, bbox_transform, bbox_transform_inv, boxes_from_deltas_np
+import time
+from keras import backend as K
+import matplotlib.pyplot as plt
+jobs = 8 # it means number of cores
+config = tf.ConfigProto(intra_op_parallelism_threads=jobs,
+                         inter_op_parallelism_threads=jobs,
+                         allow_soft_placement=True,
+                         device_count={'CPU': jobs})
+session = tf.Session(config=config)
+K.set_session(session)
 
 #np.set_printoptions(threshold=sys.maxsize)
 filename = "./files_fromTrain/model.50-3.32.hdf5"
@@ -21,10 +31,10 @@ cfg = load_dict(CONFIG)
 SqueezeDet = SqueezeDet(cfg)
 
 #dummy optimizer for compilation
-sgd = optimizers.SGD(lr=0.01, decay=0, momentum=0.9, nesterov=False, clipnorm=1.0)
+sgd = optimizers.sgd(lr=0.01, decay=0, momentum=0.9, nesterov=False, clipnorm=1.0)
 
 #model compiler 
-SqueezeDet.model.compile(optimizer=sgd, loss=[SqueezeDet.loss])
+#SqueezeDet.model.compile(optimizer=sgd, loss=[SqueezeDet.loss])
 
 #read parameters
 [kernel_conv1, bias_conv1, kernel_conv12, bias_conv12, 
@@ -208,20 +218,31 @@ SqueezeDet.model.get_layer("conv12").set_weights(kernel_conv12_load)
 ######################################################################################################################
 in_image = cv2.imread("./testing/test5.png",flags=cv2.IMREAD_UNCHANGED).astype(np.float32, copy=False)
 in_image = cv2.cvtColor(in_image, cv2.COLOR_BGRA2RGB)
-print("in_image shape  = \n", in_image.shape)
+#print("in_image shape  = \n", in_image.shape)
 in_image = np.reshape(in_image, [1, 240, 320, 3])
 
 ######################################################################################################################
 # Output
 ######################################################################################################################
-
+print("Start to executing... \n")
 intermediate_layer_model = Model(inputs=SqueezeDet.model.input, outputs=SqueezeDet.model.get_layer("reshape_1").output)
 intermediate_output = intermediate_layer_model.predict( in_image )
 
+times = []
 intermediate_layer_model2 = Model(inputs=SqueezeDet.model.input, outputs=SqueezeDet.model.get_layer("conv1").output)
-intermediate_output2 = intermediate_layer_model2.predict( in_image )
+for i in range(10000):
+   start = time.time() 
+   intermediate_output2 = intermediate_layer_model2.predict( in_image )
+   end = time.time()
+   times.append(end-start)
+#print("Time: ", times) 
 
-print("intermediate_output2\n", intermediate_output2)
+plt.plot(range(10000) , times)
+plt.show()
+
+
+
+#print("intermediate_output2\n", intermediate_output2)
 #r = open("./intermediate_output2" + ".txt", "w")
 #r.write( str( intermediate_output2 ) )
 #r.close()
@@ -239,25 +260,25 @@ det_boxes = boxes_from_deltas_np(pred_box_delta, cfg)
 probs = pred_class_probs * np.reshape(pred_conf, [1, 2700, 1])
 
 #print( " probs output = \n", probs )
-r = open("./probs" + ".txt", "w")
-r.write( str(  probs ) )
-r.close()
+#r = open("./probs" + ".txt", "w")
+#r.write( str(  probs ) )
+#r.close()
 
 det_probs = np.max(probs, 1)
 det_class = np.argmax(probs, 1)
 
-print( " det_probs output = \n", det_probs[0][0] )
-print( " det_class output = \n", det_class[0][0] )
+#print( " det_probs output = \n", det_probs[0][0] )
+#print( " det_class output = \n", det_class[0][0] )
 
 more_probable = det_class[0][0]
 
-print( " det_boxes output = \n", det_boxes[0] )
+#print( " det_boxes output = \n", det_boxes[0] )
 
 box_predicted = det_boxes[0][more_probable].astype(int)
-
-print("box_predicted: \n", box_predicted[0], box_predicted[1], box_predicted[2], box_predicted[3])
+#print("box_predicted: \n", box_predicted[0], box_predicted[1], box_predicted[2], box_predicted[3])
 
 in_image = np.reshape(in_image, [240, 320, 3])
 in_image = cv2.cvtColor(in_image, cv2.COLOR_RGB2BGR)
 cv2.rectangle(in_image, (box_predicted[0], box_predicted[1]) ,(box_predicted[2], box_predicted[3]), (0,0,255), 3)
 cv2.imwrite("./testing/test5MODIF.png", in_image)
+

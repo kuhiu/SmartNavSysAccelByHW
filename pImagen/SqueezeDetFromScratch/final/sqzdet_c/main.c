@@ -10,12 +10,12 @@ png_bytep *row_pointers = NULL;
 
 int main(void)
 {    
-    double time_spent;
-    clock_t begin;
+    struct timespec begin, end; 
 
     // Imagen de entrada
     float *img              = NULL;
-    float *img_padded       = NULL;
+    float *img_padded1      = NULL;
+    float *img_padded2      = NULL;
 
     // Conv1                                         // Conv12  
     float *conv1_kernel     = NULL;                  float *conv12_kernel    = NULL;                                     
@@ -88,7 +88,7 @@ int main(void)
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////       Memoria dinamica     ////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    img = (float*) malloc( img_width*img_height*3*sizeof(float) );
+    img = (float*) aligned_alloc( 16, img_width*img_height*3*sizeof(float) );
 ////////////////////////////////        Leo la imagen       ////////////////////////////////////////////////////////
     get_png_file(img);
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -207,38 +207,67 @@ int main(void)
     conv12_kernel = weight_load("./files_fromTrain/parametros/conv12:kernel:0.txt");
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     conv12_bias = bias_load("./files_fromTrain/parametros/conv12:bias:0.txt");
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+////////////////////////////////   Pre-Processing y Dinamic mem  ///////////////////////////////////////////////////
+    img_padded1 = (float*) aligned_calloc( (img_width+1)*(img_height+1)*3 , sizeof(float), 16 );
+    output_conv1_width  = (((IMG_WIDTH  - CONV1_KERNEL_SIZE + CONV1_PAD)/CONV1_STRIDE) + 1); 
+    output_conv1_height = (((IMG_HEIGHT - CONV1_KERNEL_SIZE + CONV1_PAD)/CONV1_STRIDE) + 1);
+    conv1_output = (float*) aligned_calloc( output_conv1_width*output_conv1_height*CONV1_FILTERS, sizeof(float), 16 );
+    pool_width_1  = output_conv1_width/2;
+    pool_height_1 = output_conv1_height/2;
+    max_pool_1 = (float*) calloc( ( pool_width_1*pool_height_1*CONV1_FILTERS ), sizeof(float));
+    fire_2 = (float*) calloc( ( pool_width_1*pool_height_1*(FIRE2_e1x1+FIRE2_e3x3) ), sizeof(float));
+    fire_3 = (float*) calloc( ( pool_width_1*pool_height_1*(FIRE3_e1x1+FIRE3_e3x3) ), sizeof(float));
+    pool_width_3  = pool_width_1/2;
+    pool_height_3 = pool_height_1/2;
+    max_pool_3 = (float*) calloc( ( pool_width_3*pool_height_3*MAXPOOL3_FILTERS ), sizeof(float));
+    fire_4 = (float*) calloc( ( pool_width_3*pool_height_3*(FIRE4_e1x1+FIRE4_e3x3) ), sizeof(float));
+    fire_5 = (float*) calloc( ( pool_width_3*pool_height_3*(FIRE5_e1x1+FIRE5_e3x3) ), sizeof(float));
+    pool_width_5  = (pool_width_3)/2;
+    pool_height_5 = (pool_height_3)/2;
+    max_pool_5 = (float*) calloc( ( pool_width_5*pool_height_5*(FIRE5_e1x1+FIRE5_e3x3) ), sizeof(float));
+    fire_6 = (float*) calloc( ( pool_width_5*pool_height_5*(FIRE6_e1x1+FIRE6_e3x3) ), sizeof(float));
+    fire_7 = (float*) calloc( ( pool_width_5*pool_height_5*(FIRE7_e1x1+FIRE7_e3x3) ), sizeof(float));
+    fire_8 = (float*) calloc( ( pool_width_5*pool_height_5*(FIRE8_e1x1+FIRE8_e3x3) ), sizeof(float));
+    fire_9 = (float*) calloc( ( pool_width_5*pool_height_5*(FIRE9_e1x1+FIRE9_e3x3) ), sizeof(float));
+    fire_10 = (float*) calloc( ( pool_width_5*pool_height_5*(FIRE10_e1x1+FIRE10_e3x3) ), sizeof(float));
+    fire_11 = (float*) calloc( ( pool_width_5*pool_height_5*(FIRE11_e1x1+FIRE11_e3x3) ), sizeof(float));
+    img_padded2 = (float*) calloc( (pool_width_5+CONV12_PAD)*(pool_height_5+CONV12_PAD)*(FIRE11_e1x1+FIRE11_e3x3) , sizeof(float) );
+    output_conv12_width  = (((pool_width_5  - CONV12_KERNEL_SIZE + CONV12_PAD)/CONV12_STRIDE) + 1); 
+    output_conv12_height = (((pool_height_5 - CONV12_KERNEL_SIZE + CONV12_PAD)/CONV12_STRIDE) + 1);
+    conv12_output = (float*) calloc( output_conv12_width*output_conv12_height*CONV12_FILTERS, sizeof(float) );
 //////////////////////////////////////   Time measure  /////////////////////////////////////////////////////////////
-    printf("Start to measure\n");
-    begin = clock();
     printf("Start to precessing...\n");
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////          SqueezeDet        ////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    img_padded = (float*) calloc( (img_width+1)*(img_height+1)*3 , sizeof(float) );
+    printf("Start to measure\n");
+    clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &begin);
     padding(    img, img_width, img_height, 3,
-                img_padded,
+                img_padded1,
                 1, 1); 
-    output_conv1_width  = (((IMG_WIDTH  - CONV1_KERNEL_SIZE + CONV1_PAD)/CONV1_STRIDE) + 1); 
-    output_conv1_height = (((IMG_HEIGHT - CONV1_KERNEL_SIZE + CONV1_PAD)/CONV1_STRIDE) + 1);
-    conv1_output = (float*) calloc( output_conv1_width*output_conv1_height*CONV1_FILTERS, sizeof(float) );
-    convolucion2d(  img_padded, (img_width+1), (img_height+1), 3,                           // Entrada: pointer, ancho, alto, profundidad
+    convolucion2d(  img_padded1, (img_width+1), (img_height+1), 3,                          // Entrada: pointer, ancho, alto, profundidad
                     conv1_kernel, CONV1_KERNEL_SIZE,                                        // Kernel: pointer, size
                     conv1_bias,                                                             // Bias: pointer
                     2,                                                                      // Stride
                     CONV1_RELU,
                     conv1_output, output_conv1_width, output_conv1_height, CONV1_FILTERS ); // Salida: pointer, ancho, alto, profundidad
+    // Stop measuring time and calculate the elapsed time
+    clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &end);
+    long seconds = end.tv_sec - begin.tv_sec;
+    long nanoseconds = end.tv_nsec - begin.tv_nsec;
+    double elapsed = seconds + nanoseconds*1e-9;
+    printf("Time executing.. %f \n", elapsed);
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    pool_width_1  = output_conv1_width/2;
-    pool_height_1 = output_conv1_height/2;
-    max_pool_1 = (float*) calloc( ( pool_width_1*pool_height_1*CONV1_FILTERS ), sizeof(float));
     maxPool2d(  MAXPOOL1_POOL_SIZE, MAXPOOL1_STRIDE, 
                 conv1_output, output_conv1_width, output_conv1_height, CONV1_FILTERS, 
                 max_pool_1, pool_width_1, pool_height_1,
                 MAXPOOL1_PAD);
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    fire_2 = (float*) calloc( ( pool_width_1*pool_height_1*(FIRE2_e1x1+FIRE2_e3x3) ), sizeof(float));
     fire_layer (    max_pool_1, pool_width_1, pool_height_1, CONV1_FILTERS,             // Entrada: pointer, ancho, alto, profundidad
                     fire_2, pool_width_1, pool_height_1, (FIRE2_e1x1+FIRE2_e3x3),       // Salida: pointer, ancho, alto, profundidad
                     fire_2_kernel_s1x1, fire_2_bias_s1x1, FIRE2_s1x1,                   // kernel_s1x1, bias_s1x1, s1x1
@@ -247,7 +276,6 @@ int main(void)
                     FIRE2_RELU                                          );              // Relu?
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    fire_3 = (float*) calloc( ( pool_width_1*pool_height_1*(FIRE3_e1x1+FIRE3_e3x3) ), sizeof(float));
     fire_layer (    fire_2, pool_width_1, pool_height_1, (FIRE2_e1x1+FIRE2_e3x3),       // Entrada: pointer, ancho, alto, profundidad
                     fire_3, pool_width_1, pool_height_1, (FIRE3_e1x1+FIRE3_e3x3),       // Salida: pointer, ancho, alto, profundidad
                     fire_3_kernel_s1x1, fire_3_bias_s1x1, FIRE3_s1x1,                   // kernel_s1x1, bias_s1x1, s1x1
@@ -256,16 +284,12 @@ int main(void)
                     FIRE3_RELU                                        );                // Relu?
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    pool_width_3  = pool_width_1/2;
-    pool_height_3 = pool_height_1/2;
-    max_pool_3 = (float*) calloc( ( pool_width_3*pool_height_3*MAXPOOL3_FILTERS ), sizeof(float));
     maxPool2d(  MAXPOOL3_POOL_SIZE, MAXPOOL3_STRIDE, 
                 fire_3, pool_width_1, pool_height_1, (FIRE3_e1x1+FIRE3_e3x3), 
                 max_pool_3, pool_width_3, pool_height_3,
                 MAXPOOL3_PAD);
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    fire_4 = (float*) calloc( ( pool_width_3*pool_height_3*(FIRE4_e1x1+FIRE4_e3x3) ), sizeof(float));
     fire_layer (    max_pool_3, pool_width_3, pool_height_3, (FIRE2_e1x1+FIRE2_e3x3),   // Entrada: pointer, ancho, alto, profundidad
                     fire_4, pool_width_3, pool_height_3, (FIRE4_e1x1+FIRE4_e3x3),       // Salida: pointer, ancho, alto, profundidad
                     fire_4_kernel_s1x1, fire_4_bias_s1x1, FIRE4_s1x1,                   // kernel_s1x1, bias_s1x1, s1x1
@@ -274,7 +298,6 @@ int main(void)
                     FIRE4_RELU                                      );                  // Relu?
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    fire_5 = (float*) calloc( ( pool_width_3*pool_height_3*(FIRE5_e1x1+FIRE5_e3x3) ), sizeof(float));
     fire_layer (    fire_4, pool_width_3, pool_height_3, (FIRE4_e1x1+FIRE4_e3x3),       // Entrada: pointer, ancho, alto, profundidad
                     fire_5, pool_width_3, pool_height_3, (FIRE5_e1x1+FIRE5_e3x3),       // Salida: pointer, ancho, alto, profundidad
                     fire_5_kernel_s1x1, fire_5_bias_s1x1, FIRE5_s1x1,                   // kernel_s1x1, bias_s1x1, s1x1
@@ -283,16 +306,12 @@ int main(void)
                     FIRE5_RELU                                      );                  // Relu?
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    pool_width_5  = (pool_width_3)/2;
-    pool_height_5 = (pool_height_3)/2;
-    max_pool_5 = (float*) calloc( ( pool_width_5*pool_height_5*(FIRE5_e1x1+FIRE5_e3x3) ), sizeof(float));
     maxPool2d(  MAXPOOL5_POOL_SIZE, MAXPOOL5_STRIDE, 
                 fire_5, pool_width_3, pool_height_3, (FIRE5_e1x1+FIRE5_e3x3), 
                 max_pool_5, pool_width_5, pool_height_5,
                 MAXPOOL5_PAD);
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    fire_6 = (float*) calloc( ( pool_width_5*pool_height_5*(FIRE6_e1x1+FIRE6_e3x3) ), sizeof(float));
     fire_layer (    max_pool_5, pool_width_5, pool_height_5, (FIRE5_e1x1+FIRE5_e3x3),   // Entrada: pointer, ancho, alto, profundidad
                     fire_6, pool_width_5, pool_height_5, (FIRE6_e1x1+FIRE6_e3x3),       // Salida: pointer, ancho, alto, profundidad
                     fire_6_kernel_s1x1, fire_6_bias_s1x1, FIRE6_s1x1,                   // kernel_s1x1, bias_s1x1, s1x1
@@ -301,7 +320,6 @@ int main(void)
                     FIRE6_RELU                                      );                  // Relu?
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    fire_7 = (float*) calloc( ( pool_width_5*pool_height_5*(FIRE7_e1x1+FIRE7_e3x3) ), sizeof(float));
     fire_layer (    fire_6, pool_width_5, pool_height_5, (FIRE6_e1x1+FIRE6_e3x3),       // Entrada: pointer, ancho, alto, profundidad
                     fire_7, pool_width_5, pool_height_5, (FIRE7_e1x1+FIRE7_e3x3),       // Salida: pointer, ancho, alto, profundidad
                     fire_7_kernel_s1x1, fire_7_bias_s1x1, FIRE7_s1x1,                   // kernel_s1x1, bias_s1x1, s1x1
@@ -310,7 +328,6 @@ int main(void)
                     FIRE7_RELU                                      );                  // Relu?
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    fire_8 = (float*) calloc( ( pool_width_5*pool_height_5*(FIRE8_e1x1+FIRE8_e3x3) ), sizeof(float));
     fire_layer (    fire_7, pool_width_5, pool_height_5, (FIRE7_e1x1+FIRE7_e3x3),       // Entrada: pointer, ancho, alto, profundidad
                     fire_8, pool_width_5, pool_height_5, (FIRE8_e1x1+FIRE8_e3x3),       // Salida: pointer, ancho, alto, profundidad
                     fire_8_kernel_s1x1, fire_8_bias_s1x1, FIRE8_s1x1,                   // kernel_s1x1, bias_s1x1, s1x1
@@ -319,7 +336,6 @@ int main(void)
                     FIRE8_RELU                                      );                  // Relu?
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    fire_9 = (float*) calloc( ( pool_width_5*pool_height_5*(FIRE9_e1x1+FIRE9_e3x3) ), sizeof(float));
     fire_layer (    fire_8, pool_width_5, pool_height_5, (FIRE8_e1x1+FIRE8_e3x3),       // Entrada: pointer, ancho, alto, profundidad
                     fire_9, pool_width_5, pool_height_5, (FIRE9_e1x1+FIRE9_e3x3),       // Salida: pointer, ancho, alto, profundidad
                     fire_9_kernel_s1x1, fire_9_bias_s1x1, FIRE9_s1x1,                   // kernel_s1x1, bias_s1x1, s1x1
@@ -328,7 +344,6 @@ int main(void)
                     FIRE9_RELU                                      );                  // Relu?
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    fire_10 = (float*) calloc( ( pool_width_5*pool_height_5*(FIRE10_e1x1+FIRE10_e3x3) ), sizeof(float));
     fire_layer (    fire_9, pool_width_5, pool_height_5, (FIRE9_e1x1+FIRE9_e3x3),       // Entrada: pointer, ancho, alto, profundidad
                     fire_10, pool_width_5, pool_height_5, (FIRE10_e1x1+FIRE8_e3x3),     // Salida: pointer, ancho, alto, profundidad
                     fire_10_kernel_s1x1, fire_10_bias_s1x1, FIRE10_s1x1,                // kernel_s1x1, bias_s1x1, s1x1
@@ -337,7 +352,6 @@ int main(void)
                     FIRE10_RELU                                     );                  // Relu?
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    fire_11 = (float*) calloc( ( pool_width_5*pool_height_5*(FIRE11_e1x1+FIRE11_e3x3) ), sizeof(float));
     fire_layer (    fire_10, pool_width_5, pool_height_5, (FIRE10_e1x1+FIRE10_e3x3),    // Entrada: pointer, ancho, alto, profundidad
                     fire_11, pool_width_5, pool_height_5, (FIRE11_e1x1+FIRE11_e3x3),    // Salida: pointer, ancho, alto, profundidad
                     fire_11_kernel_s1x1, fire_11_bias_s1x1, FIRE11_s1x1,                // kernel_s1x1, bias_s1x1, s1x1
@@ -346,15 +360,10 @@ int main(void)
                     FIRE11_RELU                                     );                  // Relu?
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    free(img_padded);
-    img_padded = (float*) calloc( (pool_width_5+CONV12_PAD)*(pool_height_5+CONV12_PAD)*(FIRE11_e1x1+FIRE11_e3x3) , sizeof(float) );
     padding(    fire_11, pool_width_5, pool_height_5, (FIRE11_e1x1+FIRE11_e3x3),
-                img_padded,
+                img_padded2,
                 CONV12_PAD, CONV12_PAD); 
-    output_conv12_width  = (((pool_width_5  - CONV12_KERNEL_SIZE + CONV12_PAD)/CONV12_STRIDE) + 1); 
-    output_conv12_height = (((pool_height_5 - CONV12_KERNEL_SIZE + CONV12_PAD)/CONV12_STRIDE) + 1);
-    conv12_output = (float*) calloc( output_conv12_width*output_conv12_height*CONV12_FILTERS, sizeof(float) );
-    convolucion2d(  img_padded, (pool_width_5+CONV12_PAD), (pool_height_5+CONV12_PAD), (FIRE11_e1x1+FIRE11_e3x3),   // Entrada: pointer, ancho, alto, profundidad
+    convolucion2d(  img_padded2, (pool_width_5+CONV12_PAD), (pool_height_5+CONV12_PAD), (FIRE11_e1x1+FIRE11_e3x3),   // Entrada: pointer, ancho, alto, profundidad
                     conv12_kernel, CONV12_KERNEL_SIZE,                                                              // Kernel: pointer, size
                     conv12_bias,                                                                                    // Bias: pointer
                     CONV12_STRIDE,                                                                                  // Stride
@@ -362,6 +371,7 @@ int main(void)
                     conv12_output, output_conv12_width, output_conv12_height, CONV12_FILTERS );                     // Salida: pointer, ancho, alto, profundidad
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
     // Consigo un vector con las predicciones de la clase 
     pred_class = (float*) malloc( 2700*sizeof(float) );
@@ -443,15 +453,12 @@ int main(void)
 
     printf("Finished\n");
 
-    clock_t end = clock();
-    time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
-    printf("Time executing.. %f \n", time_spent);
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////    Libero Memoria dinamica     ////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     free(img);
-    free(img_padded);
+    free(img_padded1);
+    free(img_padded2);
 
     free(conv1_kernel);             free(conv12_kernel);                                     
     free(conv1_bias);               free(conv12_bias);                                                        

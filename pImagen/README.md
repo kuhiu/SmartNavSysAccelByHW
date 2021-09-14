@@ -2,5 +2,5 @@
 
 
 * [Zybo - Implementacion](https://github.com/Fuschetto97/Tesis/tree/main/pImagen/Petalinux_Projects)
-* [PC - Implementacion](https://github.com/Fuschetto97/Tesis/tree/main/pImagen/SqueezeNet)
-
+* [PC - Entrenamiento](https://github.com/Fuschetto97/Tesis/tree/main/pImagen/SqueezeDetTraining)
+* [C y Python - Implementacion](https://github.com/Fuschetto97/Tesis/tree/main/pImagen/SqueezeDetFromScratch)

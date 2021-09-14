@@ -6,6 +6,9 @@
         "string": "c",
         "unordered_map": "c",
         "vector": "c",
-        "initializer_list": "c"
+        "initializer_list": "c",
+        "stdio.h": "c",
+        "random": "c",
+        "functional": "c"
     }
 }

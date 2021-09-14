@@ -160,26 +160,35 @@ void convolucion2d (float *input, int input_shape_width, int input_shape_height,
                     float *conv2d_1, int output_conv1_width, int output_conv1_height, int filtros) 
 {
     int i, j, k, l, c, v;
+    int conv2d_1_row, conv2d_1_filter; 
+    int u,g,h,q,w;
 
     for ( c = 0; c < filtros ; ++c)   // depth o filtros
     {
+        conv2d_1_filter = c*output_conv1_width*output_conv1_height;
+        h = c*input_depth*kernel_size*kernel_size;
         for ( i = 0; i < output_conv1_height; ++i)          // Filas
         {
+            conv2d_1_row = i*output_conv1_width;
+            u = input_shape_width*stride*i;
             for ( j = 0; j < output_conv1_width; ++j)       // Columnas
             {
+                q = stride*j;
                 for ( v = 0; v < input_depth ; ++v)   // depth or channel input
                 {
+                    w = v*kernel_size*kernel_size;
+                    g = input_shape_width*input_shape_height*v;
                     for ( k = 0; k < kernel_size; ++k)           // Filas del kernel 
                     {
                         for ( l = 0; l < kernel_size; ++l)       // Columnas del kernel 
-                            *(conv2d_1 + j + i*output_conv1_width + c*output_conv1_width*output_conv1_height) += *(input + input_shape_width*(k + stride*i) + (l + stride*j + input_shape_width*input_shape_height*v) ) * *(kernel + l + k*kernel_size + v*kernel_size*kernel_size + c*input_depth*kernel_size*kernel_size);
+                            *(conv2d_1 + j + conv2d_1_row + conv2d_1_filter) += *(input + input_shape_width*k + u + l + q + g ) * *(kernel + l + k*kernel_size + w + h);
                     }
                 }
                 // Bias
-                *(conv2d_1 + j + i*output_conv1_width + c*output_conv1_width*output_conv1_height) = *(conv2d_1 + j + i*output_conv1_width + c*output_conv1_width*output_conv1_height) + *(bias+c);
+                *(conv2d_1 + j + conv2d_1_row + conv2d_1_filter) = *(conv2d_1 + j + conv2d_1_row + conv2d_1_filter) + *(bias+c);
                 // Relu
-                if (Relu == 1)
-                    *(conv2d_1 + j + i*output_conv1_width + c*output_conv1_width*output_conv1_height) = ReLu( *(conv2d_1 + j + i*output_conv1_width + c*output_conv1_width*output_conv1_height) );
+                //if (Relu == 1)
+                *(conv2d_1 + j + conv2d_1_row + conv2d_1_filter) = ReLu( *(conv2d_1 + j + conv2d_1_row + conv2d_1_filter) );
             }   
         }
     }
@@ -252,17 +261,17 @@ void maxPool2d( int pool_size, int stride,
     // Vectores 
     float *in_padded = NULL;
 
-    if (pad_type == 0)
-        printf("No agrego pads \n");
-    else if (pad_type == 1)
-    {
+    //if (pad_type == 0)
+    //    printf("No agrego pads \n");
+    //else if (pad_type == 1)
+    //{
         new_width = input_shape_width+1;
         new_height = input_shape_height+1;
         in_padded = (float*) calloc( new_width*new_height*input_depth , sizeof(float) );
         padding (   in, input_shape_width, input_shape_height, input_depth,
                     in_padded,
                     1, 1); 
-    }
+    //}
 
     for (c = 0; c < input_depth; ++c) {     // Cantidad de filtros o canales de la entrada
         for (j = 0; j < pool_height; ++j) {         // Filas del salto
@@ -276,9 +285,9 @@ void maxPool2d( int pool_size, int stride,
             }
         }
     }
-    if (pad_type == 1)
+    //if (pad_type == 1)
         free(in_padded);
-    return;
+    //return;
 } 
 
 
@@ -368,6 +377,7 @@ float * weight_load(char *filename)
     int i,j,k,l;
     char param[100];
     float *array = NULL;
+    //float array[50000000000];
 
     fd = fopen(filename, "r");
     getline(&line, &len, fd);
@@ -377,7 +387,7 @@ float * weight_load(char *filename)
     i_depth   = atof(s_depth); 
     i_filters = atof(s_filters);
 
-    array = (float*) malloc( ( i_width*i_height*i_depth*i_filters ) * sizeof(float));
+    array = (float*) aligned_alloc( 16, ( i_width*i_height*i_depth*i_filters ) * sizeof(float));
 
     for( j=0 ; j<i_height ; j++){
         for( i=0 ; i<i_width ; i++){
@@ -494,3 +504,104 @@ float * anchorBox_load(char *filename)
 }
 
 
+void * aligned_calloc(size_t nelem, size_t elsize, size_t alignment)
+{
+    // Watch out for overflow
+    if(elsize == 0)
+        return NULL;
+
+    size_t size = nelem * elsize;
+    void *memory = aligned_alloc(alignment, size);
+    if(memory != NULL)
+        memset(memory, 0, size);
+    return memory;
+}
+
+
+void convolucion2d_2 (float *input, int input_shape_width, int input_shape_height, int input_depth, 
+                    float *kernel, int kernel_size, 
+                    float *bias, 
+                    int stride,
+                    int Relu,
+                    float *conv2d_1, int output_conv1_width, int output_conv1_height, int filtros) 
+{
+    int i, j, k, l, c, v;
+    int conv2d_1_row, conv2d_1_filter; 
+    int u,g,h,q,w;
+
+    for ( c = 0; c < filtros ; ++c)   // depth o filtros
+    {
+        conv2d_1_filter = c*output_conv1_width*output_conv1_height;
+        h = c*input_depth*kernel_size*kernel_size;
+        for ( i = 0; i < output_conv1_height; ++i)          // Filas
+        {
+            conv2d_1_row = i*output_conv1_width;
+            u = input_shape_width*stride*i;
+            for ( j = 0; j < output_conv1_width; ++j)       // Columnas
+            {
+                q = stride*j;
+                for ( v = 0; v < input_depth ; ++v)   // depth or channel input
+                {
+                    w = v*kernel_size*kernel_size;
+                    g = input_shape_width*input_shape_height*v;
+                    for ( k = 0; k < kernel_size; ++k)           // Filas del kernel 
+                    {
+                        for ( l = 0; l < kernel_size; ++l)       // Columnas del kernel 
+                            *(conv2d_1 + j + conv2d_1_row + conv2d_1_filter) += *(input + input_shape_width*k + u + l + q + g ) * *(kernel + l + k*kernel_size + w + h);
+                    }
+                }
+                // Bias
+                *(conv2d_1 + j + conv2d_1_row + conv2d_1_filter) = *(conv2d_1 + j + conv2d_1_row + conv2d_1_filter) + *(bias+c);
+                // Relu
+                //if (Relu == 1)
+                *(conv2d_1 + j + conv2d_1_row + conv2d_1_filter) = ReLu( *(conv2d_1 + j + conv2d_1_row + conv2d_1_filter) );
+            }   
+        }
+    }
+    //printVector(conv2d_1, output_conv1_width, output_conv1_height, filtros);
+}
+
+
+
+// void convolucion2d_2 (float *input, int input_shape_width, int input_shape_height, int input_depth, 
+//                     float *kernel, int kernel_size, 
+//                     float *bias, 
+//                     int stride,
+//                     int Relu,
+//                     float *conv2d_1, int output_conv1_width, int output_conv1_height, int filtros) 
+// {
+//     int i, j, k, l, c, v;
+//     int conv2d_1_row, conv2d_1_filter; 
+//     int u,g,h,q,w;
+
+//     for ( c = 0; c < filtros ; ++c)   // depth o filtros
+//     {
+//         conv2d_1_filter = c*output_conv1_width*output_conv1_height;
+//         h = c*input_depth*kernel_size*kernel_size;
+//         for ( i = 0; i < output_conv1_height; ++i)          // Filas
+//         {
+//             conv2d_1_row = i*output_conv1_width;
+//             u = input_shape_width*stride*i;
+//             for ( j = 0; j < output_conv1_width; ++j)       // Columnas
+//             {
+//                 q = stride*j;
+//                 for ( v = 0; v < input_depth ; ++v)   // depth or channel input
+//                 {
+//                     w = v*kernel_size*kernel_size;
+//                     g = input_shape_width*input_shape_height*v;
+//                     for ( k = 0; k < kernel_size; ++k)           // Filas del kernel 
+//                     {
+//                         for ( l = 0; l < kernel_size; ++l)       // Columnas del kernel 
+//                             *(conv2d_1 + j + conv2d_1_row + conv2d_1_filter) += *(input + input_shape_width*k + u + l + q + g ) * *(kernel + l + k*kernel_size + w + h);
+//                     }
+//                 }
+//                 // Bias
+//                 *(conv2d_1 + j + conv2d_1_row + conv2d_1_filter) = *(conv2d_1 + j + conv2d_1_row + conv2d_1_filter) + *(bias+c);
+//                 // Relu
+//                 //if (Relu == 1)
+//                 *(conv2d_1 + j + conv2d_1_row + conv2d_1_filter) = ReLu( *(conv2d_1 + j + conv2d_1_row + conv2d_1_filter) );
+//             }   
+//         }
+//     }
+//     //printVector(conv2d_1, output_conv1_width, output_conv1_height, filtros);
+// }

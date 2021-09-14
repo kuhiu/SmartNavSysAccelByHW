@@ -58,18 +58,18 @@ def slice_predictions_np(y_pred):
         [1, 2700, 1],
     )
 
-    r = open("./softmax" + ".txt", "w")
-    r.write( str( pred_class_probs ) )
-    r.close()
+    #r = open("./softmax" + ".txt", "w")
+    #r.write( str( pred_class_probs ) )
+    #r.close()
 
     # number of confidence scores, one for each anchor + class probs
     num_confidence_scores = 9 + num_class_probs
 
     # slice the confidence scores and put them trough a sigmoid for probabilities
     #print("a que le aplico sigmoid \n",y_pred[:, :, :, num_class_probs:num_confidence_scores])
-    r = open("./sigmoid" + ".txt", "w")
-    r.write( str( np.reshape( y_pred[:, :, :, num_class_probs:num_confidence_scores], [1, 2700] ) ) )
-    r.close()
+    #r = open("./sigmoid" + ".txt", "w")
+    #r.write( str( np.reshape( y_pred[:, :, :, num_class_probs:num_confidence_scores], [1, 2700] ) ) )
+    #r.close()
 
     pred_conf = sigmoid(
         np.reshape(
@@ -78,14 +78,14 @@ def slice_predictions_np(y_pred):
         )
     )
 
-    r = open("./sigmoid" + ".txt", "w")
-    r.write( str(  pred_conf ) )
-    r.close()
+    #r = open("./sigmoid" + ".txt", "w")
+    #r.write( str(  pred_conf ) )
+    #r.close()
 
     # slice remaining bounding box_deltas
-    r = open("./pred_box_delta" + ".txt", "w")
-    r.write( str( np.reshape( y_pred[:, :, :, num_confidence_scores:], [1, 2700, 4] ) ) )
-    r.close()
+    #r = open("./pred_box_delta" + ".txt", "w")
+    #r.write( str( np.reshape( y_pred[:, :, :, num_confidence_scores:], [1, 2700, 4] ) ) )
+    #r.close()
 
     pred_box_delta = np.reshape(
         y_pred[:, :, :, num_confidence_scores:],
@@ -165,28 +165,28 @@ def boxes_from_deltas_np(pred_box_delta, config):
     #print(" delta:  \n", delta_h[0][2114] )
 
     # get the coordinates and sizes of the anchor boxes from config
-    print("config.ANCHOR_BOX \n", config.ANCHOR_BOX.shape) # 2700, 4
+    #print("config.ANCHOR_BOX \n", config.ANCHOR_BOX.shape) # 2700, 4
     
-    r = open("./files_fromTrain/ANCHOR_BOX" + ".txt", "w")
-    l = config.ANCHOR_BOX[:].flatten()
-    r.write(str( config.ANCHOR_BOX.shape ) + '\n')
-    for item in l:
-        r.write(str('{:f}'.format(item)) + '\n')
-    r.close()
+    #r = open("./files_fromTrain/ANCHOR_BOX" + ".txt", "w")
+    #l = config.ANCHOR_BOX[:].flatten()
+    #r.write(str( config.ANCHOR_BOX.shape ) + '\n')
+    #for item in l:
+    #    r.write(str('{:f}'.format(item)) + '\n')
+    #r.close()
 
     anchor_x = config.ANCHOR_BOX[:, 0]
     anchor_y = config.ANCHOR_BOX[:, 1]
     anchor_w = config.ANCHOR_BOX[:, 2]
     anchor_h = config.ANCHOR_BOX[:, 3]
 
-    print(" anchor_x:  \n", anchor_x[2114] )
+    #print(" anchor_x:  \n", anchor_x[2114] )
     # as we only predict the deltas, we need to transform the anchor box values before computing the loss
 
     box_center_x = anchor_x + delta_x * anchor_w
     box_center_y = anchor_y + delta_y * anchor_h
     box_width = anchor_w * safe_exp_np(delta_w, config.EXP_THRESH)
     box_height = anchor_h * safe_exp_np(delta_h, config.EXP_THRESH)
-    print("box \n", box_center_x[0][2114], box_center_y[0][2114], box_width[0][2114], box_height[0][2114])
+    #print("box \n", box_center_x[0][2114], box_center_y[0][2114], box_width[0][2114], box_height[0][2114])
     # tranform into a real box with four coordinates
 
     xmins, ymins, xmaxs, ymaxs = bbox_transform([box_center_x, box_center_y, box_width, box_height])
