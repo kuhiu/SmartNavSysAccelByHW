@@ -16,6 +16,20 @@ Al requerirse un wrapper sobre la FPGA y luego un Driver para el wrapper de la F
 
 Por cuestiones economicas y de aprendizaje se decidio realizar una prueba con el modulo OV7670 para tomar la decision. 
 
+## Introduccion teorica VDMA
+
+### Por que VDMA?
+
+El nucleo AXI Video Direct Memory Access (AXI VDMA) es un nucleo IP soft core de Xilinx que proporciona acceso directo a la memoria y la interface AXI4-Stream. Ademas el nucleo proporciona operaciones DMA bidimensionales eficientes lectura y escritura asincronica independientes.
+
+EL VDMA es de facil utilizacion ya que usa un menanismo de doble o simple Frame Bufer. 
+
+### Que es un Frame Buffer o buffer de pantalla ?
+
+Un buffer de pantalla es una memoria que almacena información de manera específica que va a la pantalla de nuestro equipo.
+
+Entonces el sistema dibuja una buena imagen en el Frame Buffer y luego le indica al dispositivo que lo muestra que puede leer el Frame Buffer.
+
 ## Desarrollo "Linux-VDMA-TPG-PNG.Server" [Tiempo = 2 semanas]
 
 <img src=./imagenes/tpg.png alt="Hardware" width="1000" height="300"/>
