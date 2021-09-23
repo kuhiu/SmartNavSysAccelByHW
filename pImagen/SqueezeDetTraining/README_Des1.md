@@ -2,7 +2,7 @@
 
 ### Introduccion y objetivos 
 
-El proposito de este desarrollo es el de entrenar la red neuronal propuesta sobre la PC.
+El proposito de este desarrollo es el de entrenar la red neuronal propuesta sobre la PC y comprobar si es apta para su uso.
 
 * Crear un pequeño dataset propio.
 * Entrenar la red neuronal.
