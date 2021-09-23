@@ -14,7 +14,7 @@
 4) Movimiento del robot 
     * ~~motores y sus drivers)~~ 
     * Comprar sensor para medir distancia recorrida y escribir driver.
-    * Para poder modificar su velocidad pwm en FPGA y su driver. (probar ILA si es necesario)
+    * ~~Para poder modificar su velocidad pwm en FPGA~~ y su driver. (probar ILA si es necesario)
     * Comprar brujula y escribir su driver. (para conocer la direccion a la que se desplaza)
 5) Comprar fuente dc-dc 5v al menos 1.5A para alimentar externamente la Zybo. 
 
@@ -22,8 +22,7 @@
 
 1) ~~Escribir en C la red~~
 2) Escribir el sistema de control difuso en C 
-4) Desarrollo en la FPGA
-5) Drivers para desarrollo sobre FPGA
+4) Desarrollo en la FPGA y su driver.
 
 ## Estado actual de la implementacion
 
