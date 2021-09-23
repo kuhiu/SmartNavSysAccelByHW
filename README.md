@@ -29,4 +29,5 @@
 
 <img src=./imagenes/estado2.jpeg height=500 width=350 alt="Hardware" /> <img src=./imagenes/estado3.jpeg alt="Hardware" />
 <img src=./imagenes/estado4.jpeg height=500 width=500 alt="Hardware" />
+<img src=./imagenes/estado5.jpeg scale=0.5 alt="Hardware" />
 
