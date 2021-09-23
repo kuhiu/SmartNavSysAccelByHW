@@ -1,7 +1,7 @@
 # Ignore all 
 * 
 !sources_save/
-!Drivers&Apps/*
+!Drivers&Apps/*/
 !imagenes/
 
 
