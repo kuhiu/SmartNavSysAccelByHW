@@ -4,6 +4,7 @@
 
 * [Modulo - Procesamiento de imagenes](https://github.com/Fuschetto97/Tesis/tree/main/pImagen)
 * [Modulo - Sistema de control difuso](https://github.com/Fuschetto97/Tesis/tree/main/FuzzyControl)
+* [Zybo - Implementacion](https://github.com/Fuschetto97/Tesis/tree/main/Petalinux_Projects)
 
 ## Pendientes
 
