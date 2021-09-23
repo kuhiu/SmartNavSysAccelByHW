@@ -944,8 +944,8 @@ int main(void)
                     2,                                                                      // Stride
                     CONV1_RELU,
                     conv1_output, output_conv1_width, output_conv1_height, CONV1_FILTERS ); // Salida: pointer, ancho, alto, profundidad
-    //printf("TEST: Conv2D_1: \n");
-    //printVector(conv2d_1, output_conv1_width, output_conv1_height, CONV1_FILTERS, 1 );
+    printf("TEST: Conv2D_1: \n");
+    printVector(conv1_output, output_conv1_width, output_conv1_height, CONV1_FILTERS, 1 );
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     printf("Creo puntero para pool_1 \n");

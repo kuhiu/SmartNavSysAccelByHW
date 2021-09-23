@@ -218,7 +218,7 @@ SqueezeDet.model.get_layer("conv12").set_weights(kernel_conv12_load)
 ######################################################################################################################
 in_image = cv2.imread("./testing/test5.png",flags=cv2.IMREAD_UNCHANGED).astype(np.float32, copy=False)
 in_image = cv2.cvtColor(in_image, cv2.COLOR_BGRA2RGB)
-#print("in_image shape  = \n", in_image.shape)
+print("in_image   = \n", in_image)
 in_image = np.reshape(in_image, [1, 240, 320, 3])
 
 ######################################################################################################################
@@ -230,19 +230,19 @@ intermediate_output = intermediate_layer_model.predict( in_image )
 
 times = []
 intermediate_layer_model2 = Model(inputs=SqueezeDet.model.input, outputs=SqueezeDet.model.get_layer("conv1").output)
-for i in range(10000):
-   start = time.time() 
-   intermediate_output2 = intermediate_layer_model2.predict( in_image )
-   end = time.time()
-   times.append(end-start)
+#for i in range(10000):
+   #start = time.time() 
+intermediate_output2 = intermediate_layer_model2.predict( in_image )
+   #end = time.time()
+   #times.append(end-start)
 #print("Time: ", times) 
 
-plt.plot(range(10000) , times)
-plt.show()
+#plt.plot(range(10000) , times)
+#plt.show()
 
 
 
-#print("intermediate_output2\n", intermediate_output2)
+print("conv1\n", intermediate_output2)
 #r = open("./intermediate_output2" + ".txt", "w")
 #r.write( str( intermediate_output2 ) )
 #r.close()

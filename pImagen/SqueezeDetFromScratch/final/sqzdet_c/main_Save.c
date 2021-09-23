@@ -1,26 +1,18 @@
 #include "main.h"
 
 // Imgage size
-//int img_width, img_height;
+int img_width, img_height;
 
 // Read png lib
 png_byte color_type;
 png_byte bit_depth;
 png_bytep *row_pointers = NULL;
 
-static volatile int keepRunning = 1;
-
-void intHandler(int dummy) {
-    keepRunning = 0;
-}
-
-
 int main(void)
 {    
     struct timespec begin, end; 
 
     // Imagen de entrada
-    int mem_fd;
     float *img              = NULL;
     float *img_padded1      = NULL;
     float *img_padded2      = NULL;
@@ -91,43 +83,15 @@ int main(void)
     int index_Ofmax=0;            
     int i,j,k;
 
-    int *img_write              = NULL;
-    int *img_read               = NULL;
-    int red, green, blue;
 ////////////////////////////////        Leo el header       ////////////////////////////////////////////////////////
     read_png_file("./test5.png");
+    printf("Finished\n");
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////       Memoria dinamica     ////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    img  = (float*) malloc( IMG_WIDTH*IMG_HEIGHT*3*sizeof(float) );
-    //img2 = (float*) malloc( img_width*img_height*3*sizeof(float) );
+    img = (float*) aligned_alloc( 16, IMG_WIDTH*IMG_HEIGHT*3*sizeof(float) );
 ////////////////////////////////        Leo la imagen       ////////////////////////////////////////////////////////
     get_png_file(img);
-    //printf("sysconf(_SC_PAGE_SIZE) es: %ld y %ld\n", sysconf(_SC_PAGE_SIZE), (FRAMEBUFFER_OFFSET/sysconf(_SC_PAGE_SIZE)) );
-    mem_fd = open("/dev/mem", O_RDWR | O_SYNC);
-    if ( mem_fd == -1)
-    {
-        printf("Open /dev/mem Failed\n");
-        return 1;
-    }
-
-    img_write = mmap(NULL, IMG_WIDTH*IMG_HEIGHT*3*sizeof(int), PROT_READ | PROT_WRITE, MAP_SHARED, mem_fd, (off_t)FRAMEBUFFER_WRITE_OFFSET );	// phys_addr should be page-aligned.	
-
-    if(img_write == MAP_FAILED){
-        printf("Mapping Failed\n");
-        printf("Oh dear, something went wrong with read()! %s\n", strerror(errno));
-        return 1;
-    }
-
-    img_read = mmap(NULL, IMG_WIDTH*IMG_HEIGHT*3*sizeof(int), PROT_READ | PROT_WRITE, MAP_SHARED, mem_fd, (off_t)FRAMEBUFFER_READ_OFFSET );	// phys_addr should be page-aligned.	
-
-    if(img_read == MAP_FAILED){
-        printf("Mapping Failed\n");
-        printf("Oh dear, something went wrong with read()! %s\n", strerror(errno));
-        return 1;
-    }
-
-    signal(SIGINT, intHandler);
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////    Cargo los parametros    ////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -245,17 +209,13 @@ int main(void)
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     conv12_bias = bias_load("./files_fromTrain/parametros/conv12:bias:0.txt");
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    ////////////////////////////////////////////    Delta box    ///////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Delta box
-    anchors = anchorBox_load("./files_fromTrain/ANCHOR_BOX.txt");
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 ////////////////////////////////   Pre-Processing y Dinamic mem  ///////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    img_padded1 = (float*) calloc( (IMG_WIDTH+1)*(IMG_HEIGHT+1)*3 , sizeof(float) );
+    img_padded1 = (float*) aligned_calloc( (img_width+1)*(img_height+1)*3 , sizeof(float), 16 );
     output_conv1_width  = (((IMG_WIDTH  - CONV1_KERNEL_SIZE + CONV1_PAD)/CONV1_STRIDE) + 1); 
     output_conv1_height = (((IMG_HEIGHT - CONV1_KERNEL_SIZE + CONV1_PAD)/CONV1_STRIDE) + 1);
-    conv1_output = (float*) calloc( output_conv1_width*output_conv1_height*CONV1_FILTERS, sizeof(float) );
+    conv1_output = (float*) aligned_calloc( output_conv1_width*output_conv1_height*CONV1_FILTERS, sizeof(float), 16 );
     pool_width_1  = output_conv1_width/2;
     pool_height_1 = output_conv1_height/2;
     max_pool_1 = (float*) calloc( ( pool_width_1*pool_height_1*CONV1_FILTERS ), sizeof(float));
@@ -279,62 +239,33 @@ int main(void)
     output_conv12_width  = (((pool_width_5  - CONV12_KERNEL_SIZE + CONV12_PAD)/CONV12_STRIDE) + 1); 
     output_conv12_height = (((pool_height_5 - CONV12_KERNEL_SIZE + CONV12_PAD)/CONV12_STRIDE) + 1);
     conv12_output = (float*) calloc( output_conv12_width*output_conv12_height*CONV12_FILTERS, sizeof(float) );
-    pred_class = (float*) malloc( 2700*sizeof(float) );         // Consigo un vector con las predicciones de la clase 
-    pred_conf = (float*) malloc( 2700*sizeof(float) );          // Consigo un vector con puntuaciones de confianza
-    prob = (float*) malloc( 2700*sizeof(float) );               // probabilidad
-    box_predicted = (float*) malloc( 10800*sizeof(float) );     // boxes
-
-while(keepRunning)
-{
 //////////////////////////////////////   Time measure  /////////////////////////////////////////////////////////////
-    printf("Start to measure\n");
-    clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &begin);	
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    max = 0;
-    index_Ofmax = 0;
-    emptyVector(img_padded1, (IMG_WIDTH+1), (IMG_HEIGHT+1), IMG_CHANNEL);
-    emptyVector(conv1_output, output_conv1_width, output_conv1_height, CONV1_FILTERS);
-    emptyVector(max_pool_1, pool_width_1, pool_height_1, CONV1_FILTERS);
-    emptyVector(fire_2, pool_width_1, pool_height_1, (FIRE2_e1x1+FIRE2_e3x3));
-    emptyVector(fire_3, pool_width_1, pool_height_1, (FIRE3_e1x1+FIRE3_e3x3));
-    emptyVector(max_pool_3, pool_width_3, pool_height_3, MAXPOOL3_FILTERS);
-    emptyVector(fire_4, pool_width_3, pool_height_3, (FIRE4_e1x1+FIRE4_e3x3));
-    emptyVector(fire_5, pool_width_3, pool_height_3, (FIRE5_e1x1+FIRE5_e3x3));
-    emptyVector(max_pool_5, pool_width_5, pool_height_5, MAXPOOL5_FILTERS);
-    emptyVector(fire_6, pool_width_5, pool_height_5, (FIRE6_e1x1+FIRE6_e3x3));
-    emptyVector(fire_7, pool_width_5, pool_height_5, (FIRE7_e1x1+FIRE7_e3x3));
-    emptyVector(fire_8, pool_width_5, pool_height_5, (FIRE8_e1x1+FIRE8_e3x3));
-    emptyVector(fire_9, pool_width_5, pool_height_5, (FIRE9_e1x1+FIRE9_e3x3));
-    emptyVector(fire_10, pool_width_5, pool_height_5, (FIRE10_e1x1+FIRE10_e3x3));
-    emptyVector(fire_11, pool_width_5, pool_height_5, (FIRE11_e1x1+FIRE11_e3x3));
-    emptyVector(img_padded2, (pool_width_5+CONV12_PAD), (pool_height_5+CONV12_PAD), (FIRE11_e1x1+FIRE11_e3x3));
-    emptyVector(conv12_output, output_conv12_width, output_conv12_height, CONV12_FILTERS);
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Leo de RAM 0x0100_0000
-    for(j=0;j<IMG_HEIGHT;j++)
-    {
-        for(i=0;i<IMG_WIDTH;i++)
-        {
-            *(img + i + IMG_WIDTH*j + IMG_WIDTH*IMG_HEIGHT*0) = (float) ( ( (*(img_read + i + j*IMG_WIDTH) >>  0) & 0xFF)  );
-            *(img + i + IMG_WIDTH*j + IMG_WIDTH*IMG_HEIGHT*1) = (float) ( ( (*(img_read + i + j*IMG_WIDTH) >>  8) & 0xFF)  );
-            *(img + i + IMG_WIDTH*j + IMG_WIDTH*IMG_HEIGHT*2) = (float) ( ( (*(img_read + i + j*IMG_WIDTH) >> 16) & 0xFF)  );
-            //printf("Red %d, Blue %d\n",  ( ( (*(img_read + i + j*IMG_WIDTH) >>  0) & 0xFF)  ), ( ( (*(img_read + i + j*IMG_WIDTH) >>  8) & 0xFF)  ) );
-            //*(img + i + IMG_WIDTH*j) = (int)( ( (red & 0xFF) << 0 ) | ( (green & 0xFF) << 8 ) | ( (blue & 0xFF) << 16 ) | ( 0xFF << 24 ) );
-        }
-    }
+    //printf("TEST: img: \n");
+    //printVector(img, 320, 240, 1, 1 );
+
     printf("Start to precessing...\n");
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////          SqueezeDet        ////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    padding(    img, IMG_WIDTH, IMG_HEIGHT, 3,
+    printf("Start to measure\n");
+    clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &begin);
+    padding(    img, img_width, img_height, 3,
                 img_padded1,
                 1, 1); 
-    convolucion2d(  img_padded1, (IMG_WIDTH+1), (IMG_HEIGHT+1), 3,                          // Entrada: pointer, ancho, alto, profundidad
+    convolucion2d(  img_padded1, (img_width+1), (img_height+1), 3,                          // Entrada: pointer, ancho, alto, profundidad
                     conv1_kernel, CONV1_KERNEL_SIZE,                                        // Kernel: pointer, size
                     conv1_bias,                                                             // Bias: pointer
                     2,                                                                      // Stride
                     CONV1_RELU,
                     conv1_output, output_conv1_width, output_conv1_height, CONV1_FILTERS ); // Salida: pointer, ancho, alto, profundidad
+    printf("TEST: conv1_output: \n");
+    printVector(conv1_output, output_conv1_width, output_conv1_height, 1, 1 );
+    // Stop measuring time and calculate the elapsed time
+    clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &end);
+    long seconds = end.tv_sec - begin.tv_sec;
+    long nanoseconds = end.tv_nsec - begin.tv_nsec;
+    double elapsed = seconds + nanoseconds*1e-9;
+    printf("Time executing.. %f \n", elapsed);
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     maxPool2d(  MAXPOOL1_POOL_SIZE, MAXPOOL1_STRIDE, 
@@ -385,7 +316,6 @@ while(keepRunning)
                 fire_5, pool_width_3, pool_height_3, (FIRE5_e1x1+FIRE5_e3x3), 
                 max_pool_5, pool_width_5, pool_height_5,
                 MAXPOOL5_PAD);
-    usleep(500000); // Sleep 0.5 seg.
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     fire_layer (    max_pool_5, pool_width_5, pool_height_5, (FIRE5_e1x1+FIRE5_e3x3),   // Entrada: pointer, ancho, alto, profundidad
@@ -447,6 +377,17 @@ while(keepRunning)
                     conv12_output, output_conv12_width, output_conv12_height, CONV12_FILTERS );                     // Salida: pointer, ancho, alto, profundidad
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //printf("TEST: conv12_output: \n");
+    //printVector(conv12_output, output_conv12_width, output_conv12_height, 54, 1 );
+
+    // Consigo un vector con las predicciones de la clase 
+    pred_class = (float*) malloc( 2700*sizeof(float) );
+     // Consigo un vector con puntuaciones de confianza
+    pred_conf = (float*) malloc( 2700*sizeof(float) );
+    // probabilidad
+    prob = (float*) malloc( 2700*sizeof(float) );
+    // boxes
+    box_predicted = (float*) malloc( 10800*sizeof(float) );
 
     for(j=0;j<output_conv12_height;j++)
     {
@@ -484,13 +425,16 @@ while(keepRunning)
             index_Ofmax = i;
         }
     }
-    printf("Probabilidad maxima encontrada: %f \n", max);
+
     // Search delta max prob
     // Boxes from delta
     delta_x = *(box_predicted + index_Ofmax*4 + 0);
     delta_y = *(box_predicted + index_Ofmax*4 + 1);
     delta_w = *(box_predicted + index_Ofmax*4 + 2);
     delta_h = *(box_predicted + index_Ofmax*4 + 3);
+    
+    // Delta box
+    anchors = anchorBox_load("./files_fromTrain/ANCHOR_BOX.txt");
 
     // Consigo los anchors box
     box_center_x = *(anchors + 0 + 4*index_Ofmax) + delta_x * *(anchors + 2 + 4*index_Ofmax);   //box_center_x = anchor_x + delta_x * anchor_w;
@@ -509,40 +453,13 @@ while(keepRunning)
     // Escribir...
 
     // Dibujo la caja
-    if (max > PROB_TRSH)
-        process_png_file(img, xmin, xmax, ymin, ymax);
+    process_png_file(img, xmin, xmax, ymin, ymax);
 
     // Guardo la imagen
-    //write_png_file("./test5MODIF.png");
-
-    // Guardo en RAM 0x0200_0000
-    for(j=0;j<IMG_HEIGHT;j++)
-    {
-        for(i=0;i<IMG_WIDTH;i++)
-        {
-            red   = (int) *(img + i + IMG_WIDTH*j + IMG_WIDTH*IMG_HEIGHT*0);
-            green = (int) *(img + i + IMG_WIDTH*j + IMG_WIDTH*IMG_HEIGHT*1);
-            blue  = (int) *(img + i + IMG_WIDTH*j + IMG_WIDTH*IMG_HEIGHT*2);
-            //printf("Red %d, green %d, blue %d, composicion %d\n", red, green, blue, ( ( (red & 0xFF) << 24 ) & ( (green & 0xFF) << 16 ) & ( (blue & 0xFF) << 8 ) ));
-            *(img_write + i + IMG_WIDTH*j) = (int)( ( (red & 0xFF) << 0 ) | ( (green & 0xFF) << 8 ) | ( (blue & 0xFF) << 16 ) | ( 0xFF << 24 ) );
-
-        }
-    }
+    write_png_file("./test4MODIF.png");
 
     printf("Finished\n");
-    // Stop measuring time and calculate the elapsed time
-    clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &end);
-    long seconds = end.tv_sec - begin.tv_sec;
-    long nanoseconds = end.tv_nsec - begin.tv_nsec;
-    double elapsed = seconds + nanoseconds*1e-9;
-    printf("Time executing.. %f \n", elapsed);
 
-    usleep(500000); // Sleep 0.5 seg.
-
-    free(pred_class_softmax);
-    free(pred_conf_sigmod);
-}
-    printf("Sali del loop\n");
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////    Libero Memoria dinamica     ////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -574,8 +491,8 @@ while(keepRunning)
 
     free(fire_10            );      free(fire_11            );      free(pred_class        );
     free(fire_10_kernel_s1x1);      free(fire_11_kernel_s1x1);      free(pred_conf         );
-    free(fire_10_bias_s1x1  );      free(fire_11_bias_s1x1  );      
-    free(fire_10_kernel_e1x1);      free(fire_11_kernel_e1x1);      
+    free(fire_10_bias_s1x1  );      free(fire_11_bias_s1x1  );      free(pred_class_softmax);
+    free(fire_10_kernel_e1x1);      free(fire_11_kernel_e1x1);      free(pred_conf_sigmod  );
     free(fire_10_bias_e1x1  );      free(fire_11_bias_e1x1  );      free(prob              );
     free(fire_10_kernel_e3x3);      free(fire_11_kernel_e3x3);      free(box_predicted     );
     free(fire_10_bias_e3x3  );      free(fire_11_bias_e3x3  );      free(anchors           );  

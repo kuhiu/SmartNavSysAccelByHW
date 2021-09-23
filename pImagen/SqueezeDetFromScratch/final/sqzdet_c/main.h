@@ -10,13 +10,18 @@
 #include <string.h>
 #include <malloc.h>
 #include <sys/time.h>
+#include <sys/mman.h>
+#include <errno.h>
+#include <signal.h>
 
 
-
-#define FRAMEBUFFER_OFFSET  0x01000000  // Image ram position
+#define FRAMEBUFFER_READ_OFFSET  0x01000000  // Image ram position
+#define FRAMEBUFFER_WRITE_OFFSET 0x02000000
+#define PROB_TRSH 0.8
 
 #define IMG_WIDTH                 320   // Image size
 #define IMG_HEIGHT                240
+#define IMG_CHANNEL                 3
 #define PIXEL_SIZE                  4   // number of bytes per pixel
 
 #define CONV1_KERNEL_SIZE           3
@@ -112,10 +117,10 @@ float *bias_load(char *filename);
 float *anchorBox_load(char *filename);
 float *softmax( float *x, int  i_width);
 float *sigmoid( float *x, int  i_width);
-void *aligned_calloc(size_t nelem, size_t elsize, size_t alignment);
+void emptyVector(float *in, int i_width, int i_height, int i_depth);
 
 // Read png lib
-extern int img_width, img_height;
+//extern int img_width, img_height;
 extern png_byte color_type;
 extern png_byte bit_depth;
 extern png_bytep *row_pointers;

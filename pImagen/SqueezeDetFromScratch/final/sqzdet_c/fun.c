@@ -3,32 +3,33 @@
 
 void get_png_file(float *img) {
     int x, y, z;
-    for(y = 0; y < img_height; y++) {
+    for(y = 0; y < IMG_HEIGHT; y++) {
         png_bytep row = row_pointers[y];
-        for(x = 0; x < img_width; x++) {
+        for(x = 0; x < IMG_WIDTH; x++) {
             png_bytep px = &(row[x * 4]);
             for(z = 0; z<3; z++)
-                *(img + x + img_width*y + img_height*img_width*z ) = px[z]; 
+                *(img + x + IMG_WIDTH*y + IMG_HEIGHT*IMG_WIDTH*z ) = px[z]; 
         }
     }
 }
 
 void process_png_file(float *img, int xmin, int xmax, int ymin, int ymax) {
-    int x, y, z;
-    for(y = 0; y < img_height; y++) {
-        png_bytep row = row_pointers[y];
-        for(x = 0; x < img_width; x++) {
-            png_bytep px = &(row[x * 4]);
-            for(z = 0; z<3; z++)
+    int i, j, k;
+    //printf("Xs son: %d,%d,%d,%d\n", xmax, xmin, ymax, ymin);
+    for(k = 0; k < 3; k++) {
+        //png_bytep row = row_pointers[y];
+        for(j = 0; j < IMG_HEIGHT; j++) {
+            //png_bytep px = &(row[x * 4]);
+            for(i = 0; i<IMG_WIDTH; i++)
             {
-                if ( (x > xmin) && (x < (xmin+5)) && (y < ymax) && (y > ymin) )
-                    px[z] = 0; 
-                if ( (x < xmax) && (x > (xmax-5)) && (y < ymax) && (y > ymin))
-                    px[z] = 0;
-                if ( (y > ymin) && (y < (ymin+5)) && (x < xmax) && (x > xmin))
-                    px[z] = 0; 
-                if ( (y < ymax) && (y > (ymax-5)) && (x < xmax) && (x > xmin))
-                    px[z] = 0;
+                if ( (i > xmin) && (i < (xmin+5)) && (j < ymax) && (j > ymin) )
+                    *(img + i + IMG_WIDTH*j + IMG_WIDTH*IMG_HEIGHT*k) = 0; 
+                if ( (i < xmax) && (i > (xmax-5)) && (j < ymax) && (j > ymin))
+                    *(img + i + IMG_WIDTH*j + IMG_WIDTH*IMG_HEIGHT*k) = 0; 
+                if ( (j > ymin) && (j < (ymin+5)) && (i < xmax) && (i > xmin))
+                    *(img + i + IMG_WIDTH*j + IMG_WIDTH*IMG_HEIGHT*k) = 0; 
+                if ( (j < ymax) && (j > (ymax-5)) && (i < xmax) && (i > xmin))
+                    *(img + i + IMG_WIDTH*j + IMG_WIDTH*IMG_HEIGHT*k) = 0; 
             }
         }
     }
@@ -49,8 +50,8 @@ void read_png_file(char *filename) {
     png_init_io(png, fp);
     png_read_info(png, info);
 
-    img_width  = png_get_image_width(png, info);
-    img_height = png_get_image_height(png, info);
+    //img_width  = png_get_image_width(png, info);
+    //img_height = png_get_image_height(png, info);
     color_type = png_get_color_type(png, info);
     bit_depth  = png_get_bit_depth(png, info);
 
@@ -84,8 +85,8 @@ void read_png_file(char *filename) {
 
     if (row_pointers) abort();
 
-    row_pointers = (png_bytep*)malloc(sizeof(png_bytep) * img_height);
-    for(int y = 0; y < img_height; y++) {
+    row_pointers = (png_bytep*)malloc(sizeof(png_bytep) * IMG_HEIGHT);
+    for(int y = 0; y < IMG_HEIGHT; y++) {
         row_pointers[y] = (png_byte*)malloc(png_get_rowbytes(png,info));
     }
 
@@ -116,7 +117,7 @@ void write_png_file(char *filename) {
     png_set_IHDR(
         png,
         info,
-        img_width, img_height,
+        IMG_WIDTH, IMG_HEIGHT,
         8,
         PNG_COLOR_TYPE_RGBA,
         PNG_INTERLACE_NONE,
@@ -134,7 +135,7 @@ void write_png_file(char *filename) {
     png_write_image(png, row_pointers);
     png_write_end(png, NULL);
 
-    for(int y = 0; y < img_height; y++) {
+    for(int y = 0; y < IMG_HEIGHT; y++) {
         free(row_pointers[y]);
     }
     free(row_pointers);
@@ -160,40 +161,39 @@ void convolucion2d (float *input, int input_shape_width, int input_shape_height,
                     float *conv2d_1, int output_conv1_width, int output_conv1_height, int filtros) 
 {
     int i, j, k, l, c, v;
-    int conv2d_1_row, conv2d_1_filter; 
-    int u,g,h,q,w;
 
     for ( c = 0; c < filtros ; ++c)   // depth o filtros
     {
-        conv2d_1_filter = c*output_conv1_width*output_conv1_height;
-        h = c*input_depth*kernel_size*kernel_size;
         for ( i = 0; i < output_conv1_height; ++i)          // Filas
         {
-            conv2d_1_row = i*output_conv1_width;
-            u = input_shape_width*stride*i;
             for ( j = 0; j < output_conv1_width; ++j)       // Columnas
             {
-                q = stride*j;
                 for ( v = 0; v < input_depth ; ++v)   // depth or channel input
                 {
-                    w = v*kernel_size*kernel_size;
-                    g = input_shape_width*input_shape_height*v;
                     for ( k = 0; k < kernel_size; ++k)           // Filas del kernel 
                     {
                         for ( l = 0; l < kernel_size; ++l)       // Columnas del kernel 
-                            *(conv2d_1 + j + conv2d_1_row + conv2d_1_filter) += *(input + input_shape_width*k + u + l + q + g ) * *(kernel + l + k*kernel_size + w + h);
+                        {
+                            *(conv2d_1 + j + i*output_conv1_width + c*output_conv1_width*output_conv1_height) += *(input + input_shape_width*(k + stride*i) + (l + stride*j + input_shape_width*input_shape_height*v) ) * *(kernel + l + k*kernel_size + v*kernel_size*kernel_size + c*input_depth*kernel_size*kernel_size);
+                            //printf("acum: %d\n", *(input + input_shape_width*(k + stride*i) + (l + stride*j + input_shape_width*input_shape_height*v) ));
+                            //usleep(300000);
+                        }    
                     }
                 }
+                //printVector(conv2d_1, output_conv1_width, output_conv1_height, 1);
+                //printf("acum: %d\n",*(conv2d_1 + j + i*output_conv1_width + c*output_conv1_width*output_conv1_height));
+                //usleep(300000);
                 // Bias
-                *(conv2d_1 + j + conv2d_1_row + conv2d_1_filter) = *(conv2d_1 + j + conv2d_1_row + conv2d_1_filter) + *(bias+c);
+                *(conv2d_1 + j + i*output_conv1_width + c*output_conv1_width*output_conv1_height) = *(conv2d_1 + j + i*output_conv1_width + c*output_conv1_width*output_conv1_height) + *(bias+c);
                 // Relu
-                //if (Relu == 1)
-                *(conv2d_1 + j + conv2d_1_row + conv2d_1_filter) = ReLu( *(conv2d_1 + j + conv2d_1_row + conv2d_1_filter) );
+                if (Relu == 1)
+                    *(conv2d_1 + j + i*output_conv1_width + c*output_conv1_width*output_conv1_height) = ReLu( *(conv2d_1 + j + i*output_conv1_width + c*output_conv1_width*output_conv1_height) );
             }   
         }
     }
     //printVector(conv2d_1, output_conv1_width, output_conv1_height, filtros);
 }
+
 
 void printVector(float *in, int i_width, int i_height, int i_depth, int i_filters)
 {
@@ -214,6 +214,21 @@ void printVector(float *in, int i_width, int i_height, int i_depth, int i_filter
 
     return;
 }
+
+void emptyVector(float *in, int i_width, int i_height, int i_depth)
+{
+    int i,j,k;
+
+    for( k=0 ; k<i_depth ; k++){
+        for( j=0 ; j<i_height ; j++){
+            for( i=0 ; i<i_width ; i++)
+                *(in + i + i_width*j + i_width*i_height*k) = 0;
+        }
+    }
+
+    return;
+}
+
 
 
 void padding(   float *input, int input_shape_width, int input_shape_height, int input_depth, 
@@ -362,6 +377,10 @@ void fire_layer (   float *input, int input_shape_width, int input_shape_height,
     }
     //printf("output: \n");
     //printVector(output, input_shape_width, input_shape_height, 4);
+    free(conv2d_s1x1);
+    free(conv2d_e1x1);
+    free(conv2d_e3x3);
+    free(input_padded);
 }
 
 
@@ -504,104 +523,3 @@ float * anchorBox_load(char *filename)
 }
 
 
-void * aligned_calloc(size_t nelem, size_t elsize, size_t alignment)
-{
-    // Watch out for overflow
-    if(elsize == 0)
-        return NULL;
-
-    size_t size = nelem * elsize;
-    void *memory = aligned_alloc(alignment, size);
-    if(memory != NULL)
-        memset(memory, 0, size);
-    return memory;
-}
-
-
-void convolucion2d_2 (float *input, int input_shape_width, int input_shape_height, int input_depth, 
-                    float *kernel, int kernel_size, 
-                    float *bias, 
-                    int stride,
-                    int Relu,
-                    float *conv2d_1, int output_conv1_width, int output_conv1_height, int filtros) 
-{
-    int i, j, k, l, c, v;
-    int conv2d_1_row, conv2d_1_filter; 
-    int u,g,h,q,w;
-
-    for ( c = 0; c < filtros ; ++c)   // depth o filtros
-    {
-        conv2d_1_filter = c*output_conv1_width*output_conv1_height;
-        h = c*input_depth*kernel_size*kernel_size;
-        for ( i = 0; i < output_conv1_height; ++i)          // Filas
-        {
-            conv2d_1_row = i*output_conv1_width;
-            u = input_shape_width*stride*i;
-            for ( j = 0; j < output_conv1_width; ++j)       // Columnas
-            {
-                q = stride*j;
-                for ( v = 0; v < input_depth ; ++v)   // depth or channel input
-                {
-                    w = v*kernel_size*kernel_size;
-                    g = input_shape_width*input_shape_height*v;
-                    for ( k = 0; k < kernel_size; ++k)           // Filas del kernel 
-                    {
-                        for ( l = 0; l < kernel_size; ++l)       // Columnas del kernel 
-                            *(conv2d_1 + j + conv2d_1_row + conv2d_1_filter) += *(input + input_shape_width*k + u + l + q + g ) * *(kernel + l + k*kernel_size + w + h);
-                    }
-                }
-                // Bias
-                *(conv2d_1 + j + conv2d_1_row + conv2d_1_filter) = *(conv2d_1 + j + conv2d_1_row + conv2d_1_filter) + *(bias+c);
-                // Relu
-                //if (Relu == 1)
-                *(conv2d_1 + j + conv2d_1_row + conv2d_1_filter) = ReLu( *(conv2d_1 + j + conv2d_1_row + conv2d_1_filter) );
-            }   
-        }
-    }
-    //printVector(conv2d_1, output_conv1_width, output_conv1_height, filtros);
-}
-
-
-
-// void convolucion2d_2 (float *input, int input_shape_width, int input_shape_height, int input_depth, 
-//                     float *kernel, int kernel_size, 
-//                     float *bias, 
-//                     int stride,
-//                     int Relu,
-//                     float *conv2d_1, int output_conv1_width, int output_conv1_height, int filtros) 
-// {
-//     int i, j, k, l, c, v;
-//     int conv2d_1_row, conv2d_1_filter; 
-//     int u,g,h,q,w;
-
-//     for ( c = 0; c < filtros ; ++c)   // depth o filtros
-//     {
-//         conv2d_1_filter = c*output_conv1_width*output_conv1_height;
-//         h = c*input_depth*kernel_size*kernel_size;
-//         for ( i = 0; i < output_conv1_height; ++i)          // Filas
-//         {
-//             conv2d_1_row = i*output_conv1_width;
-//             u = input_shape_width*stride*i;
-//             for ( j = 0; j < output_conv1_width; ++j)       // Columnas
-//             {
-//                 q = stride*j;
-//                 for ( v = 0; v < input_depth ; ++v)   // depth or channel input
-//                 {
-//                     w = v*kernel_size*kernel_size;
-//                     g = input_shape_width*input_shape_height*v;
-//                     for ( k = 0; k < kernel_size; ++k)           // Filas del kernel 
-//                     {
-//                         for ( l = 0; l < kernel_size; ++l)       // Columnas del kernel 
-//                             *(conv2d_1 + j + conv2d_1_row + conv2d_1_filter) += *(input + input_shape_width*k + u + l + q + g ) * *(kernel + l + k*kernel_size + w + h);
-//                     }
-//                 }
-//                 // Bias
-//                 *(conv2d_1 + j + conv2d_1_row + conv2d_1_filter) = *(conv2d_1 + j + conv2d_1_row + conv2d_1_filter) + *(bias+c);
-//                 // Relu
-//                 //if (Relu == 1)
-//                 *(conv2d_1 + j + conv2d_1_row + conv2d_1_filter) = ReLu( *(conv2d_1 + j + conv2d_1_row + conv2d_1_filter) );
-//             }   
-//         }
-//     }
-//     //printVector(conv2d_1, output_conv1_width, output_conv1_height, filtros);
-// }
