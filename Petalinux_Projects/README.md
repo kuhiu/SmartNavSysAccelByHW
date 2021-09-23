@@ -7,6 +7,11 @@
 * [I2C controller handling SCCB](https://github.com/Fuschetto97/Tesis/blob/main/Petalinux_Projects/README_Des3.md) Tiempo =  5 dias
 
 
+## Diagrama en bloques 
+
+<img src=./imagenes/BlockDiagram.png alt="Hardware" />
+
+
 ## Petalinux-build
 
 * petalinux-config --get-hw-description /home/martin/Escritorio/Tesis/pImagen/Petalinux_Projects/Imagen/
