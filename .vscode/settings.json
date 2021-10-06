@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "tensor": "c",
+        "gpio.h": "c"
+    }
+}
