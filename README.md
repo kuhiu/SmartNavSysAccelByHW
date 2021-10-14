@@ -12,12 +12,12 @@
 1) ~~Quitar la red del framework y sus pesos, escribirla en python~~
 2) Escribir el sistema de control difuso en python
 3) Aplicaciones (1 y 2)
-4) Movimiento del robot 
+4) Movimiento del robot (Tiempo=1 mes)
     * ~~motores y sus drivers)~~ 
-    * Comprar sensor para medir distancia recorrida y escribir driver.
-    * ~~Para poder modificar su velocidad pwm en FPGA~~ y su driver. (probar ILA si es necesario)
-    * Comprar brujula y escribir su driver. (para conocer la direccion a la que se desplaza)
-5) Comprar fuente dc-dc 5v al menos 1.5A para alimentar externamente la Zybo. 
+    * ~~Comprar sensor para medir distancia recorrida y escribir driver.~~
+    * ~~Para poder modificar su velocidad pwm en FPGA y su driver. (probar ILA si es necesario)~~
+    * ~~Comprar brujula y escribir su driver. (para conocer la direccion a la que se desplaza)~~
+5) ~~Comprar fuente dc-dc 5v al menos 1.5A para alimentar externamente la Zybo. ~~
 
 ### Pendientes probables
 
