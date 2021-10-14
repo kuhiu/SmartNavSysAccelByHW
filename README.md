@@ -18,7 +18,8 @@
     * ~~Para poder modificar su velocidad pwm en FPGA y su driver. (probar ILA si es necesario)~~
     * ~~Comprar brujula y escribir su driver. (para conocer la direccion a la que se desplaza)~~
 5) ~~Comprar fuente dc-dc 5v al menos 1.5A para alimentar externamente la Zybo.~~
-
+6) Crear un archivo en donde se mantenga actualizada toda la informacion de los drivers, direccion del robot, velocidad del robot, distancia por recorrrer para llegar al target, sensores de distancia, etc.
+ 
 ### Pendientes probables
 
 1) ~~Escribir en C la red~~
