@@ -1,6 +1,10 @@
 {
     "files.associations": {
         "tensor": "c",
-        "gpio.h": "c"
+        "gpio.h": "c",
+        "bitset": "c",
+        "i2c-dev.h": "c",
+        "smbus.h": "c",
+        "cerrno": "c"
     }
 }

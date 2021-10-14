@@ -6,18 +6,17 @@
 #include <stdlib.h>
 #include <stdint.h>
 
-#define BYTE2READ 1*4
+#define BYTE2READ 16
 
 int main (void)
 {
-    printf("Llegue \n");
     int fd;
     int ubuff[BYTE2READ];
 
-    if ( (fd = open("/dev/chardev_hcsr04_EMIOgpio", O_RDWR)) == -1)
+    if ( (fd = open("/dev/chardev_encoder_EMIOgpio_PL", O_RDWR)) == -1)
     {
         //perror("open");
-        printf("Error abriendo leds_control_chardev\n");
+        printf("Error abriendo chardev_encoder_EMIOgpio_PL\n");
         return -1;
     }
 
@@ -27,8 +26,8 @@ int main (void)
         printf("Error leyendo leds_control_chardev\n");
         return -1;
     }
-    printf("Distancia = %f cms \n", (*ubuff*0.01715));
-
+    printf(" Revoluciones: %f - %f rpm \n", (60*10*1000000/( (float)ubuff[0])), (60*10*1000000/( (float)ubuff[1])) );
+    
     close(fd);
     return 0;
 }

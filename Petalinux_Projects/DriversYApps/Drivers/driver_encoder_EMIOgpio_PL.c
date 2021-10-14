@@ -11,12 +11,12 @@
 #include <linux/ktime.h>
 #include <linux/interrupt.h>
 
-#define DEVICE_NAME "chardev_hcsr04_EMIOgpio"             /* Define Driver Name */
-#define DEVICE_CLASS_NAME "class_hcsr04_EMIOgpio"
-#define BYTE2READ 1*4                                     /* Cantidad de word de 32 bits que tengo que leer * 4 = Bytes 2 read */
-#define BASE_MINOR 0                                      /* Base del numero menor */
-#define MINOR_COUNT 1                                     /* Cantidad de numeros menores que voy a usar */
-#define DEVICE_PARENT NULL
+#define DEVICE_NAME       "chardev_encoder_EMIOgpio_PL" /* Define Driver Name */
+#define DEVICE_CLASS_NAME "class_encoder_EMIOgpio_PL"
+#define BYTE2READ                              16       /* Cantidad de word de 32 bits que tengo que leer * 4 = Bytes 2 read */
+#define BASE_MINOR                              0       /* Base del numero menor */
+#define MINOR_COUNT                             1       /* Cantidad de numeros menores que voy a usar */
+#define DEVICE_PARENT                        NULL
 
 #define OFFSET_GPIO1_DATA   (uint32_t) 0x00000000 
 #define OFFSET_GPIO_TRI     (uint32_t) 0x00000004
@@ -26,13 +26,18 @@
 #define OFFSET_IPIER        (uint32_t) 0x00000128
 #define OFFSET_IPISR        (uint32_t) 0x00000120
 
-
 static int driver_probe (struct platform_device *pdev);
 static int driver_remove (struct platform_device *pdev);
 
-static int valid_value = 0;
-static ktime_t echo_start;
-static ktime_t echo_end;
+static int sensor_1 = 0;
+static int valid_value1 = 0;
+static ktime_t echo_start1;
+static ktime_t echo_end1;
+
+static int sensor_2 = 0;
+static int valid_value2 = 0;
+static ktime_t echo_start2;
+static ktime_t echo_end2;
 
 static struct state {
 
@@ -58,7 +63,7 @@ static struct state {
 /********************************* Estructuras  of_device_id *************************************/
 
 static const struct of_device_id driver_of_match[] = {
-{ .compatible = "driver_hcsr04_EMIOgpio" },
+{ .compatible = "driver_encoder_EMIOgpio_PL" },
 { }
 };
 
@@ -115,55 +120,67 @@ void set_registers (volatile void *base, uint32_t offset, uint32_t mask, uint32_
 /*************************************************************************************************/
 static irqreturn_t driver_isr(int irq, void *data)
 {
-	ktime_t ktime_dummy;
+	  ktime_t ktime_dummy1;
+    ktime_t ktime_dummy2;
 
-    pr_info("Hola entre a driver_isr \n");
+    //pr_info("Hola entre a driver_isr \n");
 
     if (  ioread32(state.base_addr_EMIOgpio + OFFSET_IPISR) == 0x01 )
     {
-        pr_info("Hola channel 1 interrupt \n");
+        //pr_info("Hola channel 1 interrupt \n");
 
-        pr_info("Es %08X \n", ioread32(state.base_addr_EMIOgpio + OFFSET_GPIO1_DATA) );
+        //pr_info("Es %08X \n", ioread32(state.base_addr_EMIOgpio + OFFSET_GPIO1_DATA) );
 
         if ( (ioread32(state.base_addr_EMIOgpio + OFFSET_GPIO1_DATA) & 0x01) == (uint32_t) 0x01) // Primer sensor interrumpio
         {
-            pr_info("Interumpio bit 0 \n");
-            if (valid_value==0) {
-                ktime_dummy=ktime_get();
-                pr_info("Es %08X \n", ioread32(state.base_addr_EMIOgpio + OFFSET_GPIO1_DATA) );
-                if ( ioread32(state.base_addr_EMIOgpio + OFFSET_GPIO1_DATA) == 1) 
-                {
-                    pr_info("Es 1\n");  
-                    echo_start=ktime_dummy;
+            //pr_info("Interumpio bit 0 \n");
+            if (valid_value1==0) {
+                ktime_dummy1=ktime_get();
+                if (sensor_1 == 0){  
+                    echo_start1=ktime_dummy1;
+                    valid_value1 = 0;
                 }
-                else 
-                {
-                    pr_info("Es 0\n");  
-                    echo_end=ktime_dummy;
-                    valid_value=1;
+
+                sensor_1++;
+
+                if (sensor_1 >= 200){  // 10 REVOLUCIONES
+                    sensor_1 = 0;
+                    valid_value1 = 1;
+                    echo_end1=ktime_dummy1; 
                 }
             }
+
         }
 
         if ( (ioread32(state.base_addr_EMIOgpio + OFFSET_GPIO1_DATA) & 0x02) == (uint32_t) 0x02) // Segundo sensor interrumpio
         {
-            pr_info("Interumpio bit 1 \n");
-        }
+            //pr_info("Interumpio bit 1 \n");
+            if (valid_value2==0) {
+                ktime_dummy2=ktime_get();
+                if (sensor_2 == 0){  
+                    echo_start2=ktime_dummy2;
+                    valid_value2 = 0;
+                }
 
-        if ( (ioread32(state.base_addr_EMIOgpio + OFFSET_GPIO1_DATA) & 0x04) == (uint32_t) 0x04) // Tercer sensor interrumpio
-        {
-            pr_info("Interumpio bit 2 \n");
+                sensor_2++;
+
+                if (sensor_2 >= 200){  // 10 REVOLUCIONES
+                    sensor_2 = 0;
+                    valid_value2 = 1;
+                    echo_end2=ktime_dummy2; 
+                }
+            }
         }
 
         // Clear int status channel
         set_registers(state.base_addr_EMIOgpio, OFFSET_IPISR, (uint32_t) 0x3, (uint32_t)0x01 );
     }
 
-    if (  ioread32(state.base_addr_EMIOgpio + OFFSET_IPISR) == 0x02 )
-    {
-        pr_info("Hola channel 2 interrupt  \n");  
-        set_registers(state.base_addr_EMIOgpio, OFFSET_IPISR, (uint32_t) 0x3, (uint32_t)0x02 );
-    }
+    // if (  ioread32(state.base_addr_EMIOgpio + OFFSET_IPISR) == 0x02 )
+    // {
+    //     //pr_info("Hola channel 2 interrupt  \n");  
+    //     set_registers(state.base_addr_EMIOgpio, OFFSET_IPISR, (uint32_t) 0x3, (uint32_t)0x02 );
+    // }
     
 	return IRQ_HANDLED;
 }
@@ -198,6 +215,16 @@ static int driver_open(struct inode *inode, struct file *file)
       pr_err ("Insuficiente memoria\n");
       return -ENODEV; /* No such device */
     }
+
+    // Configure the portS as input 
+    set_registers(state.base_addr_EMIOgpio, OFFSET_GPIO_TRI, (uint32_t) (0x03<<0), (uint32_t) (0x03<<0) );
+
+    // Habilito interrupcion channel 1
+    set_registers(state.base_addr_EMIOgpio, OFFSET_IPIER, (uint32_t) 0x3, (uint32_t)0x01 );
+
+    // Habilito la interrupciones globales
+    set_registers(state.base_addr_EMIOgpio, OFFSET_GIER, (uint32_t) (0x01<<31) , (uint32_t) (0x01<<31) );
+
 
     pr_info("Chau! Sali de open! \n");
     return 0;
@@ -253,28 +280,41 @@ static ssize_t driver_read(struct file *file, char __user *ubuff, size_t size, l
         pr_info("access_ok: El buffer es invalido\n");  
         return -1;
     }
-    
-    /* Escribo el dato del AXI GPIO (esta en la base de la pagina) */
-    iowrite32( (uint32_t) 0x01, state.base_addr_EMIOgpio + OFFSET_GPIO2_DATA);
-    udelay(10);
-    iowrite32( (uint32_t) 0x00, state.base_addr_EMIOgpio + OFFSET_GPIO2_DATA);
 
     // Tengo que esperar que interrumpa y tenga el resultado
+    valid_value1 = 0;
     counter=0;
-	while (valid_value==0) {
-        pr_info("Espero la interrupcion \n");  
-        counter++;
-		// Out of range
-		if (counter>23200) {
-			*(state.RX_buff) = -1;
-            break;
-		}
-		udelay(1);
-	}
+	  while (valid_value1==0) {
+      counter++;
+      // Out of range
+      if (counter>10000) {
+              pr_info("Break \n"); 
+              break;
+		  }
+		  udelay(1000);
+	  }
 
-    pr_info("Llego la interrupcion \n"); 
+    pr_info("Llego la interrupcion1 \n"); 
 
-    *(state.RX_buff) = ktime_to_us( ktime_sub(echo_end,echo_start) );
+    state.RX_buff[0] = ktime_to_us( ktime_sub(echo_end1,echo_start1) );
+
+    // Tengo que esperar que interrumpa y tenga el resultado
+    valid_value2 = 0;
+    counter=0;
+	  while (valid_value2==0) {
+      counter++;
+      // Out of range
+      if (counter>10000) {
+              pr_info("Break \n"); 
+              break;
+		  }
+		  udelay(1000);
+	  }
+
+    pr_info("Llego la interrupcion2 \n"); 
+
+    state.RX_buff[1] = ktime_to_us( ktime_sub(echo_end2,echo_start2) );
+
 
     /* Cargo el dato en el buffer del usuario */
     pr_info("Cargo el buffer del usuario con la informacion\n");
@@ -394,14 +434,16 @@ static int driver_probe (struct platform_device *pdev)
     pr_info("%s: Pido interrupcion al kernel \n", pdev->name);
     if ((state.irq = platform_get_irq(pdev, 0)) < 0)
     {
-       pr_err(DEVICE_NAME": platform_get_irq: No se pudo registrar el ISR\n");
-       return -EPERM;    // -1
+        iounmap(state.base_addr_EMIOgpio);
+        release_mem_region(state.res_EMIOgpio->start, state.remap_size_EMIOgpio);
+        pr_err(DEVICE_NAME": platform_get_irq: No se pudo registrar el ISR, estado: %d\n", state.irq);
+        return -EPERM;    // -1
     }
 
     /* Implantamos el ISR */
     pr_info(DEVICE_NAME": Implantamos el ISR \n");
     pr_info(DEVICE_NAME": Numero del IRQ del device: %d\n", state.irq);
-    if ((status = request_irq(state.irq, driver_isr, (IRQF_TRIGGER_RISING | IRQF_TRIGGER_FALLING  ) , pdev->name, NULL)) != 0) // Consultar IRQF_NO_SUSPEND
+    if ((status = request_irq(state.irq, driver_isr, IRQF_TRIGGER_RISING , pdev->name, NULL)) != 0) // Consultar IRQF_NO_SUSPEND
     {
         iounmap(state.base_addr_EMIOgpio);
         release_mem_region(state.res_EMIOgpio->start, state.remap_size_EMIOgpio);
@@ -409,14 +451,6 @@ static int driver_probe (struct platform_device *pdev)
         return -EPERM;    // -1
     }
     pr_info("%s: ISR implantado \n", pdev->name);
-
-    // Habilito interrupcion channel 1
-    set_registers(state.base_addr_EMIOgpio, OFFSET_IPIER, (uint32_t) 0x3, (uint32_t)0x01 );
-
-    // Habilito la interrupciones globales
-    set_registers(state.base_addr_EMIOgpio, OFFSET_GIER, (uint32_t) (0x01<<31) , (uint32_t) (0x01<<31) );
-
-
 
     pr_info("Chau! Salgo de driver probed! \n");
 

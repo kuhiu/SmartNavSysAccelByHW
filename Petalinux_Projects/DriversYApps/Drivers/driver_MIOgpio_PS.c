@@ -15,7 +15,7 @@
 
 #define DEVICE_NAME "chardev_MIOgpio_PS"                /* Define Driver Name */
 #define DEVICE_CLASS_NAME "class_MIOgpio_PS"
-#define BYTE2READ 1*4                                   /* Cantidad de word de 32 bits que tengo que leer * 4 = Bytes 2 read */
+#define BYTE2READ 6*4                                   /* Cantidad de word de 32 bits que tengo que leer * 4 = Bytes 2 read */
 #define BASE_MINOR 0                                    /* Base del numero menor */
 #define MINOR_COUNT 1                                   /* Cantidad de numeros menores que voy a usar */
 #define DEVICE_PARENT NULL
@@ -48,9 +48,16 @@ static int driver_probe (struct platform_device *pdev);
 static int driver_remove (struct platform_device *pdev);
 
 
-static int valid_value = 0;
-static ktime_t echo_start = 0;
-static ktime_t echo_end = 0;
+static int right_valid_value = 0;
+static int center_valid_value = 0;
+static int left_valid_value = 0;
+
+static ktime_t right_echo_start = 0;
+static ktime_t right_echo_end = 0;
+static ktime_t center_echo_start = 0;
+static ktime_t center_echo_end = 0;
+static ktime_t left_echo_start = 0;
+static ktime_t left_echo_end = 0;
 
 static struct state {
 
@@ -68,8 +75,8 @@ static struct state {
   struct cdev chardev;    // cdev_add()
 
   //void __iomem *_reg_cm_per;
-  uint32_t *TX_buff;
-  uint32_t *RX_buff;
+  long long int *TX_buff;
+  long long int *RX_buff;
 
   int irq;
 
@@ -116,34 +123,79 @@ void set_registers (volatile void *base, uint32_t offset, uint32_t mask, uint32_
 /*************************************************************************************************/
 static irqreturn_t driver_isr(int irq, void *data)
 {
-	ktime_t ktime_dummy;
+	ktime_t right_ktime_dummy;
+  ktime_t center_ktime_dummy;
+  ktime_t left_ktime_dummy;
 
   //pr_info("Hola entre a driver_isr, interrupciones en: %08X \n", ((ioread32(state.xgpiops_addr + OFFSET_GPIO_INT_STAT_0) >> 12) & (uint32_t)0x01) );
 
-    if (  ((ioread32(state.xgpiops_addr + OFFSET_GPIO_INT_STAT_0) >> 12) & (uint32_t)0x01) == (uint32_t)(0x1) )  // Hubo interrupcion en MIO-12
-    {
-        //pr_info("Hubo interrupcion en MIO-12 \n");
-        if (valid_value==0) {
-          ktime_dummy=ktime_get();
-          //pr_info("Es 1 o 0? %08X \n", ioread32(state.xgpiops_addr + OFFSET_GPIO_DATA_0_RO) );
-          if ( ((ioread32(state.xgpiops_addr + OFFSET_GPIO_DATA_0_RO) >> 12) & (uint32_t)0x01) == (uint32_t)(0x1) ) 
-          {
-              //pr_info("Es 1\n");  
-              echo_start=ktime_dummy;
-          }
-          else 
-          {
-              //pr_info("Es 0\n");  
-              echo_end=ktime_dummy;
-              valid_value=1;
-          }
+  if (  ((ioread32(state.xgpiops_addr + OFFSET_GPIO_INT_STAT_0) >> 12) & (uint32_t)0x01) == (uint32_t)(0x1) )  // Hubo interrupcion en MIO-12
+  {
+      //pr_info("Hubo interrupcion en MIO-12 \n");
+      if (right_valid_value==0) {
+        right_ktime_dummy=ktime_get();
+        //pr_info("Es 1 o 0? %08X \n", ioread32(state.xgpiops_addr + OFFSET_GPIO_DATA_0_RO) );
+        if ( ((ioread32(state.xgpiops_addr + OFFSET_GPIO_DATA_0_RO) >> 12) & (uint32_t)0x01) == (uint32_t)(0x1) ) 
+        {
+            //pr_info("MIO-12 Es 1\n");  
+            right_echo_start=right_ktime_dummy;
         }
+        else 
+        {
+            //pr_info("MIO-12 Es 0\n");  
+            right_echo_end=right_ktime_dummy;
+            right_valid_value=1;
+        }
+      }
 
-        set_registers(state.xgpiops_addr, OFFSET_GPIO_INT_STAT_0, (uint32_t)(0x1<<12), (uint32_t)(0x1<<12) );
-    }
+      set_registers(state.xgpiops_addr, OFFSET_GPIO_INT_STAT_0, (uint32_t)(0x1<<12), (uint32_t)(0x1<<12) );
+  }
 
+  if (  ((ioread32(state.xgpiops_addr + OFFSET_GPIO_INT_STAT_0) >> 14) & (uint32_t)0x01) == (uint32_t)(0x1) )  // Hubo interrupcion en MIO-12
+  {
+      //pr_info("Hubo interrupcion en MIO-14 \n");
+      if (center_valid_value==0) {
+        center_ktime_dummy=ktime_get();
+        //pr_info("Es 1 o 0? %08X \n", ioread32(state.xgpiops_addr + OFFSET_GPIO_DATA_0_RO) );
+        if ( ((ioread32(state.xgpiops_addr + OFFSET_GPIO_DATA_0_RO) >> 14) & (uint32_t)0x01) == (uint32_t)(0x1) ) 
+        {
+            //pr_info("MIO-14 Es 1\n");  
+            center_echo_start=center_ktime_dummy;
+        }
+        else 
+        {
+            //pr_info("MIO-14 Es 0\n");  
+            center_echo_end=center_ktime_dummy;
+            center_valid_value=1;
+        }
+      }
 
+      set_registers(state.xgpiops_addr, OFFSET_GPIO_INT_STAT_0, (uint32_t)(0x1<<14), (uint32_t)(0x1<<14) );
+  }
     
+
+  if (  ((ioread32(state.xgpiops_addr + OFFSET_GPIO_INT_STAT_0) >> 9) & (uint32_t)0x01) == (uint32_t)(0x1) )  // Hubo interrupcion en MIO-12
+  {
+      //pr_info("Hubo interrupcion en MIO-9 \n");
+      if (left_valid_value==0) {
+        left_ktime_dummy=ktime_get();
+        //pr_info("Es 1 o 0? %08X \n", ioread32(state.xgpiops_addr + OFFSET_GPIO_DATA_0_RO) );
+        if ( ((ioread32(state.xgpiops_addr + OFFSET_GPIO_DATA_0_RO) >> 9) & (uint32_t)0x01) == (uint32_t)(0x1) ) 
+        {
+            //pr_info("MIO-9 Es 1\n");  
+            left_echo_start=left_ktime_dummy;
+        }
+        else 
+        {
+            //pr_info("MIO-9 Es 0\n");  
+            left_echo_end=left_ktime_dummy;
+            left_valid_value=1;
+        }
+      }
+
+      set_registers(state.xgpiops_addr, OFFSET_GPIO_INT_STAT_0, (uint32_t)(0x1<<9), (uint32_t)(0x1<<9) );
+  }
+
 	return IRQ_HANDLED;
 }
 /*************************************************************************************************/
@@ -186,13 +238,13 @@ static int driver_open(struct inode *inode, struct file *file)
     pr_info("Hola! Entre a open! \n");
 
     pr_info("Consigo memoria para el buffer de recepcion y de transmision\n");
-    if ((state.RX_buff = (int *) kmalloc(BYTE2READ, GFP_KERNEL)) == NULL)
+    if ((state.RX_buff = (long long int *) kmalloc(BYTE2READ, GFP_KERNEL)) == NULL)
     {
       pr_err("Insuficiente memoria\n");
       return -ENODEV; /* No such device */
     }
 
-    if ((state.TX_buff = (int *) kmalloc(BYTE2READ, GFP_KERNEL)) == NULL)
+    if ((state.TX_buff = (long long int *) kmalloc(BYTE2READ, GFP_KERNEL)) == NULL)
     {
       pr_err("Insuficiente memoria\n");
       return -ENODEV; /* No such device */
@@ -216,7 +268,7 @@ static int driver_open(struct inode *inode, struct file *file)
     set_registers(state.mio_pin_addr, OFFSET_MIO_PIN_00_9, (uint32_t) 0xFF,      (uint32_t) 0x00);       // : Set L0_SEL, L1_SEL, L2_SEL, L3_SEL =0 y TRI_ENABLE = 0
     set_registers(state.mio_pin_addr, OFFSET_MIO_PIN_00_9, (uint32_t) (0x7<<9) , (uint32_t)(0x03<<9));   // : LVCMOS33
     set_registers(state.mio_pin_addr, OFFSET_MIO_PIN_00_9, (uint32_t) (0x1<<12), (uint32_t)(0x0<<12));   // : PULLUP disable
-    set_registers(state.mio_pin_addr, OFFSET_MIO_PIN_00_9, (uint32_t) (0x1<<8) , (uint32_t)(0x0<<8));    // : Slow CMOS edge
+    set_registers(state.mio_pin_addr, OFFSET_MIO_PIN_00_9, (uint32_t) (0x1<<8) , (uint32_t)(0x1<<8));    // : Fast CMOS edge
     set_registers(state.mio_pin_addr, OFFSET_MIO_PIN_00_9, (uint32_t) (0x1<<13), (uint32_t)(0x1<<13));   // : Disable HSTL receiver
 
     set_registers(state.mio_pin_addr, OFFSET_MIO_PIN_00_13, (uint32_t) 0xFF,      (uint32_t) 0x00);       // : Set L0_SEL, L1_SEL, L2_SEL, L3_SEL =0 y TRI_ENABLE = 0
@@ -228,7 +280,7 @@ static int driver_open(struct inode *inode, struct file *file)
     set_registers(state.mio_pin_addr, OFFSET_MIO_PIN_00_14, (uint32_t) 0xFF,      (uint32_t) 0x00);       // : Set L0_SEL, L1_SEL, L2_SEL, L3_SEL =0 y TRI_ENABLE = 0
     set_registers(state.mio_pin_addr, OFFSET_MIO_PIN_00_14, (uint32_t) (0x7<<9) , (uint32_t)(0x03<<9));   // : LVCMOS33
     set_registers(state.mio_pin_addr, OFFSET_MIO_PIN_00_14, (uint32_t) (0x1<<12), (uint32_t)(0x0<<12));   // : PULLUP disable
-    set_registers(state.mio_pin_addr, OFFSET_MIO_PIN_00_14, (uint32_t) (0x1<<8) , (uint32_t)(0x0<<8));    // : Slow CMOS edge
+    set_registers(state.mio_pin_addr, OFFSET_MIO_PIN_00_14, (uint32_t) (0x1<<8) , (uint32_t)(0x1<<8));    // : Fast CMOS edge
     set_registers(state.mio_pin_addr, OFFSET_MIO_PIN_00_14, (uint32_t) (0x1<<13), (uint32_t)(0x1<<13));   // : Disable HSTL receiver
 
     set_registers(state.mio_pin_addr, OFFSET_MIO_PIN_00_15, (uint32_t) 0xFF,      (uint32_t) 0x00);       // : Set L0_SEL, L1_SEL, L2_SEL, L3_SEL =0 y TRI_ENABLE = 0
@@ -246,36 +298,48 @@ static int driver_open(struct inode *inode, struct file *file)
     set_registers(state.mio_pin_addr, APER_CLK_CTRL, (uint32_t) (0x1<<22), (uint32_t)(0x1<<22));   // : Enable GPIO clk
 
     pr_info("GPIO Pin Configurations! \n");
-    set_registers(state.xgpiops_addr, OFFSET_GPIO_DIRM_0, (uint32_t)0x1, (uint32_t)0x1);    // PIN0 as output (0: input, 1: output)
-    set_registers(state.xgpiops_addr, OFFSET_GPIO_OUTE_0, (uint32_t)0x1, (uint32_t)0x1);    // PIN0 Output enable
 
-    set_registers(state.xgpiops_addr, OFFSET_GPIO_DIRM_0, (uint32_t)(0x1<<9), (uint32_t)(0x1<<9));      // PIN9 as output (0: input, 1: output)
-    set_registers(state.xgpiops_addr, OFFSET_GPIO_OUTE_0, (uint32_t)(0x1<<9), (uint32_t)(0x1<<9));      // PIN9 Output enable
+    // Center hc-sr04 trigger
+    set_registers(state.xgpiops_addr, OFFSET_GPIO_DIRM_0, (uint32_t)(0x1<<0), (uint32_t)(0x1<<0));    // PIN0 as output (0: input, 1: output)
+    set_registers(state.xgpiops_addr, OFFSET_GPIO_OUTE_0, (uint32_t)(0x1<<0), (uint32_t)(0x1<<0));    // PIN0 Output enable
 
+    // Right hc-sr04 trigger
+    set_registers(state.xgpiops_addr, OFFSET_GPIO_DIRM_0, (uint32_t)(0x1<<15), (uint32_t)(0x1<<15));    // PIN15 as output (0: input, 1: output)
+    set_registers(state.xgpiops_addr, OFFSET_GPIO_OUTE_0, (uint32_t)(0x1<<15), (uint32_t)(0x1<<15));    // PIN15 Output enable
+
+    // Left hc-sr04 trigger
     set_registers(state.xgpiops_addr, OFFSET_GPIO_DIRM_0, (uint32_t)(0x1<<13), (uint32_t)(0x1<<13));    // PIN13 as output (0: input, 1: output)
     set_registers(state.xgpiops_addr, OFFSET_GPIO_OUTE_0, (uint32_t)(0x1<<13), (uint32_t)(0x1<<13));    // PIN13 Output enable
-
-    set_registers(state.xgpiops_addr, OFFSET_GPIO_DIRM_0, (uint32_t)(0x1<<14), (uint32_t)(0x1<<14));    // PIN0 as output (0: input, 1: output)
-    set_registers(state.xgpiops_addr, OFFSET_GPIO_OUTE_0, (uint32_t)(0x1<<14), (uint32_t)(0x1<<14));    // PIN0 Output enable
-
-    // hc-sr04 trigger
-    set_registers(state.xgpiops_addr, OFFSET_GPIO_DIRM_0, (uint32_t)(0x1<<15), (uint32_t)(0x1<<15));    // PIN0 as output (0: input, 1: output)
-    set_registers(state.xgpiops_addr, OFFSET_GPIO_OUTE_0, (uint32_t)(0x1<<15), (uint32_t)(0x1<<15));    // PIN0 Output enable
 
     // Deshabilito todas las interrupciones
     set_registers(state.xgpiops_addr, OFFSET_GPIO_INT_DIS_0, (uint32_t)(0xFFFFFFFF), (uint32_t)(0xFFFFFFFF));
 
-    // Pin12 como entrada e interrupcion 
-    set_registers(state.xgpiops_addr, OFFSET_GPIO_DIRM_0,    (uint32_t)(0x1<<12), (uint32_t)(0x0<<12)); // PIN12 as input (0: input, 1: output)
-    set_registers(state.xgpiops_addr, OFFSET_GPIO_INTTYPE_0, (uint32_t)(0xFFFFFFFF), (uint32_t)(0x1<<12)); // 0: level-sensitive 1:Edge sensitive
-    set_registers(state.xgpiops_addr, OFFSET_GPIO_INT_ANY_0, (uint32_t)(0xFFFFFFFF), (uint32_t)(0x1<<12)); // Trigger en both edge
-    set_registers(state.xgpiops_addr, OFFSET_GPIO_INT_POL_0, (uint32_t)(0xFFFFFFFF), (uint32_t)(0x0<<12)); // cualquiera x
+    // Center hc-sr04 echo 
+    set_registers(state.xgpiops_addr, OFFSET_GPIO_DIRM_0,    (uint32_t)(0x1<<12), (uint32_t)(0x0<<12));  // PIN12 as input (0: input, 1: output)
+    set_registers(state.xgpiops_addr, OFFSET_GPIO_INTTYPE_0, (uint32_t)(0x1<<12), (uint32_t)(0x1<<12));  // 0: level-sensitive 1:Edge sensitive
+    set_registers(state.xgpiops_addr, OFFSET_GPIO_INT_ANY_0, (uint32_t)(0x1<<12), (uint32_t)(0x1<<12));  // Trigger en both edge
+    set_registers(state.xgpiops_addr, OFFSET_GPIO_INT_POL_0, (uint32_t)(0x1<<12), (uint32_t)(0x0<<12));  // cualquiera x
+
+    // Right hc-sr04 echo  
+    set_registers(state.xgpiops_addr, OFFSET_GPIO_DIRM_0,    (uint32_t)(0x1<<14), (uint32_t)(0x0<<14));  // PIN12 as input (0: input, 1: output)
+    set_registers(state.xgpiops_addr, OFFSET_GPIO_INTTYPE_0, (uint32_t)(0x1<<14), (uint32_t)(0x1<<14));  // 0: level-sensitive 1:Edge sensitive
+    set_registers(state.xgpiops_addr, OFFSET_GPIO_INT_ANY_0, (uint32_t)(0x1<<14), (uint32_t)(0x1<<14));  // Trigger en both edge
+    set_registers(state.xgpiops_addr, OFFSET_GPIO_INT_POL_0, (uint32_t)(0x1<<14), (uint32_t)(0x0<<14));  // cualquiera x
+
+    // Left hc-sr04 echo  
+    set_registers(state.xgpiops_addr, OFFSET_GPIO_DIRM_0,    (uint32_t)(0x1<<9), (uint32_t)(0x0<<9));   // PIN12 as input (0: input, 1: output)
+    set_registers(state.xgpiops_addr, OFFSET_GPIO_INTTYPE_0, (uint32_t)(0x1<<9), (uint32_t)(0x1<<9));   // 0: level-sensitive 1:Edge sensitive
+    set_registers(state.xgpiops_addr, OFFSET_GPIO_INT_ANY_0, (uint32_t)(0x1<<9), (uint32_t)(0x1<<9));   // Trigger en both edge
+    set_registers(state.xgpiops_addr, OFFSET_GPIO_INT_POL_0, (uint32_t)(0x1<<9), (uint32_t)(0x0<<9));   // cualquiera x
 
     udelay(1);
-    set_registers(state.xgpiops_addr, OFFSET_GPIO_INT_EN_0,  (uint32_t)(0xFFFFFFFF), (uint32_t)(0x1<<12));
+
+    // Habilito interrupciones de los pines de entrada
+    set_registers(state.xgpiops_addr, OFFSET_GPIO_INT_EN_0,  (uint32_t)(0xFFFFFFFF), (uint32_t) ((0x1<<12) | (0x1<<14) | (0x1<<9)));
 
     udelay(1);
     pr_info("Los pines habilitados son: %08X\n", ioread32(state.xgpiops_addr + OFFSET_GPIO_INT_MASK_0) );  // 0: int enabled, 1: no enabled 
+    
     return 0;
 } 
 
@@ -330,30 +394,75 @@ static ssize_t driver_read(struct file *file, char __user *ubuff, size_t size, l
         return -1;
     }
 
-    valid_value=0;
+    right_valid_value=0;
+    center_valid_value=0;
+    left_valid_value=0;
 
     /* Trigger */
-    set_registers(state.xgpiops_addr, OFFSET_GPIO_DATA_0, (uint32_t)(0x1<<15), (uint32_t)(0x1<<15));
+    //set_registers(state.xgpiops_addr, OFFSET_GPIO_DATA_0, (uint32_t) ((0x1<<0) | (0x1<<13) | (0x1<<15)), (uint32_t)((0x1<<0) | (0x1<<13) | (0x1<<15)) );
+    //udelay(10);
+    //set_registers(state.xgpiops_addr, OFFSET_GPIO_DATA_0, (uint32_t) ((0x1<<0) | (0x1<<13) | (0x1<<15)), (uint32_t) ((0x0<<0) | (0x0<<13) | (0x0<<15)) );
+
+
+    set_registers(state.xgpiops_addr, OFFSET_GPIO_DATA_0, (uint32_t)(0x1<<0), (uint32_t)(0x1<<0) );
     udelay(10);
-    set_registers(state.xgpiops_addr, OFFSET_GPIO_DATA_0, (uint32_t)(0x1<<15), (uint32_t)(0x0<<15));
-  
+    set_registers(state.xgpiops_addr, OFFSET_GPIO_DATA_0, (uint32_t)(0x1<<0), (uint32_t)(0x0<<0) );
 
     // Tengo que esperar que interrumpa y tenga el resultado
     counter=0;
-    while (valid_value==0) {
-      pr_info("Espero la interrupcion \n");  
+    while ( center_valid_value == 0 ) {
+      //pr_info("Espero la interrupcion rv: %d, cv: %d, lv: %d\n", right_valid_value, center_valid_value, left_valid_value);  
       counter++;
       // Out of range
-      if (counter>1000) {
-        *(state.RX_buff) = -1;
+      if (counter>50000) {
+        //*(state.RX_buff) = -1;
               break;
       }
       udelay(1);
 	  }
 
-    pr_info("Llego la interrupcion \n"); 
+    set_registers(state.xgpiops_addr, OFFSET_GPIO_DATA_0, (uint32_t)(0x1<<13), (uint32_t)(0x1<<13) );
+    udelay(10);
+    set_registers(state.xgpiops_addr, OFFSET_GPIO_DATA_0, (uint32_t)(0x1<<13), (uint32_t)(0x0<<13) );
 
-    *(state.RX_buff) = ktime_to_us( ktime_sub(echo_end,echo_start) );
+    // Tengo que esperar que interrumpa y tenga el resultado
+    counter=0;
+    while ( left_valid_value == 0 ) {
+      //pr_info("Espero la interrupcion rv: %d, cv: %d, lv: %d\n", right_valid_value, center_valid_value, left_valid_value);  
+      counter++;
+      // Out of range
+      if (counter>50000) {
+        //*(state.RX_buff) = -1;
+              break;
+      }
+      udelay(1);
+	  }
+
+    set_registers(state.xgpiops_addr, OFFSET_GPIO_DATA_0, (uint32_t)(0x1<<15), (uint32_t)(0x1<<15) );
+    udelay(10);
+    set_registers(state.xgpiops_addr, OFFSET_GPIO_DATA_0, (uint32_t)(0x1<<15), (uint32_t)(0x0<<15) );
+
+    // Tengo que esperar que interrumpa y tenga el resultado
+    counter=0;
+    while ( right_valid_value == 0 ) {
+      //pr_info("Espero la interrupcion rv: %d, cv: %d, lv: %d\n", right_valid_value, center_valid_value, left_valid_value);  
+      counter++;
+      // Out of range
+      if (counter>50000) {
+        //*(state.RX_buff) = -1;
+              break;
+      }
+      udelay(1);
+	  }
+
+    pr_info("Llego la interrupcion. rv: %d, cv: %d, lv: %d\n", right_valid_value, center_valid_value, left_valid_value); 
+    pr_info("Sensores r c l %lld %lld %lld\n", ktime_to_us( ktime_sub(right_echo_end,  right_echo_start) ), ktime_to_us( ktime_sub(center_echo_end, center_echo_start) ),  ktime_to_us( ktime_sub(left_echo_end,   left_echo_start) ) );
+    
+    state.RX_buff[0] = ktime_to_us( ktime_sub(right_echo_end,  right_echo_start) );
+    state.RX_buff[1] = ktime_to_us( ktime_sub(center_echo_end, center_echo_start) );
+    state.RX_buff[2] = ktime_to_us( ktime_sub(left_echo_end,   left_echo_start) );
+
+    pr_info("Sensores r c l %lld %lld %lld\n", *(state.RX_buff + 8*0), *(state.RX_buff + 8*1), *(state.RX_buff + 8*2) );
 
     /* Cargo el dato en el buffer del usuario */
     pr_info("Cargo el buffer del usuario con la informacion\n");
@@ -395,7 +504,7 @@ static ssize_t driver_write(struct file *file, const char __user *ubuff, size_t 
         return -1;
     }
 
-    pr_info("Voy a escribir = %08X \n", *(state.TX_buff)); 
+    pr_info("Voy a escribir = %08llX \n", *(state.TX_buff)); 
 
     pr_info("Set GPIO Pin Data \n");
     //set_registers(state.xgpiops_addr, OFFSET_GPIO_DATA_0, (uint32_t)0xFFFFFFFF, (*(state.TX_buff) & ((0x1<<0) | (0x1<<13))) );

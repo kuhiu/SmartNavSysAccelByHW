@@ -6,5 +6,6 @@ main:
 	arm-linux-gnueabihf-gcc -o test test.c -Wall
 	arm-linux-gnueabihf-gcc -o usrSpace_MIOgpio_PS usrSpace_MIOgpio_PS.c -Wall
 	arm-linux-gnueabihf-gcc -o usrSpace_pwm_EMIOgpio_PL usrSpace_pwm_EMIOgpio_PL.c -Wall
-	arm-linux-gnueabihf-gcc -o usrSpace_hcsr04_EMIOgpio usrSpace_hcsr04_EMIOgpio.c -Wall
+	arm-linux-gnueabihf-gcc -o usrSpace_encoder_EMIOgpio_PL usrSpace_encoder_EMIOgpio_PL.c -Wall
 	arm-linux-gnueabihf-gcc -o usrSpace_EMIOgpio_PL usrSpace_EMIOgpio_PL.c -Wall
+	arm-linux-gnueabihf-gcc -o usrSpace_i2c_PS_hmc5883L usrSpace_i2c_PS_hmc5883L.c -Wall -lm -L/home/martin/Escritorio/Tesis/Petalinux_Projects/Imagen/build/tmp/sysroots-components/cortexa9t2hf-neon/i2c-tools/usr/lib -lpthread -li2c -I/home/martin/Escritorio/Tesis/Petalinux_Projects/Imagen/build/tmp/sysroots-components/cortexa9t2hf-neon/i2c-tools/usr/include/i2c
