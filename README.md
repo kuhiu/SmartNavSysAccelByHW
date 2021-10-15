@@ -20,8 +20,8 @@
 
 ## Pendientes v1 del robot
 
-El sistema de procesamiento de imagenes unicamente reconoce un tomate.
-El sistema de control difuso solamente controla la direccion a la cual se dirige el robot para evitar colisionar con el obstaculo.
+* El sistema de procesamiento de imagenes unicamente reconoce un tomate.
+* El sistema de control difuso solamente controla la direccion a la cual se dirige el robot para evitar colisionar con el obstaculo.
 
 5) A partir de la red neuronal escribir las variables de estado.
 6) A partir de las variables de estado controlar los motores del robot.
