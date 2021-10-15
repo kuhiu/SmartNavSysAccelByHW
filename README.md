@@ -10,21 +10,24 @@
 
 0) ~~Comprar sensores de distancia~~ y escribir drivers.
 1) ~~Quitar la red del framework y sus pesos, escribirla en python~~
-2) Escribir el sistema de control difuso en python
-3) Aplicaciones (1 y 2)
-4) ~~Movimiento del robot~~ (Tiempo=1 mes)
+2) ~~Movimiento del robot~~ (Tiempo=1 mes)
     * ~~motores y sus drivers)~~ 
     * ~~Comprar sensor para medir distancia recorrida y escribir driver.~~
     * ~~Para poder modificar su velocidad pwm en FPGA y su driver. (probar ILA si es necesario)~~
     * ~~Comprar brujula y escribir su driver. (para conocer la direccion a la que se desplaza)~~
-5) ~~Comprar fuente dc-dc 5v al menos 1.5A para alimentar externamente la Zybo.~~
-6) Crear un archivo en donde se mantenga actualizada toda la informacion de los drivers, direccion del robot, velocidad del robot, distancia por recorrrer para llegar al target, sensores de distancia, etc.
- 
+3) ~~Comprar fuente dc-dc 5v al menos 1.5A para alimentar externamente la Zybo.~~
+4) ~~Crear un archivo en donde se mantenga actualizada toda la informacion de los drivers, direccion del robot, velocidad del robot, distancia por recorrrer para llegar al target, sensores de distancia, etc.~~
+5) A partir de la red neuronal escribir las variables de estado.
+6) A partir de las variables de estado controlar los motores del robot.
+7) Escribir el sistema de control difuso en python
+8) Aplicaciones (sistema difuso + procesamiento de imagenes).
+
 ### Pendientes probables
 
 1) ~~Escribir en C la red~~
 2) Escribir el sistema de control difuso en C 
 4) Desarrollo en la FPGA y su driver.
+5) A partir de las variables de estado controlar la velocidad del robot.
 
 ## Estado actual de la implementacion
 
