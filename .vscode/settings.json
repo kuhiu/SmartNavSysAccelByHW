@@ -5,6 +5,10 @@
         "bitset": "c",
         "i2c-dev.h": "c",
         "smbus.h": "c",
-        "cerrno": "c"
+        "cerrno": "c",
+        "*.tcc": "c",
+        "string": "c",
+        "istream": "c",
+        "func.h": "c"
     }
 }

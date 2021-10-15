@@ -88,7 +88,7 @@ static int HMC5883L_probe(struct i2c_client *client, const struct i2c_device_id 
     i2c_smbus_write_byte_data(client , QMC5883L_CONFIG2, (uint32_t)0x81 ); // No softreset, No rollover function, No interrupt
 
     pr_info("HMC5883L_probe: config reg \n");
-    i2c_smbus_write_byte_data(client , QMC5883L_CONFIG, (uint32_t)0x11);
+    i2c_smbus_write_byte_data(client , QMC5883L_CONFIG, (uint32_t) 0x11);
 
     pr_info("HMC5883L_probe: reset reg \n");
     i2c_smbus_write_byte_data(client , QMC5883L_RESET, (uint32_t)0x01 );

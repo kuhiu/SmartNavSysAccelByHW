@@ -9,3 +9,7 @@ main:
 	arm-linux-gnueabihf-gcc -o usrSpace_encoder_EMIOgpio_PL usrSpace_encoder_EMIOgpio_PL.c -Wall
 	arm-linux-gnueabihf-gcc -o usrSpace_EMIOgpio_PL usrSpace_EMIOgpio_PL.c -Wall
 	arm-linux-gnueabihf-gcc -o usrSpace_i2c_PS_hmc5883L usrSpace_i2c_PS_hmc5883L.c -Wall -lm -L/home/martin/Escritorio/Tesis/Petalinux_Projects/Imagen/build/tmp/sysroots-components/cortexa9t2hf-neon/i2c-tools/usr/lib -lpthread -li2c -I/home/martin/Escritorio/Tesis/Petalinux_Projects/Imagen/build/tmp/sysroots-components/cortexa9t2hf-neon/i2c-tools/usr/include/i2c
+	arm-linux-gnueabihf-gcc -o usrSpace_top usrSpace_top.c ./Funciones/func.c -Wall -lm -L/home/martin/Escritorio/Tesis/Petalinux_Projects/Imagen/build/tmp/sysroots-components/cortexa9t2hf-neon/i2c-tools/usr/lib -lpthread -li2c -I/home/martin/Escritorio/Tesis/Petalinux_Projects/Imagen/build/tmp/sysroots-components/cortexa9t2hf-neon/i2c-tools/usr/include/i2c
+
+asd:
+	insmod Tesis/Drivers/driver_MIOgpio_PS.ko && insmod Tesis/Drivers/driver_pwm_EMIOgpio_PL.ko && insmod Tesis/Drivers/driver_EMIOgpio_PL.ko && insmod Tesis/Drivers/driver_i2c_PS_hmc5883L.ko && rmmod Tesis/Drivers/driver_i2c_PS_hmc5883L.ko && insmod Tesis/Drivers/driver_encoder_EMIOgpio_PL.ko

@@ -13,7 +13,7 @@
 
 #define DEVICE_NAME       "chardev_encoder_EMIOgpio_PL" /* Define Driver Name */
 #define DEVICE_CLASS_NAME "class_encoder_EMIOgpio_PL"
-#define BYTE2READ                              16       /* Cantidad de word de 32 bits que tengo que leer * 4 = Bytes 2 read */
+#define BYTE2READ                             8*4       /* Cantidad de word de 32 bits que tengo que leer * 4 = Bytes 2 read */
 #define BASE_MINOR                              0       /* Base del numero menor */
 #define MINOR_COUNT                             1       /* Cantidad de numeros menores que voy a usar */
 #define DEVICE_PARENT                        NULL
@@ -30,11 +30,13 @@ static int driver_probe (struct platform_device *pdev);
 static int driver_remove (struct platform_device *pdev);
 
 static int sensor_1 = 0;
+static uint32_t nro_vueltas1 = 0;
 static int valid_value1 = 0;
 static ktime_t echo_start1;
 static ktime_t echo_end1;
 
 static int sensor_2 = 0;
+static uint32_t nro_vueltas2 = 0;
 static int valid_value2 = 0;
 static ktime_t echo_start2;
 static ktime_t echo_end2;
@@ -134,7 +136,7 @@ static irqreturn_t driver_isr(int irq, void *data)
         if ( (ioread32(state.base_addr_EMIOgpio + OFFSET_GPIO1_DATA) & 0x01) == (uint32_t) 0x01) // Primer sensor interrumpio
         {
             //pr_info("Interumpio bit 0 \n");
-            if (valid_value1==0) {
+            //if (valid_value1==0) {
                 ktime_dummy1=ktime_get();
                 if (sensor_1 == 0){  
                     echo_start1=ktime_dummy1;
@@ -143,19 +145,20 @@ static irqreturn_t driver_isr(int irq, void *data)
 
                 sensor_1++;
 
-                if (sensor_1 >= 200){  // 10 REVOLUCIONES
+                if (sensor_1 >= 20){  // 1 REVOLUCIONES
                     sensor_1 = 0;
                     valid_value1 = 1;
+                    nro_vueltas1++;
                     echo_end1=ktime_dummy1; 
                 }
-            }
+            //}
 
         }
 
         if ( (ioread32(state.base_addr_EMIOgpio + OFFSET_GPIO1_DATA) & 0x02) == (uint32_t) 0x02) // Segundo sensor interrumpio
         {
             //pr_info("Interumpio bit 1 \n");
-            if (valid_value2==0) {
+            //if (valid_value2==0) {
                 ktime_dummy2=ktime_get();
                 if (sensor_2 == 0){  
                     echo_start2=ktime_dummy2;
@@ -164,12 +167,13 @@ static irqreturn_t driver_isr(int irq, void *data)
 
                 sensor_2++;
 
-                if (sensor_2 >= 200){  // 10 REVOLUCIONES
+                if (sensor_2 >= 20){  // 1 REVOLUCIONES
                     sensor_2 = 0;
                     valid_value2 = 1;
+                    nro_vueltas2++;
                     echo_end2=ktime_dummy2; 
                 }
-            }
+            //}
         }
 
         // Clear int status channel
@@ -282,12 +286,11 @@ static ssize_t driver_read(struct file *file, char __user *ubuff, size_t size, l
     }
 
     // Tengo que esperar que interrumpa y tenga el resultado
-    valid_value1 = 0;
     counter=0;
 	  while (valid_value1==0) {
       counter++;
       // Out of range
-      if (counter>10000) {
+      if (counter>1000) {
               pr_info("Break \n"); 
               break;
 		  }
@@ -295,16 +298,18 @@ static ssize_t driver_read(struct file *file, char __user *ubuff, size_t size, l
 	  }
 
     pr_info("Llego la interrupcion1 \n"); 
+    if (valid_value1!=0)
+      state.RX_buff[0] = ktime_to_us( ktime_sub(echo_end1,echo_start1) );
+    else
+      state.RX_buff[0] = 0;
 
-    state.RX_buff[0] = ktime_to_us( ktime_sub(echo_end1,echo_start1) );
-
+    state.RX_buff[1] = nro_vueltas1;
     // Tengo que esperar que interrumpa y tenga el resultado
-    valid_value2 = 0;
     counter=0;
 	  while (valid_value2==0) {
       counter++;
       // Out of range
-      if (counter>10000) {
+      if (counter>1000) {
               pr_info("Break \n"); 
               break;
 		  }
@@ -313,9 +318,12 @@ static ssize_t driver_read(struct file *file, char __user *ubuff, size_t size, l
 
     pr_info("Llego la interrupcion2 \n"); 
 
-    state.RX_buff[1] = ktime_to_us( ktime_sub(echo_end2,echo_start2) );
+    if (valid_value2!=0)
+      state.RX_buff[2] = ktime_to_us( ktime_sub(echo_end2,echo_start2) );
+    else
+      state.RX_buff[2] = 0;
 
-
+    state.RX_buff[3] = nro_vueltas2;
     /* Cargo el dato en el buffer del usuario */
     pr_info("Cargo el buffer del usuario con la informacion\n");
     if(__copy_to_user(ubuff, state.RX_buff, size) != 0)

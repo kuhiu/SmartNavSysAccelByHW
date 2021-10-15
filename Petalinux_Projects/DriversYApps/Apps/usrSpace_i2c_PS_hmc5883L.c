@@ -100,8 +100,10 @@ int main (void)
 
     int status;
     // Calibracion
-    int xlow=0, xhigh=0;
-    int ylow=0, yhigh=0;
+    int xlow  = -12391;             // Calibracion
+    int xhigh =   1301;
+    int ylow  =  -6210;
+    int yhigh =     75;   
 
     if ( (fd = open("/dev/i2c-0", O_WRONLY)) == -1)
     {
@@ -114,95 +116,89 @@ int main (void)
         return -1;
     }
 
-    printf("HMC5883L: Read raw data \n");
+    //printf("HMC5883L: config: %08X, config2: %08X\n", i2c_smbus_read_byte_data (fd , QMC5883L_CONFIG), i2c_smbus_read_byte_data (fd , QMC5883L_CONFIG2));
 
-    raw_x = get_raw_x(fd);
-    raw_y = get_raw_y(fd);
+    // printf("HMC5883L: Calibracion... \n");
 
-    xlow  = raw_x;
-    xhigh = raw_x;
-    ylow  = raw_y;
-    yhigh = raw_y;
+    // for(i=0;i<500;i++)
+    // {
+    //     //printf("HMC5883L: Read raw data \n");
+    //     status = i2c_smbus_read_byte_data (fd , QMC5883L_STATUS);
+    //     //printf("HMC5883L: Status: %08X\n", status);
 
-    printf("HMC5883L: config: %08X, config2: %08X\n", i2c_smbus_read_byte_data (fd , QMC5883L_CONFIG), i2c_smbus_read_byte_data (fd , QMC5883L_CONFIG2));
+    //     if (status == 0X02){   // hubo ov
+    //         printf("HMC5883L: Overflow \n");
+    //         return -1;
+    //     }
 
-    printf("HMC5883L: Calibracion... \n");
+    //     if (status == 0X04){   // Data skipped
+    //         raw_x = get_raw_x(fd);
+    //         raw_y = get_raw_y(fd);
+    //         raw_z = get_raw_z(fd);
+    //         //printf("HMC5883L: data skipped: raw_x: %d, raw_y: %d \n", raw_x, raw_y);
+    //         continue;
+    //     }
 
-    for(i=0;i<500;i++)
-    {
-        //printf("HMC5883L: Read raw data \n");
-        status = i2c_smbus_read_byte_data (fd , QMC5883L_STATUS);
-        //printf("HMC5883L: Status: %08X\n", status);
+    //     if (status == 0X01){   // New data available
+    //         raw_x = get_raw_x(fd);
+    //         raw_y = get_raw_y(fd);
+    //         raw_z = get_raw_z(fd);
+    //         printf("HMC5883L: new data: raw_x: %d, raw_y: %d \n", raw_x, raw_y);
+    //     }
 
-        if (status == 0X02){   // hubo ov
-            printf("HMC5883L: Overflow \n");
-            return -1;
-        }
+    //     else {                  // Data no available
+    //         printf("HMC5883L: Data no disponible\n");
+    //         usleep(100); // Sleep 50 mseg
+    //         continue;
+    //     }
 
-        if (status == 0X04){   // Data skipped
-            raw_x = get_raw_x(fd);
-            raw_y = get_raw_y(fd);
-            raw_z = get_raw_z(fd);
-            //printf("HMC5883L: data skipped: raw_x: %d, raw_y: %d \n", raw_x, raw_y);
-            continue;
-        }
+    //     printf("HMC5883L: raw_x: %d, raw_y: %d \n", raw_x, raw_y);
 
-        if (status == 0X01){   // New data available
-            raw_x = get_raw_x(fd);
-            raw_y = get_raw_y(fd);
-            raw_z = get_raw_z(fd);
-            printf("HMC5883L: new data: raw_x: %d, raw_y: %d \n", raw_x, raw_y);
-        }
+    //     if(raw_x < xlow) 
+    //         xlow = raw_x;
+    //     if(raw_x > xhigh) 
+    //         xhigh = raw_x;
+    //     if(raw_y < ylow) 
+    //         ylow = raw_y;
+    //     if(raw_y > yhigh) 
+    //         yhigh = raw_y;
 
-        else {                  // Data no available
-            printf("HMC5883L: Data no disponible\n");
-            usleep(80000); // Sleep 50 mseg
-            continue;
-        }
+    // }
 
-        printf("HMC5883L: raw_x: %d, raw_y: %d \n", raw_x, raw_y);
-
-        if(raw_x < xlow) 
-            xlow = raw_x;
-        if(raw_x > xhigh) 
-            xhigh = raw_x;
-        if(raw_y < ylow) 
-            ylow = raw_y;
-        if(raw_y > yhigh) 
-            yhigh = raw_y;
-
-    }
-
-    printf("HMC5883L: La calibracion termino.\n");
+    // printf("HMC5883L: La calibracion termino.\n");
     printf("HMC5883L: xlow: %d, xhigh: %d, ylow: %d, yhigh: %d\n", xlow, xhigh, ylow, yhigh);
 
     i=0;
     while(1)
     {
         status = i2c_smbus_read_byte_data (fd , QMC5883L_STATUS);
+        status = status & 0x07; // Me quedo con los ultimos 3 bits
 
-        if (status == 0X02){   // hubo ov
-            printf("HMC5883L: Overflow \n");
-            return -1;
-        }
+        //printf("status: %d \n", status);
 
-        if (status == 0X04){   // Data skipped
+        if ( (status & 0x02) == 0X02){   // hubo ov
             raw_x = get_raw_x(fd);
             raw_y = get_raw_y(fd);
             raw_z = get_raw_z(fd);
             continue;
         }
 
-        if (status == 0X01){   // New data available
+        if ( (status & 0x04) == 0X04){   // Data skipped
             raw_x = get_raw_x(fd);
             raw_y = get_raw_y(fd);
             raw_z = get_raw_z(fd);
-            //printf("HMC5883L: new data: raw_x: %d, raw_y: %d \n", raw_x, raw_y);
+            continue;
+        }
+
+        if ( (status & 0x01) == 0X01){   // New data available
+            raw_x = get_raw_x(fd);
+            raw_y = get_raw_y(fd);
+            raw_z = get_raw_z(fd);
         }
 
         else {                  // Data no available
             //printf("HMC5883L: Data no disponible\n");
-            usleep(80000); // Sleep 50 mseg
+            usleep(100); // Sleep 50 mseg
             continue;
         }
 
@@ -224,14 +220,13 @@ int main (void)
         if(heading<=0) 
             heading += 360;
 
-        //printf("Heading: %f \n", heading);
-        
+        printf("Heading: %f \n", heading);
         acum_heading = acum_heading + heading;
 
         if(i == 3)
         {
             i=0;
-            printf("Promedio: %f \n", acum_heading/3);
+            //printf("Promedio: %f \n", acum_heading/3);
             acum_heading = 0;
         }
 
