@@ -8,7 +8,7 @@
 
 ## Resuelto
 
-0) ~~Comprar sensores de distancia~~ y escribir drivers.
+0) ~~Comprar sensores de distancia y escribir drivers.~~
 1) ~~Quitar la red del framework y sus pesos, escribirla en python~~
 2) ~~Escribir en C la red~~
 3) ~~Movimiento del robot~~ (Tiempo=1 mes)
