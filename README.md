@@ -16,7 +16,7 @@
     * ~~Para poder modificar su velocidad pwm en FPGA y su driver. (probar ILA si es necesario)~~
     * ~~Comprar brujula y escribir su driver. (para conocer la direccion a la que se desplaza)~~
 3) ~~Comprar fuente dc-dc 5v al menos 1.5A para alimentar externamente la Zybo.~~
-4) ~~Crear un archivo en donde se mantenga actualizada toda la informacion de los drivers, direccion del robot, velocidad del robot, distancia por recorrrer para llegar al target, sensores de distancia, etc.~~
+4) ~~Crear un archivo en donde se mantenga actualizada toda la informacion de los drivers, direccion del robot, velocidad del robot, distancia por recorrrer para llegar al target, sensores de distancia, etc. A PARTIR DE AQUI LLAMADAS VARIABLES DE ESTADO DEL ROBOT~~
 5) A partir de la red neuronal escribir las variables de estado.
 6) A partir de las variables de estado controlar los motores del robot.
 7) Escribir el sistema de control difuso en python
