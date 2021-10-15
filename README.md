@@ -6,7 +6,7 @@
 * [Modulo - Sistema de control difuso](https://github.com/Fuschetto97/Tesis/tree/main/FuzzyControl)
 * [Zybo - Implementacion](https://github.com/Fuschetto97/Tesis/tree/main/Petalinux_Projects)
 
-## Pendientes
+## Resuelto
 
 0) ~~Comprar sensores de distancia~~ y escribir drivers.
 1) ~~Quitar la red del framework y sus pesos, escribirla en python~~
