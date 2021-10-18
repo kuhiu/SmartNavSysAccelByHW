@@ -28,6 +28,7 @@
 6) A partir de las variables de estado controlar los motores del robot.
 7) Escribir el sistema de control difuso en python
 8) Aplicaciones (sistema difuso + procesamiento de imagenes).
+9) Convertir el archivo a una shr mem, para poder loggear las variables de estado.
 
 ### Pendientes, proximas versiones del robot
 
