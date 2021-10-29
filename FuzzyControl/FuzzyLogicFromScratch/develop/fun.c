@@ -1,24 +1,14 @@
 #include "fun.h"
 
 
-int get_system_inputs(long long int *rightSensor, long long int *centerSensor, long long int *leftSensor)
+int get_system_inputs(FILE* fdd_State, long long int *rightSensor, long long int *centerSensor, long long int *leftSensor)
 {
-    FILE* fdd_State;
-
     ssize_t lread;
     char readed[10];
     char * line = NULL;
     size_t len = 0;  
 
-    //////////////////////////////////////////////////////////////////////////////////////////////////////
-    //////////////////////////////////////   State TXT  //////////////////////////////////////////////////
-    //////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    if ( (fdd_State = fopen("./state.txt", "r")) == NULL)
-    {
-        printf("Error abriendo state.txt\n");
-        return -1;
-    }
+    fseek(fdd_State, 0, SEEK_SET);
 
     // Leo el archivo buscando las entradas
     while ( (lread=getline(&line, &len, fdd_State )) != -1)
@@ -68,6 +58,53 @@ int get_system_inputs(long long int *rightSensor, long long int *centerSensor, l
 
     return 0;
 }
+
+int put_system_outputs(FILE* fdd_State, float Angle)
+{
+    ssize_t lread;
+    char readed[10];
+    char * line = NULL;
+    size_t len = 0;  
+    ssize_t loffset=0;
+
+    size_t asd;
+
+    // Reunicio puntero al archivo
+    fseek(fdd_State, 0, SEEK_SET);
+
+    // Leo el archivo buscando las entradas
+    while ( (lread=getline(&line, &len, fdd_State )) != -1)
+    {
+        loffset = loffset + lread;
+        switch (sscanf(line, "Angulo requerido = %s g", readed ))
+        {
+        case EOF:       // Error
+            perror("sscanf");
+            exit(1);
+            break;
+        case 0:         // No encontro
+            //printf("No se encontro la linea \n");
+            break;
+        default:        // Encontro
+        //printf("Encontre \n");
+          //printf("Line %s strlen %d\n", line, (int)strlen(line));
+            sprintf(line, "Angulo requerido = %f", Angle); 
+            fseek(fdd_State, (loffset-lread), SEEK_SET);
+            //printf("Line %s strlen %d\n", line, (int)strlen(line));
+            if ( ( asd=fwrite(line, sizeof(char), strlen(line), fdd_State)) != strlen(line))
+            {
+                printf("Error escribiendo %d\n", (int)asd);
+                return -1;
+            }
+            fseek(fdd_State, (loffset), SEEK_SET);
+            break;
+        }
+    }
+
+    return 0;
+}
+
+
 
 struct io_type* initialize_system_io(char *name, int value, struct mf_type *membership_functions, struct io_type *next)
 {
@@ -140,7 +177,7 @@ void fuzzification(struct io_type *System_Inputs)
         for(mf=si->membership_functions; mf != NULL; mf=mf->next)   // Para cada funcion de pertenencia de cada entrada 
         {
             compute_degree_of_membership(mf,si->value);
-            printf("Entrada: %s, valor: %f - Pertenencia: %s, grado de pertenencia %f\n", si->name, si->value, mf->name, mf->value);
+            //printf("Entrada: %s, valor: %f - Pertenencia: %s, grado de pertenencia %f\n", si->name, si->value, mf->name, mf->value);
         }
     }
 }
@@ -165,7 +202,7 @@ void rule_evaluation(struct rule_type *Rule_Base, struct io_type *System_Outputs
 
     for(rule=Rule_Base; rule != NULL; rule=rule->next)
     {
-        printf("Rules: %s \n", rule->name);
+        //printf("Rules: %s \n", rule->name);
 
         strength = UPPER_LIMIT;          // maximo peso posible             
         for(ip=rule->if_side; ip!=NULL; ip=ip->next)  // determino el peso o fuerza de las reglas (if side)
@@ -174,7 +211,7 @@ void rule_evaluation(struct rule_type *Rule_Base, struct io_type *System_Outputs
             //printf("*(ip->value): %f\n", *(ip->value));
         }
         *(rule->then_side->value) = strength;
-        printf("strength: %f \n", strength);
+        //printf("strength: %f \n", strength);
     }
 
     for(rule=Rule_Base; rule != NULL; rule=rule->next)
@@ -189,7 +226,7 @@ void rule_evaluation(struct rule_type *Rule_Base, struct io_type *System_Outputs
             GoCenter = fmax( *(rule->then_side->value), GoCenter);
     }
 
-    printf("GoLeft: %f, GoCenter: %f, GoRight: %f \n", GoLeft, GoCenter, GoRight);
+    //printf("GoLeft: %f, GoCenter: %f, GoRight: %f \n", GoLeft, GoCenter, GoRight);
     System_Outputs->membership_functions->value = GoLeft;
     System_Outputs->membership_functions->next->value = GoCenter;
     System_Outputs->membership_functions->next->next->value = GoRight;
@@ -213,7 +250,7 @@ void defuzzification(struct io_type *System_Outputs)
     // la regla aplicada, y se calcula el area.
     for(so=System_Outputs; so != NULL; so=so->next)
     {
-        printf("Llegue \n");
+        //printf("Llegue \n");
         sum_of_products = 0;
         sum_of_areas = 0;
         for(mf=so->membership_functions; mf != NULL; mf=mf->next)
@@ -222,12 +259,12 @@ void defuzzification(struct io_type *System_Outputs)
             centroid = mf->point1 + (mf->point2 - mf->point1)/2;
             sum_of_products += area * centroid;
             sum_of_areas += area;
-            printf("mf: %d %d %f\n", mf->point1, mf->point2, mf->value);
-            printf("area: %d, centroid: %d\n", area, centroid);
+            //printf("mf: %d %d %f\n", mf->point1, mf->point2, mf->value);
+            //printf("area: %d, centroid: %d\n", area, centroid);
         }
-        printf("Llegue sum_of_products: %d, sum_of_areas: %d\n", sum_of_products, sum_of_areas);
+        //printf("Llegue sum_of_products: %d, sum_of_areas: %d\n", sum_of_products, sum_of_areas);
         so->value = sum_of_products/sum_of_areas;   /* weighted average */
-        printf("Angulo: %f\n", so->value);
+        //printf("Angulo: %f\n", so->value);
     }
 
     return;

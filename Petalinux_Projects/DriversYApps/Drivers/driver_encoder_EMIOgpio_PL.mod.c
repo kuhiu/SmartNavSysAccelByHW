@@ -41,7 +41,7 @@ __attribute__((section("__versions"))) = {
 	{ 0x92f552c6, "kmem_cache_alloc" },
 	{ 0xb43f9365, "ktime_get" },
 	{ 0x822137e2, "arm_heavy_mb" },
-	{ 0x8e865d3c, "arm_delay_ops" },
+	{ 0xf9a482f9, "msleep" },
 	{ 0xf4fa543b, "arm_copy_to_user" },
 	{ 0x37a0cba, "kfree" },
 	{ 0xd6b8e852, "request_threaded_irq" },

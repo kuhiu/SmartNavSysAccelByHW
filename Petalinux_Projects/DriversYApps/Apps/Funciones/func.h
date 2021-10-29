@@ -11,6 +11,18 @@
 #include "smbus.h"
 #include <sys/ioctl.h>
 #include <math.h>
+#include <sys/ipc.h>
+#include <sys/sem.h>
+
+// Semaforo
+union semun {
+    int val;
+    struct semid_ds *buf;
+    ushort *array;
+};
+
+#define MAX_RETRIES 10
+int initsem(key_t key, int nsems);
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 /* Variables sensores de distancia*/
@@ -52,8 +64,7 @@ int get_headeing_degree(int fd, int xlow, int xhigh, int ylow, int yhigh);
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 /* Variables encoder */
 //////////////////////////////////////////////////////////////////////////////////////////////////////
+#define BYTE2READ_encoder       32*4
 
-#define BYTE2READ_encoder        8*4
-
-float get_revoluciones_rpm(int in);
-float get_distance_cm(int in);
+__s64 get_revoluciones_rpm(__s64 in);
+float get_distance_m(unsigned int in);

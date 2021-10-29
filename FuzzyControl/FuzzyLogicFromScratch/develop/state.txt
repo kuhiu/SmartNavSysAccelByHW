@@ -1,5 +1,5 @@
 // Variables escritas por el sistema de control difuso 
-Angulo requerido = %f grados                            // Es escrito. Indica la direccion requerida [grados]
+Angulo requerido = 175.0000000 g                        // Es escrito. Indica la direccion requerida [grados]
 Desplazamiento = ADELANTE                               // Es escrito. Indica la dir. de desplazamiento. Posibles = [ADELANTE - FRENAR - DERECHA - IZQUIERDA - ATRAS] 
 Pwm, Velocidad = 55 %                                   // Es escrito. Indica velocidad del robot 0-100% [%]
 
@@ -11,7 +11,7 @@ ImgProc, Tipo = DESCONOCIDO                             // Es leido.   Indica el
 Encoder, Rev = %f - %f rpm                              // Es leido.   Indica las revol. indicadas por ambos sensores de las ruedas traseras [cms] 
 Encoder, Distancia = %f - %f cms                        // Es leido.   Indica la distancia recorrida [cms] 
 Brujula, Angulo = %f grados                             // Es leido.   Indica angulo absoluto al Norte terrestre [grados]
-Sensores, rightSensor = 35 cms                         // Es leido.   Indica distancia del sensor de la derecha al obstaculo mas cercano [cms]
-Sensores, centerSensor = 20 cms                        // Es leido.   Indica distancia del sensor central al obstaculo mas cercano [cms]
-Sensores, leftSensor = 10 cms                           // Es leido.   Indica distancia del sensor de la izquierda al obstaculo mas cercano [cms]
+Sensores, rightSensor = 50 cms                          // Es leido.   Indica distancia del sensor de la derecha al obstaculo mas cercano [cms]
+Sensores, centerSensor = 3 cms                           // Es leido.   Indica distancia del sensor central al obstaculo mas cercano [cms]
+Sensores, leftSensor =  10 cms                           // Es leido.   Indica distancia del sensor de la izquierda al obstaculo mas cercano [cms]
 

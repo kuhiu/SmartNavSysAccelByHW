@@ -24,19 +24,18 @@
 * El sistema de procesamiento de imagenes unicamente reconoce un tomate.
 * El sistema de control difuso solamente controla la direccion a la cual se dirige el robot para evitar colisionar con el obstaculo.
 
-5) A partir de la red neuronal escribir las variables de estado.
-6) A partir de las variables de estado controlar los motores del robot.
-7) Escribir el sistema de control difuso en python
+5) ~~A partir de la red neuronal escribir las variables de estado.~~
+6) ~~A partir de las variables de estado controlar los motores del robot.~~
+7) ~~Escribir el sistema de control difuso en C~~
 8) Aplicaciones (sistema difuso + procesamiento de imagenes).
 9) Convertir el archivo a una shr mem, para poder loggear las variables de estado.
 
 ### Pendientes, proximas versiones del robot
 
-1) Escribir el sistema de control difuso en C 
-2) Desarrollo en la FPGA y su driver.
-3) A partir de las variables de estado controlar la velocidad del robot.
-4) El sistema de control difuso es capaz de dirigirse a un punto especifico evitando colisionar.
-5) El robot es capaz de modificar su comportamiento al reconocer distintos obstaculos.
+1) Desarrollo en la FPGA y su driver.
+2) A partir de las variables de estado controlar la velocidad del robot.
+3) El sistema de control difuso es capaz de dirigirse a un punto especifico evitando colisionar.
+4) El robot es capaz de modificar su comportamiento al reconocer distintos obstaculos.
 
 ## Estado actual de la implementacion
 
@@ -44,3 +43,15 @@
 <img src=./imagenes/estado4.jpeg height=500 width=500 alt="Hardware" />
 <img src=./imagenes/estado5.jpeg scale=0.5 alt="Hardware" />
 
+
+
+# Como usar?
+
+0) echo system.bin > /sys/class/fpga_manager/fpga0/firmware
+1) insmod Tesis/Drivers/driver_i2c_PS_ov7670.ko && insmod Tesis/Drivers/driver_vdma.ko
+2) ./Tesis/Apps/ControlVdma 
+3) New Console: cd Tesis/final/sqzdet_c/ && ./main.bin 
+4) python Tesis/ServidorPNG/pngserver_ShowCNN.py
+5) insmod Tesis/Drivers/driver_MIOgpio_PS.ko && insmod Tesis/Drivers/driver_pwm_EMIOgpio_PL.ko && insmod Tesis/Drivers/driver_EMIOgpio_PL.ko && insmod Tesis/Drivers/driver_i2c_PS_hmc5883L.ko && rmmod Tesis/Drivers/driver_i2c_PS_hmc5883L.ko && insmod Tesis/Drivers/driver_encoder_EMIOgpio_PL.ko
+7) New console : ./Tesis/develop/readSTATE.bin
+6) ./Tesis/Apps/usrSpace_top & disown && ./Tesis/develop/FuzzyControl.bin & disown && ./Tesis/Apps/usrSpace_drive & disown

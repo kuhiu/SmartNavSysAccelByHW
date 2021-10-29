@@ -1,6 +1,74 @@
 #include "main.h"
 
 
+int put_system_outputs(FILE* fdd_State, char Tipo[], char Direccion[])
+{
+    ssize_t lread;
+    char readed[10];
+    char * line = NULL;
+    size_t len = 0;  
+    ssize_t loffset=0;
+
+    size_t asd;
+
+    // Reunicio puntero al archivo
+    fseek(fdd_State, 0, SEEK_SET);
+
+    // Leo el archivo buscando las entradas
+    while ( (lread=getline(&line, &len, fdd_State )) != -1)
+    {
+        loffset = loffset + lread;
+        switch (sscanf(line, "ImgProc, Direccion = %s", readed ))
+        {
+        case EOF:       // Error
+            perror("sscanf");
+            exit(1);
+            break;
+        case 0:         // No encontro
+            //printf("No se encontro la linea \n");
+            break;
+        default:        // Encontro
+
+            sprintf(line, "ImgProc, Direccion = %s", Direccion); 
+            fseek(fdd_State, (loffset-lread), SEEK_SET);
+            if ( ( asd=fwrite(line, sizeof(char), strlen(line), fdd_State)) != strlen(line))
+            {
+                printf("Error escribiendo %d\n", (int)asd);
+                return -1;
+            }
+            fseek(fdd_State, (loffset), SEEK_SET);
+            break;
+        }
+
+        switch (sscanf(line, "ImgProc, Tipo = %s", readed ))
+        {
+        case EOF:       // Error
+            perror("sscanf");
+            exit(1);
+            break;
+        case 0:         // No encontro
+            //printf("No se encontro la linea \n");
+            break;
+        default:        // Encontro
+
+            sprintf(line, "ImgProc, Tipo = %s", Tipo); 
+            fseek(fdd_State, (loffset-lread), SEEK_SET);
+            if ( ( asd=fwrite(line, sizeof(char), strlen(line), fdd_State)) != strlen(line))
+            {
+                printf("Error escribiendo %d\n", (int)asd);
+                return -1;
+            }
+            fseek(fdd_State, (loffset), SEEK_SET);
+            break;
+        }
+    }
+
+    return 0;
+}
+
+
+
+
 void get_png_file(float *img) {
     int x, y, z;
     for(y = 0; y < IMG_HEIGHT; y++) {

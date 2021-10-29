@@ -9,6 +9,7 @@
         "utility": "c",
         "typeindex": "c",
         "typeinfo": "c",
-        "fun.h": "c"
+        "fun.h": "c",
+        "types.h": "c"
     }
 }

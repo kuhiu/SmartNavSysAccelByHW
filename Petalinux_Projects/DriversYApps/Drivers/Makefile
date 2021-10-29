@@ -21,3 +21,6 @@ source:
 	cd /tools/Xilinx/Vivado/2019.1/
 	source settings64.sh
 	cd ~/Escritorio/Tesis/Petalinux_Projects/Drivers
+
+insmod:
+	insmod Tesis/Drivers/driver_MIOgpio_PS.ko && insmod Tesis/Drivers/driver_pwm_EMIOgpio_PL.ko && insmod Tesis/Drivers/driver_EMIOgpio_PL.ko && insmod Tesis/Drivers/driver_i2c_PS_hmc5883L.ko && rmmod Tesis/Drivers/driver_i2c_PS_hmc5883L.ko && insmod Tesis/Drivers/driver_encoder_EMIOgpio_PL.ko

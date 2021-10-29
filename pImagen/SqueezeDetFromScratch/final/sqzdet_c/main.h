@@ -13,6 +13,8 @@
 #include <sys/mman.h>
 #include <errno.h>
 #include <signal.h>
+#include <sys/ipc.h>
+#include <sys/sem.h>
 
 
 #define FRAMEBUFFER_READ_OFFSET  0x01000000  // Image ram position
@@ -118,9 +120,19 @@ float *anchorBox_load(char *filename);
 float *softmax( float *x, int  i_width);
 float *sigmoid( float *x, int  i_width);
 void emptyVector(float *in, int i_width, int i_height, int i_depth);
+int initsem(key_t key, int nsems);
+int put_system_outputs(FILE* fdd_State, char Tipo[], char Direccion[]);
 
 // Read png lib
 //extern int img_width, img_height;
 extern png_byte color_type;
 extern png_byte bit_depth;
 extern png_bytep *row_pointers;
+
+// Semaforo
+#define MAX_RETRIES 10
+union semun {
+    int val;
+    struct semid_ds *buf;
+    ushort *array;
+};

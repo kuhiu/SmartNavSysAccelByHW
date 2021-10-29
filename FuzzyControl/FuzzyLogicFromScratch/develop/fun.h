@@ -5,9 +5,20 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include <unistd.h>
+#include <errno.h>
+#include <sys/ipc.h>
+#include <sys/sem.h>
 
 #define MAXNAME         35      // Numero maximo de caracteres en los nombres 
 #define UPPER_LIMIT      1      // Numero maximo asignable como grado de pertenencia 
+
+// Semaforo
+union semun {
+    int val;
+    struct semid_ds *buf;
+    ushort *array;
+};
 
 // io_type crea una lista de entradas y salidas del sistema. Todos los campos
 // son fijos excepto "value", que se actualiza en cada paso de inferencia difusa. 
@@ -43,9 +54,11 @@ struct rule_type{
   };
 
 
+int initsem(key_t key, int nsems);
 struct mf_type* initialize_membership_inputs(char *name, int value, int point1, int point2, float slope1, float slope2, struct mf_type * next);
 struct io_type* initialize_system_io(char *name, int value, struct mf_type *membership_functions, struct io_type *next);
-int get_system_inputs(long long int *rightSensor, long long int *centerSensor, long long int *leftSensor);
+int get_system_inputs(FILE* fdd_State, long long int *rightSensor, long long int *centerSensor, long long int *leftSensor);
+int put_system_outputs(FILE* fdd_State, float Angle);
 void fuzzification(struct io_type *System_Inputs);
 void rule_evaluation(struct rule_type *Rule_Base, struct io_type *System_Outputs);
 void defuzzification(struct io_type *System_Outputs);

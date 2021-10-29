@@ -157,7 +157,7 @@ int get_headeing_degree(int fd, int xlow, int xhigh, int ylow, int yhigh)
         return -3;
     }
 
-    printf("raw_x: %d, raw_y: %d \n", raw_x, raw_y);
+    //printf("raw_x: %d, raw_y: %d \n", raw_x, raw_y);
 
     raw_x = raw_x - (xhigh+xlow)/2;
     raw_y = raw_y - (yhigh+ylow)/2;
@@ -182,16 +182,14 @@ int get_headeing_degree(int fd, int xlow, int xhigh, int ylow, int yhigh)
 /* Variables encoder */
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 
-float get_revoluciones_rpm(int in){
-
-    float rpm = ((60 * 1000000)/ (float)in );
-
-    if (in == 0 || rpm < 0 ) 
-        return 0;
+__s64 get_revoluciones_rpm(__s64 in)
+{
+    if (in == -1) 
+        return -1;
     else
-        return rpm;
+        return (((60 * 1000000)/ (in*4) ));
 }
     
-float get_distance_cm(int in){
-    return (in*2*M_PI*3);
+float get_distance_m(unsigned int in){
+    return (in*2*M_PI*3*4/100);
 }

@@ -140,11 +140,11 @@ static struct regval_list ov7670_default_regs[] = {
     { 0x73,     0xF1 }, // QVGA
     //{ 0xA2, 0x02 }, // QVGA
 
-    { 0x8C,     0x00 }, // RGB444 Set RGB format
-   	{ 0x04,     0x00 }, // COM1   no CCIR601
- 	{ 0x40,     0x10 }, // COM15  Full 0-255 output, RGB 565
+    { 0x8C,     0x00 }, // RGB444 Set RGB format                                
+   	{ 0x04,     0x00 }, // COM1   no CCIR601                                
+ 	{ 0x40,     0x10 }, // COM15  Full 0-255 output, RGB 565                    
 	{ 0x3a,     0x04 }, // TSLB   Set UV ordering,  do not auto-reset window
-	{ 0x14,     0x38 }, // COM9  - AGC Celling
+	{ 0x14,     0x38 }, // COM9  - AGC Celling                                  
 
 	//{ 0x4f,     0xb3 }, // MTX1  - colour conversion matrix
 	//{ 0x50,     0xb3 }, // MTX2  - colour conversion matrix
@@ -160,7 +160,6 @@ static struct regval_list ov7670_default_regs[] = {
     { 0x53,     0x5E },
     { 0x54,     0x80 },
     { 0x58,     0x9e },
-
 	{ 0x3d,     0xc0 }, // COM13 - Turn on GAMMA and UV Auto adjust
 	{ 0x11,     0x00 }, // CLKRC  Prescaler - Fin/(1+1)
 	

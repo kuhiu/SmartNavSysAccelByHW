@@ -94,15 +94,58 @@ int main(void)
     int *img_write              = NULL;
     int *img_read               = NULL;
     int red, green, blue;
+
+    // Escribo STATE.txt
+    int DeltaX_left, DeltaX_right;
+    char Tipo[20];
+    char Direccion[20];
+
+    // Semaforo
+    key_t key;              
+    int semid, fdp;
+    struct sembuf sb;
+
+    sb.sem_num = 0;
+    sb.sem_op = -1; /* set to allocate resource */
+    sb.sem_flg = SEM_UNDO;
+
+    // File
+    FILE* fdd_State;
+
+  //////////////////////////////////////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////   State TXT  //////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////////////////////////////
+  if ( (fdd_State = fopen("/home/root/Tesis/Apps/state.txt", "r+")) == NULL)
+  {
+      printf("Error abriendo state.txt\n");
+      return -1;
+  }
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////// Inicializar semaforo  /////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    if((fdp=open("SemFile", O_RDONLY | O_CREAT, 0777))==-1){
+        perror(" Open");
+        exit(1);
+    }
+    if((key = ftok("SemFile", 'E'))==-1){
+        perror(" ftok ");
+        close(fdp);
+        exit(1);
+    }
+    if ((semid = initsem(key, 1)) == -1) {      /* Configura el semaforo */
+        perror("initsem");
+        close(fdp);
+        exit(1);
+    }
 ////////////////////////////////        Leo el header       ////////////////////////////////////////////////////////
-    read_png_file("./test5.png");
+    //read_png_file("./test5.png");
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////       Memoria dinamica     ////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     img  = (float*) malloc( IMG_WIDTH*IMG_HEIGHT*3*sizeof(float) );
     //img2 = (float*) malloc( img_width*img_height*3*sizeof(float) );
 ////////////////////////////////        Leo la imagen       ////////////////////////////////////////////////////////
-    get_png_file(img);
+    //get_png_file(img);
     //printf("sysconf(_SC_PAGE_SIZE) es: %ld y %ld\n", sysconf(_SC_PAGE_SIZE), (FRAMEBUFFER_OFFSET/sysconf(_SC_PAGE_SIZE)) );
     mem_fd = open("/dev/mem", O_RDWR | O_SYNC);
     if ( mem_fd == -1)
@@ -110,7 +153,6 @@ int main(void)
         printf("Open /dev/mem Failed\n");
         return 1;
     }
-
     img_write = mmap(NULL, IMG_WIDTH*IMG_HEIGHT*3*sizeof(int), PROT_READ | PROT_WRITE, MAP_SHARED, mem_fd, (off_t)FRAMEBUFFER_WRITE_OFFSET );	// phys_addr should be page-aligned.	
 
     if(img_write == MAP_FAILED){
@@ -508,10 +550,49 @@ while(keepRunning)
     // Recorto boxes si esta por fuera de la imagen
     // Escribir...
 
-    // Dibujo la caja
+    // Dibujo la caja, informo resultados
     if (max > PROB_TRSH)
+    {
         process_png_file(img, xmin, xmax, ymin, ymax);
 
+        DeltaX_left  = (int)IMG_WIDTH/2 - (int)xmin;
+        DeltaX_right = (int)xmax - (int)IMG_WIDTH/2;
+
+        strcpy(Tipo,"TOMATE      ");
+
+        sb.sem_op = -1;         /* Asignar recurso */
+        if (semop(semid, &sb, 1) == -1) {           /* semop setea, chequea o limpia uno o varios semaforos */
+            perror("semop");
+            exit(1);
+        }
+            if ( DeltaX_left >=  DeltaX_right)
+            {
+                // Escribo en STATE que tengo que ir a la derecha 
+                printf("Tengo que ir a la derecha \n");
+                strcpy(Direccion,"DERECHA     ");
+                put_system_outputs(fdd_State, Tipo, Direccion);
+            }
+            else 
+            {
+                // Escribo en STATE que tengo que ir a la izquierda
+                printf("Tengo que ir a la izquierda \n");
+                strcpy(Direccion,"IZQUIERDA   ");
+                put_system_outputs(fdd_State, Tipo, Direccion);
+            }
+        sb.sem_op = 1;          /* Libera el recurso */
+        if (semop(semid, &sb, 1) == -1) {
+            perror("semop");
+            exit(1);
+        }
+    }
+    else 
+    {
+        // Escribo en STATE que no se reconocio el obstaculo
+        printf("Direccion y obstaculo desconocidos \n");
+        strcpy(Direccion,"DESCONOCIDO ");
+        strcpy(Tipo,"DESCONOCIDO ");
+        put_system_outputs(fdd_State, Tipo, Direccion);
+    }
     // Guardo la imagen
     //write_png_file("./test5MODIF.png");
 
