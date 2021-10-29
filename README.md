@@ -28,7 +28,7 @@
 6) ~~A partir de las variables de estado controlar los motores del robot.~~
 7) ~~Escribir el sistema de control difuso en C~~
 8) Aplicaciones (sistema difuso + procesamiento de imagenes).
-9) Convertir el archivo a una shr mem, para poder loggear las variables de estado.
+9) Mejorar rendimiento de la CNN.
 
 ### Pendientes, proximas versiones del robot
 
@@ -36,6 +36,7 @@
 2) A partir de las variables de estado controlar la velocidad del robot.
 3) El sistema de control difuso es capaz de dirigirse a un punto especifico evitando colisionar.
 4) El robot es capaz de modificar su comportamiento al reconocer distintos obstaculos.
+5) Convertir el archivo a una shr mem, para poder loggear las variables de estado.
 
 ## Estado actual de la implementacion
 
