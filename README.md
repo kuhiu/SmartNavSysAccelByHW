@@ -18,17 +18,18 @@
     * ~~Comprar brujula y escribir su driver. (para conocer la direccion a la que se desplaza)~~
 4) ~~Comprar fuente dc-dc 5v al menos 1.5A para alimentar externamente la Zybo.~~
 5) ~~Crear un archivo en donde se mantenga actualizada toda la informacion de los drivers, direccion del robot, velocidad del robot, distancia por recorrrer para llegar al target, sensores de distancia, etc. A PARTIR DE AQUI LLAMADAS VARIABLES DE ESTADO DEL ROBOT~~
+6) ~~A partir de la red neuronal escribir las variables de estado.~~
+7) ~~A partir de las variables de estado controlar los motores del robot.~~
+8) ~~Escribir el sistema de control difuso en C~~
 
 ## Pendientes v1 del robot
 
 * El sistema de procesamiento de imagenes unicamente reconoce un tomate.
 * El sistema de control difuso solamente controla la direccion a la cual se dirige el robot para evitar colisionar con el obstaculo.
 
-5) ~~A partir de la red neuronal escribir las variables de estado.~~
-6) ~~A partir de las variables de estado controlar los motores del robot.~~
-7) ~~Escribir el sistema de control difuso en C~~
-8) Aplicaciones (sistema difuso + procesamiento de imagenes).
-9) Mejorar rendimiento de la CNN.
+1) Mejorar rendimiento de la CNN.
+2) Mejorar encoder.
+3) Aplicaciones (sistema difuso + procesamiento de imagenes).
 
 ### Pendientes, proximas versiones del robot
 
