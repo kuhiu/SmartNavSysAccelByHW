@@ -11,8 +11,8 @@
 #include <linux/ktime.h>
 #include <linux/interrupt.h>
 
-#define DEVICE_NAME       "chardev_encoder_EMIOgpio_PL" /* Define Driver Name */
-#define DEVICE_CLASS_NAME "class_encoder_EMIOgpio_PL"
+#define DEVICE_NAME       "chardev_encoder_EMIOgpio_PL_1" /* Define Driver Name */
+#define DEVICE_CLASS_NAME "class_encoder_EMIOgpio_PL_1"
 #define BYTE2READ                            32*4       /* Cantidad de word de 32 bits que tengo que leer * 4 = Bytes 2 read */
 #define BASE_MINOR                              0       /* Base del numero menor */
 #define MINOR_COUNT                             1       /* Cantidad de numeros menores que voy a usar */
@@ -26,6 +26,8 @@
 #define OFFSET_IPIER        (uint32_t) 0x00000128
 #define OFFSET_IPISR        (uint32_t) 0x00000120
 
+#define _BSD_SOURCE
+
 static int driver_probe (struct platform_device *pdev);
 static int driver_remove (struct platform_device *pdev);
 
@@ -34,12 +36,6 @@ static uint32_t nro_vueltas1 = 0;
 static int valid_value1 = 0;
 static volatile ktime_t echo_start1;
 static volatile ktime_t echo_end1;
-
-static int sensor_2 = 0;
-static uint32_t nro_vueltas2 = 0;
-static int valid_value2 = 0;
-static volatile ktime_t echo_start2;
-static volatile ktime_t echo_end2;
 
 static struct state {
 
@@ -65,7 +61,7 @@ static struct state {
 /********************************* Estructuras  of_device_id *************************************/
 
 static const struct of_device_id driver_of_match[] = {
-{ .compatible = "driver_encoder_EMIOgpio_PL" },
+{ .compatible = "driver_encoder_EMIOgpio_PL_1" },
 { }
 };
 
@@ -123,7 +119,6 @@ void set_registers (volatile void *base, uint32_t offset, uint32_t mask, uint32_
 static irqreturn_t driver_isr(int irq, void *data)
 {
 	  ktime_t ktime_dummy1;
-    ktime_t ktime_dummy2;
 
     //pr_info("Hola entre a driver_isr \n");
 
@@ -136,45 +131,45 @@ static irqreturn_t driver_isr(int irq, void *data)
         if ( (ioread32(state.base_addr_EMIOgpio + OFFSET_GPIO1_DATA) & 0x01) == (uint32_t) 0x01) // Primer sensor interrumpio
         {
             //pr_info("Interumpio bit 0, sensor_1: %d \n", sensor_1);
-            if (valid_value1==0) {
-                ktime_dummy1=ktime_get();
-                if (sensor_1 == 0){  
-                    echo_start1=ktime_dummy1;
-                    //valid_value1 = 0;
-                }
-
-                sensor_1++;
-
-                if (sensor_1 >= 5){  // 1 REVOLUCIONES
-                    sensor_1 = 0;
-                    valid_value1 = 1;
-                    nro_vueltas1++;
-                    echo_end1=ktime_dummy1; 
-                }
+            //if (valid_value1==0) {
+            ktime_dummy1=ktime_get();
+            if (sensor_1 == 0){  
+                echo_start1=ktime_dummy1;
+                valid_value1 = 0;
             }
+
+            sensor_1++;
+
+            if (sensor_1 >= 5){  // 1/4 REVOLUCIONES
+                echo_end1=ktime_dummy1;
+                nro_vueltas1 = nro_vueltas1 + 5; 
+                sensor_1 = 0;
+                valid_value1 = 1;
+            }
+            //}
 
         }
 
-        if ( (ioread32(state.base_addr_EMIOgpio + OFFSET_GPIO1_DATA) & 0x02) == (uint32_t) 0x02) // Segundo sensor interrumpio
-        {
-            //pr_info("Interumpio bit 1 \n");
-            if (valid_value2==0) {
-                ktime_dummy2=ktime_get();
-                if (sensor_2 == 0){  
-                    echo_start2=ktime_dummy2;
-                    //valid_value2 = 0;
-                }
+        // if ( (ioread32(state.base_addr_EMIOgpio + OFFSET_GPIO1_DATA) & 0x02) == (uint32_t) 0x02) // Segundo sensor interrumpio
+        // {
+        //     //pr_info("Interumpio bit 1 \n");
+        //     //if (valid_value2==0) {
+        //     ktime_dummy2=ktime_get();
+        //     if (sensor_2 == 0){  
+        //         echo_start2=ktime_dummy2;
+        //         valid_value2 = 0;
+        //     }
 
-                sensor_2++;
+        //     sensor_2++;
 
-                if (sensor_2 >= 5){  // 1 REVOLUCIONES
-                    sensor_2 = 0;
-                    valid_value2 = 1;
-                    nro_vueltas2++;
-                    echo_end2=ktime_dummy2; 
-                }
-            }
-        }
+        //     if (sensor_2 >= 1){  // 1 REVOLUCIONES
+        //         echo_end2=ktime_dummy2; 
+        //         nro_vueltas2++;
+        //         sensor_2 = 0;
+        //         valid_value2 = 1;
+        //     }
+        //     //}
+        // }
 
         // Clear int status channel
         set_registers(state.base_addr_EMIOgpio, OFFSET_IPISR, (uint32_t) 0x3, (uint32_t)0x01 );
@@ -285,11 +280,9 @@ static ssize_t driver_read(struct file *file, char __user *ubuff, size_t size, l
         return -1;
     }
 
-    valid_value1=0;
-    valid_value2=0;
     // Tengo que esperar que interrumpa y tenga el resultado
     counter=0;
-	  while ( (valid_value1==0) || (valid_value2==0) ) {
+	  while ( (valid_value1==0) ) {
       counter++;
       // Out of range
       if (counter>10) {
@@ -307,15 +300,7 @@ static ssize_t driver_read(struct file *file, char __user *ubuff, size_t size, l
 
     state.RX_buff[1] = nro_vueltas1;
 
-    //pr_info("Llego la interrupcion2 \n"); 
-    if (valid_value2!=0)
-      state.RX_buff[2] = ktime_to_us( ktime_sub(echo_end2,echo_start2) );
-    else
-      state.RX_buff[2] = -1;
-
-    state.RX_buff[3] = nro_vueltas2;
-
-    pr_info("Tiempo en useg en kernel: %lld - %lld \n", state.RX_buff[0], state.RX_buff[2] );
+    pr_info("Tiempo en useg en kernel 1: %lld \n", state.RX_buff[0] );
 
     /* Cargo el dato en el buffer del usuario */
     pr_info("Cargo el buffer del usuario con la informacion\n");

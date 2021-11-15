@@ -66,5 +66,5 @@ int get_headeing_degree(int fd, int xlow, int xhigh, int ylow, int yhigh);
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 #define BYTE2READ_encoder       32*4
 
-__s64 get_revoluciones_rpm(__s64 in);
+float get_revoluciones_rpm(__s64 in);
 float get_distance_m(unsigned int in);

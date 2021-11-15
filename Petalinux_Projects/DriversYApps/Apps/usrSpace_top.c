@@ -171,9 +171,9 @@ int main (int argc, char *argv[])
         int yhigh =     75;   
 
     /* Variables encoder */
-        int fd_encoder;
-        __s64 rb_encoder[BYTE2READ_encoder];
-        __s64 revoluciones_rpm_s1, revoluciones_rpm_s2;
+        int fd_encoder_1, fd_encoder_2;
+        __s64 rb_encoder_1[BYTE2READ_encoder], rb_encoder_2[BYTE2READ_encoder];
+        float revoluciones_rpm_s1, revoluciones_rpm_s2;
         float distance_cm_s1, distance_cm_s2;
 
     /* Semaforo */
@@ -227,7 +227,6 @@ int main (int argc, char *argv[])
         printf("Error abriendo/dev/HMC5883L\n");
         return -1;
     }
-
     if (ioctl(fd_brujula, I2C_SLAVE, addr_brujula) < 0) {
         printf("Error ioctl HMC5883L: %s\n", strerror(errno));
         return -1;
@@ -235,7 +234,12 @@ int main (int argc, char *argv[])
     //////////////////////////////////////////////////////////////////////////////////////////////////////
     /////////////////////////////////////////////  Encoder  //////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////////////////////////////////////
-    if ( (fd_encoder = open("/dev/chardev_encoder_EMIOgpio_PL", O_RDWR)) == -1)
+    if ( (fd_encoder_1 = open("/dev/chardev_encoder_EMIOgpio_PL_1", O_RDWR)) == -1)
+    {
+        printf("Error abriendo chardev_encoder_EMIOgpio_PL\n");
+        return -1;
+    }
+    if ( (fd_encoder_2 = open("/dev/chardev_encoder_EMIOgpio_PL_2", O_RDWR)) == -1)
     {
         printf("Error abriendo chardev_encoder_EMIOgpio_PL\n");
         return -1;
@@ -253,6 +257,7 @@ int main (int argc, char *argv[])
         printf("HMC5883L: La calibracion termino.\n");
         //printf("HMC5883L: xlow: %d, xhigh: %d, ylow: %d, yhigh: %d\n", xlow, xhigh, ylow, yhigh);
     }
+    printf("Llegue3 \n" );
     //////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////  Lecturas  //////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -289,20 +294,24 @@ int main (int argc, char *argv[])
         }
 
         ///////////////////////////////////////////// Encoders //////////////////////////////////////////////
-        if ( ( read(fd_encoder, rb_encoder, BYTE2READ_encoder)) == -1)
+        if ( ( read(fd_encoder_1, rb_encoder_1, BYTE2READ_encoder)) == -1)
         {
             printf("Error leyendo chardev_encoder_EMIOgpio_PL\n");
             return -1;
         }
-        //printf("Tiempo en useg: %lld - %lld \n", rb_encoder[0], rb_encoder[2] );
-        //printf("Vueltas: %d - %d \n", rb_encoder[1], rb_encoder[3] );
-        revoluciones_rpm_s1 = get_revoluciones_rpm(rb_encoder[0]);
-        revoluciones_rpm_s2 = get_revoluciones_rpm(rb_encoder[2]);
-        //printf("Revoluciones: %d - %d rpm \n", (int)revoluciones_rpm_s1, (int)revoluciones_rpm_s2 );
-        distance_cm_s1 = get_distance_m(rb_encoder[1]);
-        distance_cm_s2 = get_distance_m(rb_encoder[3]);
-        //printf("Distancia recorrida Total: %f - %f ms \n", distance_cm_s1, distance_cm_s2);
-
+        if ( ( read(fd_encoder_2, rb_encoder_2, BYTE2READ_encoder)) == -1)
+        {
+            printf("Error leyendo chardev_encoder_EMIOgpio_PL\n");
+            return -1;
+        }
+        printf("Tiempo en useg: %lld - %lld \n", rb_encoder_1[0], rb_encoder_2[0] );
+        printf("Ranuras: %lld - %lld \n", rb_encoder_1[1], rb_encoder_2[1] );
+        revoluciones_rpm_s1 = get_revoluciones_rpm(rb_encoder_1[0]);
+        revoluciones_rpm_s2 = get_revoluciones_rpm(rb_encoder_1[0]);
+        printf("Revoluciones: %d - %d rpm \n", (int)revoluciones_rpm_s1, (int)revoluciones_rpm_s2 );
+        distance_cm_s1 = get_distance_m(rb_encoder_1[1]);
+        distance_cm_s2 = get_distance_m(rb_encoder_2[1]);
+        printf("Distancia recorrida Total: %f - %f ms \n", distance_cm_s1, distance_cm_s2);
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////
         /////////////////////////////////////////  State.txt update  /////////////////////////////////////////
@@ -332,7 +341,8 @@ int main (int argc, char *argv[])
     fclose(fdd_State);
     close(fd_MIOgpio_PS);
     close(fd_brujula);
-    close(fd_encoder);
+    close(fd_encoder_1);
+    close(fd_encoder_2);
 
     return 0;
 }

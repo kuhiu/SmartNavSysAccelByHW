@@ -182,14 +182,14 @@ int get_headeing_degree(int fd, int xlow, int xhigh, int ylow, int yhigh)
 /* Variables encoder */
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 
-__s64 get_revoluciones_rpm(__s64 in)
+float get_revoluciones_rpm(__s64 in)
 {
     if (in == -1) 
-        return -1;
+        return 0;
     else
-        return (((60 * 1000000)/ (in*4) ));
+        return (((60 * 1000000)/ ((float)in*5) ));
 }
     
 float get_distance_m(unsigned int in){
-    return (in*2*M_PI*3*4/100);
+    return (in*2*M_PI*3*5/100);
 }
