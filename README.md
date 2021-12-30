@@ -4,7 +4,6 @@
 
 Este repositorio describe los avances de mi tesis de grado, un sistema de navegacion inteligente acelerado por hardware, su objetivo general es investigar e implementar un sistema nuevo de control basados en lógica difusa y redes neuronales convolucionales para que el robot pueda tomar mejores decisiones a la hora de sortear un obstáculo. Un modulo de redes neuronales convolucionales logrará reconocer un obstáculo, y de este se obtendrán ciertas características y en función de éstas se decidirá en un modulo de sistema de control difuso con distintos tipos de sets de reglas difusas cual de estos sets utilizará el robot para sortear el obstáculo.
 
-
 ### Autor
 
 | Fuschetto Martin         | Email: <marfus@hotmail.es>
@@ -17,9 +16,8 @@ Este repositorio describe los avances de mi tesis de grado, un sistema de navega
 
 ## Indices
 
-* [Modulo - Procesamiento de imagenes](https://github.com/Fuschetto97/Tesis/tree/main/pImagen)
-* [Modulo - Sistema de control difuso](https://github.com/Fuschetto97/Tesis/tree/main/FuzzyControl)
-* [Implementacion](https://github.com/Fuschetto97/Tesis/tree/main/Petalinux_Projects)
+* [Modulos](https://github.com/Fuschetto97/Tesis/tree/main/Modulos)
+* [Implementacion en zybo](https://github.com/Fuschetto97/Tesis/tree/main/Petalinux_Projects)
 
 # Como usar?
 
@@ -74,7 +72,7 @@ Este repositorio describe los avances de mi tesis de grado, un sistema de navega
 2) El sistema de control difuso es capaz de dirigirse a un punto especifico evitando colisionar.
 3) El robot es capaz de modificar su comportamiento al reconocer distintos obstaculos.
 
-### Proxima version del robot
+## Proxima version del robot
 
 0) Mejorar rendimiento de la CNN.
 1) Desarrollo en la FPGA y su driver.
