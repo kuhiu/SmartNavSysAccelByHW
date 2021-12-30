@@ -16,10 +16,11 @@ Este repositorio describe los avances de mi tesis de grado, un sistema de navega
 
 ## Indices
 
+* [Android App](https://github.com/Fuschetto97/Tesis/tree/main/AndroidApp)
 * [Modulos](https://github.com/Fuschetto97/Tesis/tree/main/Modulos)
 * [Implementacion en zybo](https://github.com/Fuschetto97/Tesis/tree/main/Petalinux_Projects)
 
-# Como usar?
+# Como usar? (QUEDA POR MODIFICAR)
 
 0) echo system.bin > /sys/class/fpga_manager/fpga0/firmware
 1) insmod Tesis/Drivers/driver_i2c_PS_ov7670.ko && insmod Tesis/Drivers/driver_vdma.ko
