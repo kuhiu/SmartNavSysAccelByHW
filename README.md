@@ -5,10 +5,15 @@
 Este repositorio describe los avances de mi tesis de grado, un sistema de navegacion inteligente acelerado por hardware, su objetivo general es investigar e implementar un sistema nuevo de control basados en lógica difusa y redes neuronales convolucionales para que el robot pueda tomar mejores decisiones a la hora de sortear un obstáculo. Un modulo de redes neuronales convolucionales logrará reconocer un obstáculo, y de este se obtendrán ciertas características y en función de éstas se decidirá en un modulo de sistema de control difuso con distintos tipos de sets de reglas difusas cual de estos sets utilizará el robot para sortear el obstáculo.
 
 
-## Autor
+### Autor
 
 | Fuschetto Martin         | Email: <marfus@hotmail.es>
 |:-------------------------:|:-------------------------:
+
+## Caracteristicas de esta version
+
+* El sistema de procesamiento de imagenes unicamente reconoce un tomate.
+* El sistema de control difuso solamente controla la direccion a la cual se dirige el robot para evitar colisionar con el obstaculo.
 
 ## Indices
 
@@ -27,12 +32,24 @@ Este repositorio describe los avances de mi tesis de grado, un sistema de navega
 7) New console : ./Tesis/develop/readSTATE.bin
 6) ./Tesis/Apps/usrSpace_top & disown && ./Tesis/develop/FuzzyControl.bin & disown && ./Tesis/Apps/usrSpace_drive & disown
 
-
-
 ## Matriz de requisitos (act. 29/12/2021)
 
 <img src=./imagenes/matriz.png scale=0.5 alt="Hardware" />
 
+## Fotos
+
+<p float="left">
+    <img src="./imagenes/state0.jpeg" width="225" />
+    <img src="./imagenes/state1.jpeg" width="150" />
+    <img src="./imagenes/state2.jpeg" width="266" />
+    <img src="./imagenes/state3.jpeg" width="150" /> 
+    <img src="./imagenes/state4.jpeg" width="150" />
+    <img src="./imagenes/state5.jpeg" width="150" />
+    <img src="./imagenes/state6.jpeg" width="266" />
+    <img src="./imagenes/state7.jpeg" width="227" />
+    <img src="./imagenes/state8.jpeg" width="150" />
+    <img src="./imagenes/state9.jpeg" width="190" />
+</p>
 
 ## Resuelto
 
@@ -56,28 +73,6 @@ Este repositorio describe los avances de mi tesis de grado, un sistema de navega
 1) Aplicaciones (sistema difuso + procesamiento de imagenes).
 2) El sistema de control difuso es capaz de dirigirse a un punto especifico evitando colisionar.
 3) El robot es capaz de modificar su comportamiento al reconocer distintos obstaculos.
-
-### Caracteristicas de esta version
-
-* El sistema de procesamiento de imagenes unicamente reconoce un tomate.
-* El sistema de control difuso solamente controla la direccion a la cual se dirige el robot para evitar colisionar con el obstaculo.
-
-## Fotos
-
-<p float="left">
-    <img src="./imagenes/state0.jpeg" width="225" />
-    <img src="./imagenes/state1.jpeg" width="150" />
-    <img src="./imagenes/state2.jpeg" width="266" />
-    <img src="./imagenes/state3.jpeg" width="150" /> 
-    <img src="./imagenes/state4.jpeg" width="150" />
-    <img src="./imagenes/state5.jpeg" width="150" />
-    <img src="./imagenes/state6.jpeg" width="266" />
-    <img src="./imagenes/state7.jpeg" width="227" />
-    <img src="./imagenes/state8.jpeg" width="150" />
-    <img src="./imagenes/state9.jpeg" width="190" />
-</p>
-
-
 
 ### Proxima version del robot
 
