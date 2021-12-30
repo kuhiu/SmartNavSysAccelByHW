@@ -77,4 +77,4 @@ Este repositorio describe los avances de mi tesis de grado, un sistema de navega
 0) Mejorar rendimiento de la CNN.
 1) Desarrollo en la FPGA y su driver.
 2) A partir de las variables de estado controlar la velocidad del robot.
-3) Convertir el archivo a una shr mem, para poder loggear las variables de estado.
+3) Convertir el archivo a una share memory, para poder loggear las variables de estado.

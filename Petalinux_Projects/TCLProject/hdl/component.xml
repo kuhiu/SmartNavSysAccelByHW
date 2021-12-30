@@ -1,0 +1,344 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<spirit:component xmlns:xilinx="http://www.xilinx.com" xmlns:spirit="http://www.spiritconsortium.org/XMLSchema/SPIRIT/1685-2009" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <spirit:vendor>user.org</spirit:vendor>
+  <spirit:library>user</spirit:library>
+  <spirit:name>debounce</spirit:name>
+  <spirit:version>1.0</spirit:version>
+  <spirit:model>
+    <spirit:views>
+      <spirit:view>
+        <spirit:name>xilinx_anylanguagesynthesis</spirit:name>
+        <spirit:displayName>Synthesis</spirit:displayName>
+        <spirit:envIdentifier>:vivado.xilinx.com:synthesis</spirit:envIdentifier>
+        <spirit:language>VHDL</spirit:language>
+        <spirit:modelName>debounce</spirit:modelName>
+        <spirit:fileSetRef>
+          <spirit:localName>xilinx_anylanguagesynthesis_view_fileset</spirit:localName>
+        </spirit:fileSetRef>
+        <spirit:parameters>
+          <spirit:parameter>
+            <spirit:name>viewChecksum</spirit:name>
+            <spirit:value>af43c8dd</spirit:value>
+          </spirit:parameter>
+        </spirit:parameters>
+      </spirit:view>
+      <spirit:view>
+        <spirit:name>xilinx_anylanguagebehavioralsimulation</spirit:name>
+        <spirit:displayName>Simulation</spirit:displayName>
+        <spirit:envIdentifier>:vivado.xilinx.com:simulation</spirit:envIdentifier>
+        <spirit:language>VHDL</spirit:language>
+        <spirit:modelName>debounce</spirit:modelName>
+        <spirit:fileSetRef>
+          <spirit:localName>xilinx_anylanguagebehavioralsimulation_view_fileset</spirit:localName>
+        </spirit:fileSetRef>
+        <spirit:parameters>
+          <spirit:parameter>
+            <spirit:name>viewChecksum</spirit:name>
+            <spirit:value>af43c8dd</spirit:value>
+          </spirit:parameter>
+        </spirit:parameters>
+      </spirit:view>
+      <spirit:view>
+        <spirit:name>xilinx_xpgui</spirit:name>
+        <spirit:displayName>UI Layout</spirit:displayName>
+        <spirit:envIdentifier>:vivado.xilinx.com:xgui.ui</spirit:envIdentifier>
+        <spirit:fileSetRef>
+          <spirit:localName>xilinx_xpgui_view_fileset</spirit:localName>
+        </spirit:fileSetRef>
+        <spirit:parameters>
+          <spirit:parameter>
+            <spirit:name>viewChecksum</spirit:name>
+            <spirit:value>74591e5f</spirit:value>
+          </spirit:parameter>
+        </spirit:parameters>
+      </spirit:view>
+    </spirit:views>
+    <spirit:ports>
+      <spirit:port>
+        <spirit:name>clk</spirit:name>
+        <spirit:wire>
+          <spirit:direction>in</spirit:direction>
+          <spirit:wireTypeDefs>
+            <spirit:wireTypeDef>
+              <spirit:typeName>STD_LOGIC</spirit:typeName>
+              <spirit:viewNameRef>xilinx_anylanguagesynthesis</spirit:viewNameRef>
+              <spirit:viewNameRef>xilinx_anylanguagebehavioralsimulation</spirit:viewNameRef>
+            </spirit:wireTypeDef>
+          </spirit:wireTypeDefs>
+        </spirit:wire>
+      </spirit:port>
+      <spirit:port>
+        <spirit:name>button</spirit:name>
+        <spirit:wire>
+          <spirit:direction>in</spirit:direction>
+          <spirit:wireTypeDefs>
+            <spirit:wireTypeDef>
+              <spirit:typeName>STD_LOGIC</spirit:typeName>
+              <spirit:viewNameRef>xilinx_anylanguagesynthesis</spirit:viewNameRef>
+              <spirit:viewNameRef>xilinx_anylanguagebehavioralsimulation</spirit:viewNameRef>
+            </spirit:wireTypeDef>
+          </spirit:wireTypeDefs>
+        </spirit:wire>
+      </spirit:port>
+      <spirit:port>
+        <spirit:name>result</spirit:name>
+        <spirit:wire>
+          <spirit:direction>out</spirit:direction>
+          <spirit:wireTypeDefs>
+            <spirit:wireTypeDef>
+              <spirit:typeName>STD_LOGIC</spirit:typeName>
+              <spirit:viewNameRef>xilinx_anylanguagesynthesis</spirit:viewNameRef>
+              <spirit:viewNameRef>xilinx_anylanguagebehavioralsimulation</spirit:viewNameRef>
+            </spirit:wireTypeDef>
+          </spirit:wireTypeDefs>
+        </spirit:wire>
+      </spirit:port>
+    </spirit:ports>
+    <spirit:modelParameters>
+      <spirit:modelParameter xsi:type="spirit:nameValueTypeType" spirit:dataType="INTEGER">
+        <spirit:name>counter_size</spirit:name>
+        <spirit:displayName>Counter Size</spirit:displayName>
+        <spirit:value spirit:format="long" spirit:resolve="generated" spirit:id="MODELPARAM_VALUE.counter_size">24</spirit:value>
+      </spirit:modelParameter>
+    </spirit:modelParameters>
+  </spirit:model>
+  <spirit:fileSets>
+    <spirit:fileSet>
+      <spirit:name>xilinx_anylanguagesynthesis_view_fileset</spirit:name>
+      <spirit:file>
+        <spirit:name>debounce_v1.vhd</spirit:name>
+        <spirit:fileType>vhdlSource</spirit:fileType>
+        <spirit:userFileType>CHECKSUM_af43c8dd</spirit:userFileType>
+      </spirit:file>
+    </spirit:fileSet>
+    <spirit:fileSet>
+      <spirit:name>xilinx_anylanguagebehavioralsimulation_view_fileset</spirit:name>
+      <spirit:file>
+        <spirit:name>debounce_v1.vhd</spirit:name>
+        <spirit:fileType>vhdlSource</spirit:fileType>
+      </spirit:file>
+    </spirit:fileSet>
+    <spirit:fileSet>
+      <spirit:name>xilinx_xpgui_view_fileset</spirit:name>
+      <spirit:file>
+        <spirit:name>xgui/debounce_v1_0.tcl</spirit:name>
+        <spirit:fileType>tclSource</spirit:fileType>
+        <spirit:userFileType>CHECKSUM_74591e5f</spirit:userFileType>
+        <spirit:userFileType>XGUI_VERSION_2</spirit:userFileType>
+      </spirit:file>
+    </spirit:fileSet>
+  </spirit:fileSets>
+  <spirit:description>debounce_v1_0</spirit:description>
+  <spirit:parameters>
+    <spirit:parameter>
+      <spirit:name>counter_size</spirit:name>
+      <spirit:displayName>Counter Size</spirit:displayName>
+      <spirit:value spirit:format="long" spirit:resolve="user" spirit:id="PARAM_VALUE.counter_size">24</spirit:value>
+    </spirit:parameter>
+    <spirit:parameter>
+      <spirit:name>Component_Name</spirit:name>
+      <spirit:value spirit:resolve="user" spirit:id="PARAM_VALUE.Component_Name" spirit:order="1">debounce_v1_0</spirit:value>
+    </spirit:parameter>
+  </spirit:parameters>
+  <spirit:vendorExtensions>
+    <xilinx:coreExtensions>
+      <xilinx:supportedFamilies>
+        <xilinx:family xilinx:lifeCycle="Production">virtex7</xilinx:family>
+        <xilinx:family xilinx:lifeCycle="Production">qvirtex7</xilinx:family>
+        <xilinx:family xilinx:lifeCycle="Production">kintex7</xilinx:family>
+        <xilinx:family xilinx:lifeCycle="Production">kintex7l</xilinx:family>
+        <xilinx:family xilinx:lifeCycle="Production">qkintex7</xilinx:family>
+        <xilinx:family xilinx:lifeCycle="Production">qkintex7l</xilinx:family>
+        <xilinx:family xilinx:lifeCycle="Production">akintex7</xilinx:family>
+        <xilinx:family xilinx:lifeCycle="Production">artix7</xilinx:family>
+        <xilinx:family xilinx:lifeCycle="Production">artix7l</xilinx:family>
+        <xilinx:family xilinx:lifeCycle="Production">aartix7</xilinx:family>
+        <xilinx:family xilinx:lifeCycle="Production">qartix7</xilinx:family>
+        <xilinx:family xilinx:lifeCycle="Production">zynq</xilinx:family>
+        <xilinx:family xilinx:lifeCycle="Production">qzynq</xilinx:family>
+        <xilinx:family xilinx:lifeCycle="Production">azynq</xilinx:family>
+        <xilinx:family xilinx:lifeCycle="Production">spartan7</xilinx:family>
+        <xilinx:family xilinx:lifeCycle="Production">aspartan7</xilinx:family>
+        <xilinx:family xilinx:lifeCycle="Production">virtexu</xilinx:family>
+        <xilinx:family xilinx:lifeCycle="Production">zynquplus</xilinx:family>
+        <xilinx:family xilinx:lifeCycle="Production">virtexuplus</xilinx:family>
+        <xilinx:family xilinx:lifeCycle="Production">virtexuplusHBM</xilinx:family>
+        <xilinx:family xilinx:lifeCycle="Production">kintexuplus</xilinx:family>
+        <xilinx:family xilinx:lifeCycle="Production">kintexu</xilinx:family>
+      </xilinx:supportedFamilies>
+      <xilinx:taxonomies>
+        <xilinx:taxonomy>/UserIP</xilinx:taxonomy>
+      </xilinx:taxonomies>
+      <xilinx:displayName>debounce_v1_0</xilinx:displayName>
+      <xilinx:definitionSource>package_project</xilinx:definitionSource>
+      <xilinx:xpmLibraries>
+        <xilinx:xpmLibrary>XPM_CDC</xilinx:xpmLibrary>
+        <xilinx:xpmLibrary>XPM_FIFO</xilinx:xpmLibrary>
+        <xilinx:xpmLibrary>XPM_MEMORY</xilinx:xpmLibrary>
+      </xilinx:xpmLibraries>
+      <xilinx:coreRevision>20</xilinx:coreRevision>
+      <xilinx:coreCreationDateTime>2021-10-31T14:38:26Z</xilinx:coreCreationDateTime>
+      <xilinx:tags>
+        <xilinx:tag xilinx:name="nopcore"/>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3a9d476a_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@38683601_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@adcdbb0_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@223ad7eb_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@42e4ee0c_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@5a3c9045_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3df1b842_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@173f3c8f_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@32c4b948_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7e067fe_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4f034712_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@6b2a5ece_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@20d58349_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@f313000_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@764b1d29_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@5805cf04_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@781601bf_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@773b056_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@24a5b5db_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@481f105a_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@28bb132e_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3715a108_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2bd5f218_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@76d27de2_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@6cd83a69_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@5e3bd1e3_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7d2d92be_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4ef0ae9_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@75ae4287_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@e5e1def_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4f8adc8d_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@27d2bd50_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4a83b00c_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@13792ee5_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3339fd86_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@5eac209d_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3f596ba4_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@11c79c61_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@12c7c14a_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@6d52d51e_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@59e65c76_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7973297b_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7b609305_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4562b5db_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@45cc9a18_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@1dbdd2bc_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2dc2cb85_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@59e3007_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@5369b2c8_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@793a1463_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@58b1c560_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2872e3a8_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2a99f850_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4e9db46f_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@1d1ca22d_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7b76b278_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4b458663_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7e47a85d_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@63c281e1_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@44f7cde6_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7c5b9061_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3aaea6aa_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2e244b7c_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4ad1c539_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@47fad7e9_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@5c8c2bb5_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7947aaa4_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2a2234dc_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@1f908d9b_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7d2a3319_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2f73bf99_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@c993804_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7693fc00_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@1d57bd16_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@5076e9d0_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@36da1d27_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4f196e_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2896e461_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@16f33643_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@1c42a6b2_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7748ed2b_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@211b0fe6_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@c7927ac_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@287ba07_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@1745045a_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@10329dfd_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@e98adcc_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3e91061e_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4c2a7f65_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@1c74745f_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@6494159d_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4d71e34d_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@110b6397_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@6225fffb_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3a1beb21_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3b05ce3f_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@428d1d31_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@30495232_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7994bbfb_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@22ff2ecb_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@52cc900e_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@68c88da0_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@79323bae_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7853733_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@69717fd_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@1a1906f9_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@636f65fb_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@789ba00c_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4b84cbd4_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@725441ec_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@6d670aa9_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3e20216f_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@77a05cf7_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@9536802_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@6d960f88_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3026ea60_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@662d2e44_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@6d0725dd_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@5f2dfd7d_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@23269f9c_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3c40e602_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@5d98472b_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4c16c096_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@6784e640_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@14bb0f6_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@72a96e0a_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@68da7711_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@21e2b1d2_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@72e914aa_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@5773f369_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@28d5cd3_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@5186f0a7_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@622fa366_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3ba00d62_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@628ca5f5_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@48fa35e6_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7528290d_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@36287be0_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@28b18e4_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@29d67146_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@6dff1c32_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@35f2d841_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@22f3170d_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4b01c8b5_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4ce29aa4_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@19ebaa3e_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@5f563bb2_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@310daa6a_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7e29da75_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@5d582591_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@6ed94a03_ARCHIVE_LOCATION">/home/martin/Escritorio/Tesis/Petalinux_Projects/ov7670/ov7670.srcs/debounce</xilinx:tag>
+      </xilinx:tags>
+    </xilinx:coreExtensions>
+    <xilinx:packagingInfo>
+      <xilinx:xilinxVersion>2019.1</xilinx:xilinxVersion>
+      <xilinx:checksum xilinx:scope="fileGroups" xilinx:value="fba1b958"/>
+      <xilinx:checksum xilinx:scope="ports" xilinx:value="9139cf6a"/>
+      <xilinx:checksum xilinx:scope="hdlParameters" xilinx:value="dd0ee131"/>
+      <xilinx:checksum xilinx:scope="parameters" xilinx:value="20646bf6"/>
+    </xilinx:packagingInfo>
+  </spirit:vendorExtensions>
+</spirit:component>
