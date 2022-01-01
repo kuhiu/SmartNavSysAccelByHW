@@ -1,9 +1,12 @@
 # Ignore all 
 /*
 .*
-/*/
+
+
+# Unignore all with this directories:
+
 !/SqueezeDetFromScratch/
-!SqueezeDetTraining/imagenes/
+!/SqueezeDetTraining/imagenes/
 !/imagenes/
 
 
