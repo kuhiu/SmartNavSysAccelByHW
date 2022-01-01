@@ -3,6 +3,8 @@
 .*
 /*/
 !/SqueezeDetFromScratch/
+!/SqueezeDetTraining/imagenes
+!/SqueezeDetTraining/*.md
 !/imagenes/
 
 
