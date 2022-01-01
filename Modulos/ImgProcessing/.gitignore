@@ -6,7 +6,7 @@
 # Unignore all with this directories:
 
 !/SqueezeDetFromScratch/
-!/SqueezeDetFromScratch/*
+!/SqueezeDetFromScratch/final
 !/SqueezeDetTraining/
 !/SqueezeDetTraining/imagenes/*
 !/imagenes/
