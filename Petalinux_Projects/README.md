@@ -1,4 +1,4 @@
-<h1 align="center"> Modulo: Procesamiento de imagenes </h1> 
+<h1 align="center"> Implementacion sobre la Zybo </h1> 
 
 ## Desarrollos
 
