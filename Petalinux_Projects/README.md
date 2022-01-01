@@ -13,7 +13,7 @@
 
 ## Diagrama en Vivado 
 
-<img src=./imagenes/Vivado.png alt="Hardware" />
+<img src=./imagenes/Vivado2.png alt="Hardware" />
 
 ## Petalinux-build
 
