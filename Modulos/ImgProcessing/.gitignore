@@ -6,8 +6,8 @@
 # Unignore all with this directories:
 
 !/SqueezeDetFromScratch/
-!/SqueezeDetFromScratch/sqzdet_c/
-!/SqueezeDetFromScratch/sqzdet_py/
+!/SqueezeDetFromScratch/sqzdet_c/*/
+!/SqueezeDetFromScratch/sqzdet_py/*/
 !/SqueezeDetTraining/
 !/SqueezeDetTraining/imagenes/*
 !/imagenes/
