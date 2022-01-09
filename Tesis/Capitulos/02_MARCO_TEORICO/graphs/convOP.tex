@@ -1,0 +1,135 @@
+\begin{tikzpicture}
+
+    % Simbolo de conv
+    \begin{scope}[shift={(4,-0.3)},rotate=45, scale=0.5]
+        \draw[-] (0,0,0) circle(1cm);
+        \draw[-] (0,-1)--(0,1)--cycle;
+        \draw[-] (-1,0)--(1,0)--cycle;
+    \end{scope}
+    
+    % igual
+    \begin{scope}[shift={(10.5,-0.5)},rotate=0, scale=0.35]
+        \draw[-] (-1,1)--(1,1)--cycle;
+        \draw[-] (-1,0)--(1,0)--cycle;
+    \end{scope}
+    
+     % Matriz de entrada
+    \begin{scope}[tdplot_main_coords,line join=miter,font=\sffamily, xshift=0, yshift=0cm]
+        \pgfmathsetmacro{\xstretch}{1}
+        \edef\Cols{white, white, white}
+        \edef\LstCols{{"white", "white", "white"}}
+        
+        \foreach \Col [count=\X starting from 0,remember=\X as \LastX] in \Cols
+        {  
+            \foreach \XX in {1}
+            {  
+                \draw[thick,\Col] (\xstretch*\X+0.4*\XX-0.1,0,0) -- (\xstretch*\X+0.4*\XX,0,0);
+                \begin{scope}[canvas is yz plane at x=\xstretch*\X+0.4*\XX]
+                    \pgfmathtruncatemacro{\fullness}{120-20*\XX}
+                    \draw[fill=\Col!\fullness] (-1,-1) rectangle (1,1);
+                \end{scope}
+            }
+            %\node[anchor=west] at (\xstretch*\X,-2,-2){$x_\X$};
+        }
+        \node[anchor=west] at (\xstretch,-1.5,-1.5){$N_{iz}$};
+        \node[anchor=west] at (\xstretch,1,-2.5){$N_{ix}$};
+        \node[anchor=west] at (\xstretch,2.5,-1.5){$N_{iy}$};
+        \node[anchor=west] at (\xstretch,-1,3){Matriz de entrada};
+    \end{scope}
+    % cuadraditos en la matriz de entrada
+    \begin{scope}[tdplot_main_coords,line join=miter,font=\sffamily, xshift=-5, yshift=5, scale=0.2]
+        \pgfmathsetmacro{\xstretch}{1}
+        \edef\Cols{white, white, white}
+        \edef\LstCols{{"white", "white", "white"}}
+        
+        \foreach \Col [count=\X starting from 0,remember=\X as \LastX] in \Cols
+        {  
+            \foreach \XX in {1}
+            {  
+                \draw[thick,\Col] (\xstretch*\X+0.4*\XX-0.1,0,0) -- (\xstretch*\X+0.4*\XX,0,0);
+                \begin{scope}[canvas is yz plane at x=5*\xstretch*\X+0.4*\XX]
+                    \pgfmathtruncatemacro{\fullness}{120-20*\XX}
+                    \draw[fill=\Col!\fullness, draw=red] (-1,-1) rectangle (1,1);
+                \end{scope}
+            }
+            %\node[anchor=west] at (\xstretch*\X,-2,-2){$x_\X$};
+        }
+    \end{scope}
+
+
+    % Grupo de filtros
+    \begin{scope}[tdplot_main_coords,line join=miter,font=\sffamily, xshift=5.5cm, yshift=0.2cm, scale=0.6]
+        \pgfmathsetmacro{\xstretch}{1}
+        \edef\Cols{red, green, blue}
+        \edef\LstCols{{"red", "green", "blue"}}
+        
+        \foreach \Col [count=\X starting from 0,remember=\X as \LastX] in \Cols
+        {  
+            \foreach \XX in {1,2,3,4}
+            {  
+                %\draw[thick,\Col] (\xstretch*\X+0.4*\XX-0.1,0,0) -- (\xstretch*\X+0.4*\XX,0,0);
+                \begin{scope}[canvas is yz plane at x=3.5*\xstretch*\X+0.4*\XX]
+                    \pgfmathtruncatemacro{\fullness}{120-20*\XX}
+                    \draw[fill=\Col!\fullness] (-1,-1) rectangle (1,1);
+                \end{scope}
+            }
+            %\node[anchor=west] at (\xstretch*\X,-2,-2){$x_\X$};
+        }
+        \node[anchor=west] at (\xstretch,-1,4){Grupo de filtros};
+        \node[anchor=west] at (5,0,-3.5){$N_{iz}$};
+        \node[anchor=west] at (6,2,-4){$N_{wx}$};
+        \node[anchor=west] at (7.5,2.5,-1){$N_{wy}$};
+    \end{scope}
+    
+    % Matriz de salida
+    \begin{scope}[tdplot_main_coords,line join=miter,font=\sffamily, xshift=350, yshift=0cm]
+        \pgfmathsetmacro{\xstretch}{1}
+        \edef\Cols{red, green, blue}
+        \edef\LstCols{{"red", "green", "blue"}}
+        
+        \foreach \Col [count=\X starting from 0,remember=\X as \LastX] in \Cols
+        {  
+            \foreach \XX in {1}
+            {  
+                \draw[thick,\Col] (\xstretch*\X+0.4*\XX-0.1,0,0) -- (\xstretch*\X+0.4*\XX,0,0);
+                \begin{scope}[canvas is yz plane at x=\xstretch*\X+0.4*\XX]
+                    \pgfmathtruncatemacro{\fullness}{120-20*\XX}
+                    \draw[fill=\Col!\fullness] (-1,-1) rectangle (1,1);
+                \end{scope}
+            }
+            %\node[anchor=west] at (\xstretch*\X,-2,-2){$x_\X$};
+        }
+        \node[anchor=west] at (\xstretch,-1.5,-1.5){$N_{oz}$};
+        \node[anchor=west] at (\xstretch,1,-2.5){$N_{ox}$};
+        \node[anchor=west] at (\xstretch,2.5,-1.5){$N_{oy}$};
+        \node[anchor=west] at (\xstretch,-1,3){Matriz de salida};
+    \end{scope}
+    
+    
+\end{tikzpicture}
+
+
+  
+  %\draw[thick,\Col] (\xstretch*\X+0.4*4,0,0) coordinate(front-\X) -- (\xstretch*\X+1+0.4*4,0,0) coordinate(back-\X);
+%  \begin{scope}[canvas is xy plane at z=0]
+%   \ifnum\X>0
+%    \foreach \Z in {0,...,\LastX}
+%    {\pgfmathsetmacro{\mycol}{\LstCols[\Z]}
+%    \draw[thick,\mycol,overlay] (front-\Z) to[out=-90,in=-90,looseness=1.5] (back-\X);}
+%   \fi
+%  \end{scope}
+%  \begin{scope}[canvas is yz plane at x=\xstretch*\X+1+0.4*4,transform shape]
+%   \ifnum\X=4
+%    \node[draw,fill=white] (BN-\X) at (0,0) {Transition layer};
+%   \else
+%    \node[draw,fill=white] (BN-\X) at (0,0) {BN--RelU--Conv};
+%   \fi
+%  \end{scope}
+%  \pgfmathtruncatemacro{\NextX}{\X+1}
+%  \ifnum\X<4
+%   \node[anchor=south west] at (BN-\X.north east) {$H_\NextX$};
+%   \pgfmathsetmacro{\NextCol}{\LstCols[\NextX]}
+%  \else 
+%   \pgfmathsetmacro{\NextCol}{"black"} 
+%  \fi 
+%  \draw[thick,\NextCol] (\xstretch*\X+1+0.4*4,0,0) -- ({\xstretch*(\X+1)+0.4*4},0,0);

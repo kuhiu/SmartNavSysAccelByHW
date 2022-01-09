@@ -1,0 +1,25 @@
+\subsection{Plan de calidad}
+
+Cuando hablamos de calidad hablamos del grado de cumplimiento que tiene un proyecto respecto a sus requisitos. Es importante remarcar que un proyecto no cumple con los requisitos tanto cuando no llega a conseguir estos, como cuando los excede.
+
+Los requisitos normalmente se pueden dividir en dos grupos.
+
+\subsubsection{Requisitos del proyecto}
+
+Aquellos requisitos relativos al proceso de trabajo o forma de gestionar el proyecto que este debe seguir por el hecho de ser llevado a cabo dentro de la institución.
+
+\subsubsection{Requisitos del producto}
+
+Aquellas características que debe cumplir el producto resultante del proyecto. Con el fin de satisfacer ciertos requerimientos puestos por el proyecto de investigación y llevar a cabo la gestión del proyecto se comienza por definir el alcance del proyecto con relación a dos aspectos.
+
+\subsubsection{¿Qué características debe cumplir el producto? ¿Cómo se comprobara que este cumple con estas características?}
+
+Con la intención de definir las características que se deben cumplir de forma cuantificable y medible se lleva a acabo la descripción de los requisitos.\par
+
+\begin{itemize}
+    \item[*] El robot móvil a desarrollar deberá de poder reconocer al menos 3 obstáculos de distintas dimensiones y formas capaz de evadir, a su vez como el propósito del proyecto de investigación es mejorar la toma de decisión a la hora de evasión en función de las dimensiones del obstáculo y de la meta alcanzable por el robot se harán numerosas pruebas para testear que evada los distintos obstáculos de la forma adecuada.\par
+    A su vez, como el robot se ira desplazando, el modulo de procesamiento de imágenes sera sometido a distintos tipos de entornos. Por este motivo se hará un sistema robusto intentando que el robot sea capaz de reconocer el o los obstáculos frente la mayor cantidad de veces posibles antes de que tome la decisión de como esquivarlo. Se va a estudiar la exactitud de la red propuesta, la referencia \cite{SQ} promete una exactitud del 80.3\% para el Top-5 y una exactitud del 57.5\% para el Top-1.
+    \item[*] En cuanto a la movilidad y capacidades sensitivas el robot tendrá que ser capaz de desplazarse, medir la distancia recorrida, la dirección y evaluar constantemente la distancia a los obstáculos mas cercanos por delante de el. Se estudiará la precisión de los sensores de distancia, la precisión al medir la distancia recorrida y del sensor que indicara la dirección de movimiento. 
+    \item[*] Por cuestiones de recursos, el sistema tiene que ser implementado sobre una placa de desarrollo Zybo.
+    \item[*] Por cuestiones de consumo de energía y aceleración de toma de decisiones el sistema se procesarán ciertas operaciones en la lógica programable de la Zybo.
+\end{itemize} 

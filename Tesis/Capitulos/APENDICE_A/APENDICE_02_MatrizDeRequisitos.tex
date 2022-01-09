@@ -1,0 +1,98 @@
+\begin{landscape}
+\section{APÉNDICE A}
+\subsection{Matriz de requisitos}
+
+\begin{tabular}{| l | m{4.5cm} | c | c | c | c | c | m{5.5cm} |}
+    \hline
+    \multicolumn{8}{ |c| }{Matriz de requisitos} \\ 
+    \hline
+    \multicolumn{1}{|c|}{ID}  & \multicolumn{1}{c|}{Requisito} & \multicolumn{3}{c|}{Estado completo}  & \multicolumn{1}{c|}{Prioridad} & \multicolumn{1}{c|}{Complejidad} & \multicolumn{1}{c|}{Objetivo} \\ 
+
+    \cline{1-8}    
+    & & Estado & Versión & Fecha & & & \\  
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    0 &                                                 % ID
+    Tiene que reconocer obstáculos. &           % Requisito
+    \cellcolor{yellow}  EN CURSO  & 1.0 & \today &      % Estado
+    ALTA &                                              % Prioridad
+    ALTA &                                              % Complejidad
+                                                        % Objetivo
+    Capacidad de reconocer algunos de los obstáculos.\\\hline
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    1 &                                                 % ID
+    Tiene que evadir obstáculos. &                      % Requisito
+    \cellcolor{yellow} EN CURSO & 1.0 & \today &        % Estado
+    ALTA &                                              % Prioridad
+    ALTA &                                              % Complejidad
+                                                        % Objetivo
+    Capacidad de evadir obstáculos, si el obstáculo es reconocido la evasión se hará en función de sus dimensiones.\\\hline
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    2 &                                                 % ID
+    Capacidad de desplazarse.   &                       % Requisito
+    \cellcolor{red} SIN COMENZAR & 1.0 & \today &       % Estado
+    ALTA &                                              % Prioridad
+    BAJA &                                              % Complejidad
+                                                        % Objetivo
+    Capacidad de desplazarse a través de ciertos entornos.\\\hline   
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    3 &                                                 % ID
+    Capacidad de sensar distancia a obstáculos.   &     % Requisito
+    \cellcolor{red} SIN COMENZAR & 1.0 & \today &       % Estado
+    ALTA &                                              % Prioridad
+    BAJA &                                              % Complejidad
+                                                        % Objetivo
+    Necesidad de obtener la distancia al obstáculo en su cono de visión.\\\hline   
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    4 &                                                 % ID
+    Capacidad de conocer dirección de desplazamiento. & % Requisito
+    \cellcolor{red} SIN COMENZAR & 1.0 & \today &       % Estado
+    ALTA &                                              % Prioridad
+    MEDIA &                                             % Complejidad
+                                                        % Objetivo
+    Necesidad de saber el sentido al cual se dirige.\\\hline
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    5 &                                                 % ID
+    Capacidad de medir la distancia recorrida.  &       % Requisito
+    \cellcolor{red} SIN COMENZAR & 1.0 & \today &       % Estado
+    ALTA &                                              % Prioridad
+    MEDIA &                                             % Complejidad
+                                                        % Objetivo
+    Decoders ayudarán a medir la distancia recorrida.\\\hline
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    6 &                                                 % ID
+    Tiene que ser implementado en la Zybo.  &       % Requisito
+    \cellcolor{red} SIN COMENZAR & 1.0 & \today &       % Estado
+    BAJA &                                              % Prioridad
+    MEDIA &                                             % Complejidad
+                                                        % Objetivo
+    Implementado en la placa de desarrollo Zybo.\\\hline
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    7 &                                                 % ID
+    Tiene que ser alimentado por batería.  &       % Requisito
+    \cellcolor{red} SIN COMENZAR & 1.0 & \today &       % Estado
+    BAJA &                                              % Prioridad
+    BAJA &                                             % Complejidad
+                                                        % Objetivo
+    -.\\\hline
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    8 &                                                 % ID
+    Operaciones de mayor consumo computacional tienen que ser implementadas en una FPGA.  &                                            % Requisito
+    \cellcolor{yellow} EN CURSO & 1.0 & \today &       % Estado
+    BAJA &                                              % Prioridad
+    ALTA &                                              % Complejidad
+                                                        % Objetivo
+    Con el propósito de ahorrar energía, acelerar las operaciones, etc.\\\hline
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    
+\end{tabular}
+\end{landscape}

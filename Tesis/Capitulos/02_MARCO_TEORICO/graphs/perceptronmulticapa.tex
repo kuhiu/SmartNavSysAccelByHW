@@ -1,0 +1,77 @@
+\begin{tikzpicture}[scale=1.5]
+ 
+% Input Layer
+\foreach \i in {1,...,\inputnum}
+{
+    \node[circle, 
+        draw=black!90,
+        very thick,
+        minimum size = 10mm,
+        fill=white!30] (Input-\i) at (-1.5,-\i*1.2) {};
+}
+\node[above=1cm] at (Input-1) {Capa de entrada}; % nombre de la capa
+ 
+% Hidden Layer
+\foreach \i in {1,...,\hiddennum}
+{
+    \node[circle, 
+        draw=black!90,
+        very thick,
+        minimum size = 10mm,
+        fill=white!50,
+        yshift=(\hiddennum-\inputnum)*5 mm
+    ] (Hidden-\i) at (1.5,-\i*1.2) {};
+}
+\node[above=2cm] at (Hidden-1) {Capa oculta}; % nombre de la capa
+\node[above=1cm] at (Hidden-1) {$a_j = f(\sum_{i=1}^N w_{ij}x_i + b_j)$}; % nombre de la capa
+
+% Output Layer
+\foreach \i in {1,...,\outputnum}
+{
+    \node[circle, 
+        draw=black!90,
+        very thick,
+        minimum size = 10mm,
+        fill=white!50,
+        yshift=(\outputnum-\inputnum)*5 mm
+    ] (Output-\i) at (4.5,-\i*1.2) {};
+}
+\node[above=2cm] at (Output-1) {Capa de salida}; % nombre de la capa
+\node[above=1cm] at (Output-1) {$y_{k} = g(\sum_{j=1}^M w_{jk}a_{jk} + b_k)$}; % nombre de la capa
+
+% Connect neurons In-Hidden
+\foreach \i in {1,...,\inputnum}
+{
+    \foreach \j in {1,...,\hiddennum}
+    {
+        \ifthenelse{ \i = 1 } 
+        {\draw[->, shorten >=1pt,myarrow,black] (Input-\i) -- (Hidden-\j) node [pos=0.3,above] {$w_{\i\j}$};} 
+        {\draw[->, shorten >=1pt, gray] (Input-\i) -- (Hidden-\j);}
+    }
+}
+ 
+% Connect neurons Hidden-Out
+\foreach \i in {1,...,\hiddennum}
+{
+    \foreach \j in {1,...,\outputnum}
+    {
+        %\draw[->, shorten >=1pt] (Hidden-\i) -- (Output-\j);
+        \ifthenelse{ \j = 1 } 
+        {\draw[->, shorten >=1pt,myarrow,black] (Hidden-\i) -- (Output-\j) node [pos=0.2,above] {$a_{\i}$};} 
+        {\draw[->, shorten >=1pt, gray] (Hidden-\i) -- (Output-\j);}
+    }
+}
+ 
+% Inputs
+\foreach \i in {1,...,\inputnum}
+{            
+    \draw[<-, shorten <=1pt] (Input-\i) -- ++(-1,0) node[left]{$x_{\i}$};
+}
+ 
+% Outputs
+\foreach \i in {1,...,\outputnum}
+{            
+    \draw[->, shorten <=1pt] (Output-\i) -- ++(1,0) node[right]{$y_{\i}$};
+}
+ 
+\end{tikzpicture}

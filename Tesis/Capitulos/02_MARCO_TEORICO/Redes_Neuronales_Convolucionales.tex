@@ -1,0 +1,133 @@
+\subsection{Redes Neuronales Convolucionales}
+
+\subsubsection{Introducción}
+
+Sin duda alguna en la ultima década las redes neuronales convolucionales se popularizaron en gran medida. Todo comenzó con una nueva forma de computación inspirada en modelos biológicos, los cuales consisten en sistemas con un gran numero de procesos interconectados funcionando en paralelo los cuales procesan información y tienen la capacidad de aprender a través de la experiencia.\par
+La detección de objetos en imágenes es una tarea de suma importancia a la hora de realizar un sistema de navegación autónomo, las redes neuronales vienen a resolver el problema.\par
+Dentro de las las redes neuronales hay distintos tipos y una de ellas son las redes neuronales convolucionales (CNN) las cuales están inspiradas en las neuronas de la corteza visual primaria del cerebro. Estos tipos de redes neuronales pueden dotar a los robots de visión y es por eso que vienen a resolver el problema.\par
+De esta forma esta sección de la tesis se enfocara en aportar un marco teórico de las redes neuronales convolucionales.\par
+
+\subsubsection{El perceptrón}
+
+En 1957 Frank Rosenblatt comenzó el desarrollo de una red neuronal a la que denomino ''El perceptrón'' fue tal su aporte que hoy en día se lo utiliza para reconocer patrones. Este modelo fue capaz de generalizar, es decir que luego un aprendizaje de ciertos patrones, y a pesar de sus limitaciones (era incapaz de resolver la OR exclusiva y en general incapaz de clasificar clases no separables linealmente) era capaz de reconocer patrones que jamas se le hayan presentado.
+La entrada de la función de activación se calcula como la suma ponderada de todas las entradas del perceptrón más un valor de bias.\par
+
+\begin{figure}[!h]
+\centering
+\input{Tesis/Capitulos/02_MARCO_TEORICO/graphs/neuronalnet} 
+\captionof{figure}{El perceptrón}
+\label{fig:elperceptron}
+\end{figure}
+
+\subsubsection{¿Que es una red neuronal?}
+
+Una red neuronal es un grupo interconecto de distintos elementos procesadores simples que operan en paralelo, cuya función se determina a partir de distintas características de la red, su estructura, la fuerza o pesos en las conexiones y el procesamiento realizado en cada nodo.\par
+Muchas veces se la define como un aproximador universal. El modelo conocido como perceptrón multicapa esta compuesto por ''k'' capas de neuronas que están interconectadas y cada salida de cada neurona es la suma ponderada de todas las salidas de las neuronas de la capa anterior mas un valor de bías (\autoref{fig:elperceptron}).
+
+\begin{figure}[!h]
+\centering
+\input{Tesis/Capitulos/02_MARCO_TEORICO/graphs/perceptronmulticapa} 
+\captionof{figure}{Perceptrón multicapa}
+\label{fig:elperceptronmulticapa}
+\end{figure}
+
+Debido a que la salida de una determinada neurona de la capa ''k'' se calcula utilizando todas las salidas de la neurona anterior se denomina capa de neuronas ''fully conected''.\par
+
+\begin{itemize}
+    \item Vector x: Entrada de la capa (conformado por las salidas de cada una de las neuronas de la capa anterior).
+    \item n: Cantidad de neuronas de la capa anterior.
+    \item Vector y: Vector de salidas.
+    \item m: Cantidad de neuronas de la capa a calcular.
+    \item Matriz w: Coeficientes de la capa ''fully connected''.
+    \item Vector b: Bias de la capa ''fully connected''.
+\end{itemize}
+
+\input{Tesis/Capitulos/02_MARCO_TEORICO/graphs/matriz}
+
+\subsubsection{Capas convolucionales}
+
+La principal diferencia de una red neuronal convolucional de cualquier otro red neuronal es que utiliza una operación llama ''convolución'' en algunas de sus capas en vez de utilizar la multiplicación de matrices. Esta operación recibe como entrada una imagen y luego le aplica un filtro (también llamado ''kernel'') y retorna otra imagen con las características de la imagen de entrada.\par
+A continuación el proceso: \par
+
+\begin{figure}[!h]
+    \centering
+    \input{Tesis/Capitulos/02_MARCO_TEORICO/graphs/convOP} 
+    \captionof{figure}{Operación de convolución}
+    \label{fig:opconvolucion}
+\end{figure}
+
+\begin{itemize}
+    \item $N_{iz}:$ cantidad de canales de la matriz de entrada a la capa. 
+    \item $N_{ix}:$ ancho de la matriz de entrada. 
+    \item $N_{iy}:$ largo de la matriz de entrada.
+    \item $N_{wx}:$ ancho de cada filtro (del grupo de filtros) de la capa.
+    \item $N_{wy}:$ largo de cada filtro (del grupo de filtros) de la capa.
+    \item $N_{oz}:$ cantidad de filtros de la capa o bien los canales de la matriz de salida.
+    \item $N_{ox}:$ ancho de la matriz de salida.
+    \item $N_{oy}:$ largo de la matriz de salida.
+\end{itemize}
+
+Las salidas de una determinada capa convolucional se obtiene al desplazar $N_{of}$ filtros de dimensiones $ N_{wx} x N_{wy} x N_{iz}$ por las salidas de la capa anterior. En cada desplazamiento se realiza una suma ponderada de las salidas de la capa anterior por los pesos del filtro.\par
+
+A continuación se presenta su algoritmo en pseudocódigo.\par
+
+\input{Tesis/Capitulos/02_MARCO_TEORICO/algorithms/conv_algorithm} 
+
+\paragraph{Funciones de activación}\mbox{}\\
+
+Normalmente utilizadas luego de una capa convolucional (o ''full connected'', según corresponda) y su función es la de agregar alinealidades al comportamiento de la red. Aplican un valor a cada valor de entrada (descripto mediante una función matemática). A continuación una explicación de las mas utilizadas.\par
+
+\subparagraph{Sigmoide}\mbox{}\\
+
+Una capa de activación Sigmoide transforma todos los valores de la entrada a una escala del (0,1) en donde los valores muy altos tienden a 1 y los valores muy bajos a 0.
+
+\begin{figure}[!h]
+\centering
+\scalebox{.5}{\input{Tesis/Capitulos/02_MARCO_TEORICO/graphs/sigmoide} }
+\captionof{figure}{Función de activación: Sigmoide}
+\label{fig:sigmoide}
+\end{figure}
+
+\subparagraph{ReLu}\mbox{}\\
+
+Una capa de activación ReLu reemplaza todos los valores negativos recibidos a su entrada por ceros, su propósito es hacer el modulo alineal.
+
+\begin{figure}[!h]
+\centering
+\scalebox{.5}{\input{Tesis/Capitulos/02_MARCO_TEORICO/graphs/relu} }
+\captionof{figure}{Función de activación: ReLu}
+\label{fig:relu}
+\end{figure}
+
+\paragraph{Método de submuestreo: capa de Pooling}\mbox{}\\
+
+La capa de Pooling tiene como objetivo submuestrear la matriz de entrada reduciendo su tamaño. Una de sus principales ventajas es la de reducir el costo computacional de la red neuronal convolucional completa ya que reduce la cantidad de parámetros que esta tiene que aprender. A continuación una explicación de las mas utilizadas a la hora de construir una red neuronal convolucional. \par 
+
+\subparagraph{Max Pooling}\mbox{}\\
+\bigbreak
+
+Max Pooling consiste en tomar una ''ventana'' de la matriz de entrada y efectuar una operación fija que retorne un escalar. En este caso retorna el valor máximo de la ventana y lo asigna como salida. A modo de ejemplo:\par
+
+\begin{figure}[!h]
+    \centering
+    \input{Tesis/Capitulos/02_MARCO_TEORICO/graphs/max_pooling} 
+    \captionof{figure}{Max Pooling}
+    \label{fig:maxpooling}
+\end{figure}
+
+\subparagraph{Average Pooling}\mbox{}\\
+
+Average Pooling consiste en tomar una ''ventana'' de la matriz de entrada y efectuar una operación fija que retorne un escalar. En este caso retorna el valor medio de la ventana y lo asigna como salida. A modo de ejemplo:\par
+
+\begin{figure}[!h]
+    \centering
+    \input{Tesis/Capitulos/02_MARCO_TEORICO/graphs/average_pooling} 
+    \captionof{figure}{Average Pooling}
+    \label{fig:averagepooling}
+\end{figure}
+
+\paragraph{Acá explicar la capa de SqueezeDet}\mbox{}\\
+
+\subsubsection{Arquitectura de una red neuronal convolucional}
+
+\subsubsection{Entrenamiento de la red}

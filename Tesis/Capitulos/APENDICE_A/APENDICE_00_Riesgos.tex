@@ -1,0 +1,269 @@
+\subsection{Gestión del riesgo}
+
+La matriz de probabilidad-impacto es una herramienta de análisis cualitativo de riesgos que nos permite establecer prioridades en cuanto a los posibles riesgos de un proyecto en función tanto de la probabilidad de que ocurran como de las repercusiones que podrían tener sobre nuestro proyecto en caso de que ocurrieran.\\
+
+\centering {RIESGO = Probabilidad x Impacto}
+
+\begin{table}[h!]
+    \begin{center}
+    \begin{tabular}{| c | c | c | c | c | c | c | c | }
+        \hline
+        \multicolumn{3}{ |c  }{}                            & \multicolumn{5}{ |c| }{Probabilidad}                                                      \\ \hline
+        \multicolumn{3}{ |c| }{}                            & Excepcional          & Poco probable        & Probable             & Muy probable         & Inminente     \\ \hline
+        \multicolumn{3}{ |c| }{}                            & (2)                  & (4)                  & (6)                  & (8)                  & (10)          \\ \hline
+        \multirow{5}{*}{Impacto} & Extensiva     & (10)     & 20\cellcolor{yellow} & 40\cellcolor{yellow} & 60\cellcolor{red} & 80\cellcolor{red}    & 100\cellcolor{red} \\
+                                 & Mayor         & (8)      & 16\cellcolor{green} & 32\cellcolor{yellow} & 48\cellcolor{yellow} & 64\cellcolor{red}    & 80 \cellcolor{red} \\
+                                 & Localizada    & (6)      & 12\cellcolor{green}  & 24\cellcolor{yellow} & 36\cellcolor{yellow} & 48\cellcolor{yellow} & 60 \cellcolor{red} \\
+                                 & Menor         & (4)      & 08\cellcolor{green}  & 16\cellcolor{green}  & 24\cellcolor{yellow} & 32\cellcolor{yellow} & 40 \cellcolor{red} \\
+                                 & Leve          & (2)      & 04\cellcolor{green}  & 08\cellcolor{green}  & 12\cellcolor{green} & 16\cellcolor{yellow} & 20 \cellcolor{yellow} \\\hline
+    \end{tabular}
+        \caption{\centering Matriz de probabilidad por impacto}
+        \label{tab:coches}
+    \end{center}
+\end{table}
+
+
+\begin{table}[h!]
+    \centering
+    \begin{tabular}{|p{2cm}|p{10cm}|}
+        \hline \bf Colour & \bf Legenda \\
+        \hline \cellcolor{red} & No aceptable, se requiere reducción del riesgo. \\ [10pt]
+        \hline \cellcolor{yellow} & Aceptable pero considere reducción del riesgo. \\[10pt]
+        \hline \cellcolor{green} & Aceptable. \\ [10pt]
+        \hline
+    \end{tabular}
+    \caption{Leyenda de colores de la matriz de riesgo}
+\end{table}
+
+
+\flushleft \subsubsection{Riesgos técnicos}
+
+    \begin{itemize}
+        \item[•] Incorrecta selección de arquitectura de la red neuronal convolucional y/o modificación de las etapas necesarias (24)
+        \begin{itemize}
+            \item[·] Si bien es muy probable que la red a utilizar sea seleccionada en función a la cantidad de recursos disponible para poder implementarla, este riesgo puede ocasionar una reimplementación a nivel de software o hardware. Por lo tanto este riesgo tiene una probabilidad de ocurrencia \textbf{PROBABLE} y un impacto \textbf{MENOR}.\\
+            \textbf{Gestión:} Mitigación, se reducirán las probabilidad de ocurrencia al mínimo con mucha investigación previa. 
+        \end{itemize}
+        
+        \item[•] Aprendizaje mayor al esperado (80)
+        \begin{itemize}
+            \item[·] Gran parte del desarrollo se llevara acabo sobre la placa de desarrollo ZYBO (Zynq Board). Durante la carrera el complejo tipo de SOC jamás fue utilizado. 
+            Además el conocimiento requerido en temas como Fuzzy Logic, redes neuronales, redes neuronales convolucionales, y HDL fueron temas solo alcanzados en algunas materias de forma muy limitada y/o jamas vistos. Este riesgo tiene una probabilidad de ocurrencia \textbf{INMINENTE} y un impacto \textbf{MAYOR}.\\
+            \textbf{Gestión:} Mitigación, se reducirán las probabilidad de ocurrencia al mínimo con mucha investigación previa. 
+        \end{itemize}
+        
+        \item[•] Sensibilidad, precisión, y calidad de los sensores (32)
+        \begin{itemize}
+            \item[·] Este riesgo puede ocasionar que los resultados esperados del sistema de control difuso no sea el esperado. Este riesgo tiene una probabilidad de ocurrencia \textbf{MUY PROBABLE} y un impacto \textbf{MENOR}.\\
+            \textbf{Gestión:} El propio sistema de control difuso mitiga la precisión de los sensores por ser un sistema de control robusto.
+        \end{itemize}
+        
+        \item[•] Capacidad de reconocer la dirección de avance del robot (60)
+        \begin{itemize}
+            \item[·] Este riesgo es uno de los mas grandes a enfrentar, ya que el gps no brinda buenos resultados en interiores, además es necesario conocer la orientación del robot y la ubicación del target o objetivo a alcanzar.
+            Este riesgo también puede ocasionar que los resultados esperados del sistema de control difuso no sea el esperado. Este riesgo tiene una probabilidad de ocurrencia \textbf{INMINENTE} y un impacto \textbf{LOCALIZADO}.\\
+            \textbf{Gestión:} Se intentará buscar una forma óptima de geolocalización o bien simplemente el usuario definirá un punto relativo a la orientación y ubicación inicial del robot, utilizando unos decoders en los motores del robot y una brújula para conocer la dirección de avance. 
+        \end{itemize}
+        
+        \item[•] Imposibilidad de implementar el acelerado del sistema de reconocimiento del robot por hardware (16)
+        \begin{itemize}
+            \item[·] Previendo problemas al realizar la implementación y por falta de tiempo. Este riesgo tiene una probabilidad de ocurrencia \textbf{MUY PROBABLE} y un impacto \textbf{LEVE}.\\
+            \textbf{Gestión:} Aceptación, se aceptaran las consecuencias del riesgo. 
+        \end{itemize}
+        
+        \item[•] Reducción de la exactitud de la red neuronal convolucional al utilizar aritmética de punto fijo (12)
+        \begin{itemize}
+            \item[·] Normalmente los parámetros de una red neuronal convolucional son flotantes de 32 o 64 bits. En caso de implementar algunas operaciones sobre la FPGA sera necesario reducir la representación a 8 bits con punto fijo, lo que provocara una reducción de la calidad de la precisión de la red. Se puede mitigar con correctas simulaciones sobre la PC y reentrenando la red. Este riesgo tiene una probabilidad de ocurrencia \textbf{PROBABLE} y un impacto \textbf{LEVE}.\\
+            \textbf{Gestión:} Mitigación, existen distintos programas para prever la precisión que tendrá la red al ser implementada con aritmética de 8 bits de punto fijo.
+        \end{itemize}
+        
+         \item[•] Dificultad al integrar los módulos desarrollados por separado y de alcanzar el objetivo esperado (80)
+        \begin{itemize}
+            \item[·] Una vez finalizado el sistema de control difuso y el modulo de procesamiento de imágenes existe el riesgo de redefinir algunas partes de los módulos para poder integrarlos. A su vez existe la posibilidad, una vez integrados los sistemas de no lograr el resultado esperado del proyecto. Este riesgo tiene una probabilidad de ocurrencia \textbf{MUY PROBABLE} y un impacto \textbf{EXTENSIVO}.\\
+            \textbf{Gestión:} En caso de que mi sistema de navegación no obtenga los resultados esperado y el sistema de procesamiento de imágenes no complemente y/o realce los beneficios del sistema difuso (extienda sus capacidades) no se va a asumir ninguna acción ya que es un resultado completamente válido para un proyecto de investigación. Y simplemente se remarcara en la tesis que por ahí no es el camino.
+        \end{itemize}
+        
+    \end{itemize}
+
+
+\subsubsection{Riesgos organizativos}
+
+    \begin{itemize}
+        \item[•] Disponibilidad del hardware (16)
+        \begin{itemize}
+            \item[·] Al ser un hardware caro afrontado por mi, y quiza eventualmente provisto por la facultad. Este riesgo tiene una probabilidad de ocurrencia \textbf{EXCEPCIONAL} y un impacto \textbf{MAYOR}.\\
+            \textbf{Gestión:} Prevención, esta amenaza se eliminara adquiriendo la placa de desarrollo.
+        \end{itemize}
+        
+        \item[•] Errores de estimación del cronograma (48)
+        \begin{itemize}
+            \item[·] Este riesgo puede aparecer por desconocimiento y falta de experiencia en este tipo de desarrollos. Este riesgo puede ocasionar que no se llegue a cumplir con las fechas de los hitos del proyecto. Este riesgo tiene una probabilidad de ocurrencia \textbf{PROBABLE} y un impacto \textbf{MAYOR}.
+        \end{itemize}
+    
+        \item[•] Priorizar inadecuadamente las tareas del proyecto (48)
+        \begin{itemize}
+            \item[·] Este riesgo puede aparecer si se elige incorrectamente el orden de prioridad de las tareas del proyecto, ocasionando que ciertas tareas que deberían ser necesarias para el desarrollo de otras no estén terminadas. Este riesgo tiene una probabilidad de ocurrencia \textbf{PROBABLE} y un impacto \textbf{MAYOR}.
+        \end{itemize}
+        
+        \item[•] Omisión de tareas en el cronograma (48)
+        \begin{itemize}
+            \item[·] Pueden existir tareas que debido a su poca carga de trabajo, no hayan sido tomadas en cuenta dentro del cronograma. Esto puede ocasionar retrasos no contemplados dentro del proyecto. Este riesgo tiene una probabilidad de ocurrencia \textbf{PROBABLE} y un impacto \textbf{MAYOR}.
+        \end{itemize}
+    \end{itemize}
+
+\subsubsection{Riesgos externos}  
+    
+    \begin{itemize}
+        \item[•] Cuarentena (80)
+        \begin{itemize}
+            \item[·] Ante la actual situación epidemiológica nacional e internacional en relación con la infección por coronavirus (Covid-19) se pueden encontrar problemas a la hora de acceder a recursos necesarios que podría proveer la facultad. Este riesgo tiene una probabilidad de ocurrencia \textbf{INMINENTE} y un impacto \textbf{MAYOR}.
+        \end{itemize}
+    \end{itemize}
+    
+    \newpage
+
+    \begin{table}[h!]
+        \scriptsize
+        \hspace{-1.5cm}
+        \begin{tabular}{ p{3cm} c c c c p{4cm} p{4cm} }
+            \\\hline 
+            \bf \bf Riesgo & \bf ID & \bf Probabilidad & \bf Impacto & \bf Riesgo & \bf Detalle & \bf Gestión \\
+            \hline
+            
+            &&&&&&\\
+            Incorrecta selección de arquitectura de la red neuronal convolucional y/o modificación de las etapas necesarias &
+            0 &
+            PROBABLE &
+            MENOR &
+            24\cellcolor{yellow} &
+            Si bien es muy probable que la red a utilizar sea seleccionada en función a la cantidad de recursos disponible para poder implementarla, este riesgo puede ocasionar una reimplementación a nivel de software o hardware.  & 
+            Mitigación, se reducirán las probabilidad de ocurrencia al mínimo con mucha investigación previa. 
+            \\\\\hline 
+            
+            &&&&&&\\
+            Aprendizaje mayor al esperado &
+            1 &
+            INMINENTE &
+            MAYOR &
+            80\cellcolor{red} &
+            Gran parte del desarrollo se llevara acabo sobre la placa de desarrollo ZYBO (Zynq Board). Durante la carrera el complejo tipo de SOC jamás fue utilizado. 
+            Además el conocimiento requerido en temas como Fuzzy Logic, redes neuronales, redes neuronales convolucionales, y HDL fueron temas solo alcanzados en algunas materias de forma muy limitada y/o jamas vistos.  & 
+            Mitigación, se reducirán las probabilidad de ocurrencia al mínimo con mucha investigación previa. 
+            \\\\\hline 
+
+            &&&&&&\\
+            Sensibilidad, precisión, y calidad de los sensores &
+            2 &
+            MUY PROBABLE &
+            MENOR &
+            32\cellcolor{yellow} &
+            Este riesgo puede ocasionar que los resultados esperados del sistema de control difuso no sea el esperado.  & 
+            El propio sistema de control difuso mitiga la precisión de los sensores por ser un sistema de control robusto.  
+            \\\\\hline 
+            
+            &&&&&&\\
+            Capacidad de reconocer la dirección de avance del robot &
+            3 &
+            INMINENTE &
+            LOCALIZADO &
+            60\cellcolor{red} &
+            Este riesgo es uno de los mas grandes a enfrentar, ya que el gps no brinda buenos resultados en interiores, además es necesario conocer la orientación del robot y la ubicación del target o objetivo a alcanzar.
+            Este riesgo también puede ocasionar que los resultados esperados del sistema de control difuso no sea el esperado. & 
+            Se intentará buscar una forma óptima de geolocalización o bien simplemente el usuario definirá un punto relativo a la orientación y ubicación inicial del robot, utilizando unos decoders en los motores del robot y una brújula para conocer la dirección de avance.   
+            \\\\\hline  
+            
+            &&&&&&\\
+            Imposibilidad de implementar el acelerado del sistema de reconocimiento del robot por hardware &
+            4 &
+            PROBABLE &
+            LEVE &
+            12\cellcolor{green} &
+            Previendo problemas al realizar la implementación y por falta de tiempo. & 
+            Aceptación, se aceptaran las consecuencias del riesgo.  
+            \\\\\hline  
+            
+            &&&&&&\\
+            Reducción de la exactitud de la red neuronal convolucional al utilizar aritmética de punto fijo &
+            5 &
+            PROBABLE &
+            LEVE &
+            12\cellcolor{green} &
+            Normalmente los parámetros de una red neuronal convolucional son flotantes de 32 o 64 bits. En caso de implementar algunas operaciones sobre la FPGA sera necesario reducir la representación a 8 bits con punto fijo, lo que provocara una reducción de la calidad de la precisión de la red. Se puede mitigar con correctas simulaciones sobre la PC y reentrenando la red. & 
+            Mitigación, existen distintos programas para prever la precisión que tendrá la red al ser implementada con aritmética de 8 bits de punto fijo.  
+            \\\\ 
+
+        \end{tabular}
+    \end{table}
+
+\newpage
+
+\begin{table}[h!]
+        \scriptsize
+        \hspace{-1.5cm}
+        \begin{tabular}{ p{3cm} c c c c p{4cm} p{4cm} }
+            \\\hline 
+            \bf \bf Riesgo & \bf ID & \bf Probabilidad & \bf Impacto & \bf Riesgo & \bf Detalle & \bf Gestión \\
+            \hline
+            
+            &&&&&&\\
+            Dificultad al integrar los módulos desarrollados por separado y de alcanzar el objetivo esperado &
+            6 &
+            MUY PROBABLE &
+            EXTENSIVO &
+            80\cellcolor{red} &
+            Una vez finalizado el sistema de control difuso y el modulo de procesamiento de imágenes existe el riesgo de redefinir algunas partes de los módulos para poder integrarlos. A su vez existe la posibilidad, una vez integrados los sistemas de no lograr el resultado esperado del proyecto. & 
+            En caso de que mi sistema de navegación no obtenga los resultados esperado y el sistema de procesamiento de imágenes no complemente y/o realce los beneficios del sistema difuso (extienda sus capacidades) no se va a asumir ninguna acción ya que es un resultado completamente válido para un proyecto de investigación. Y simplemente se remarcara en la tesis que por ahí no es el camino.
+            \\\\\hline 
+            
+            &&&&&&\\
+            Disponibilidad del hardware &
+            7 &
+            EXCEPCIONAL &
+            MAYOR &
+            16\cellcolor{green} &
+            Al ser un hardware caro afrontado por mi, y quiza eventualmente provisto por la facultad. & 
+            Prevención, esta amenaza se eliminara adquiriendo la placa de desarrollo.
+            \\\\\hline 
+            
+            &&&&&&\\
+            Errores de estimación del cronograma &
+            8 &
+            PROBABLE &
+            MAYOR &
+            48\cellcolor{yellow} &
+            Este riesgo puede aparecer por desconocimiento y falta de experiencia en este tipo de desarrollos. & 
+            
+            \\\\\hline
+            
+            &&&&&&\\
+            Priorizar inadecuadamente las tareas del proyecto &
+            9 &
+            PROBABLE &
+            MAYOR &
+            48\cellcolor{yellow} &
+            Este riesgo puede aparecer si se elige incorrectamente el orden de prioridad de las tareas del proyecto, ocasionando que ciertas tareas que deberían ser necesarias para el desarrollo de otras no estén terminadas. & 
+            
+            \\\\\hline
+            
+            &&&&&&\\
+            Omisión de tareas en el cronograma &
+            10 &
+            PROBABLE &
+            MAYOR &
+            48\cellcolor{yellow} &
+            Pueden existir tareas que debido a su poca carga de trabajo, no hayan sido tomadas en cuenta dentro del cronograma. Esto puede ocasionar retrasos no contemplados dentro del proyecto. & 
+            
+            \\\\\hline
+            
+            &&&&&&\\
+            Cuarentena &
+            11 &
+            INMINENTE &
+            MAYOR &
+            80\cellcolor{red} &
+            Ante la actual situación epidemiológica nacional e internacional en relación con la infección por coronavirus (Covid-19) se pueden encontrar problemas a la hora de acceder a recursos necesarios que podría proveer la facultad. & 
+            
+            \\\\
+            
+        \end{tabular}
+    \end{table}

@@ -1,0 +1,24 @@
+
+
+\begin{algorithm}[H]
+\caption{Algoritmo de convolución}\label{alg:cap}
+\begin{algorithmic}
+    \For{$(c = 0; c < N_{oz} ; ++c)$} \Comment{Selector de filtro}
+    \For{$(i = 0; i < N_{ix}; ++i)$} \Comment{Eje X de la matriz de entrada}
+    \For{$(j = 0; j < N_{iy}; ++j)$} \Comment{Eje Y de la matriz de entrada}
+        \For{$(v = 0; v < N_{iz}; ++v)$} \Comment{Canales de la matriz de entrada}
+        \For{$(k = 0; k < N_{wx}; ++k)$} \Comment{Eje X del filtro}
+        \For{$(l = 0; l < N_{wy}; ++l)$} \Comment{Eje Y del filtro}
+            \State $o[j,i,c] += i[l,k,v,j,i] * w[l,k,v,c]$
+        \EndFor
+        \EndFor
+        \EndFor
+        
+    \State $o[j,i,c] += b[c]$
+    \EndFor  
+    \EndFor   
+    \EndFor
+
+        
+\end{algorithmic}
+\end{algorithm}

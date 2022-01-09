@@ -1,0 +1,271 @@
+%\documentclass[a4paper, 12pt, notitlepage]{report}
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage{textcomp}
+
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{verbatim}
+\usepackage{listings}
+
+\usepackage{hyperref}
+\usepackage{etoc}
+
+\usepackage{float}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{mathtools}
+
+\usepackage{fancyvrb}
+\usepackage{xcolor}
+
+\usepackage{graphicx} % graphics package
+
+\setlength{\parindent}{5pt}
+\usepackage[margin=0.5cm]{geometry} 
+\geometry{
+    a4paper,
+    top=20mm,
+    bottom =20mm,
+    left=25mm,
+    right=25mm
+    }
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Paquetes agregados por mi
+\usepackage[font=small,labelfont=bf,hypcap=false]{caption} % Required for specifying captions to tables and figures
+\usepackage{titlesec}
+\setcounter{secnumdepth}{4}
+\usepackage{tcolorbox}
+\tcbuselibrary{theorems}
+\usepackage{subfigure}
+
+\usepackage[shortlabels]{enumitem}
+\usepackage{multirow} 
+\usepackage{colortbl}
+\setlist[itemize]{label=\textbullet}
+
+\usepackage{rotating}
+\usepackage{pdflscape}
+\usepackage{lscape}
+
+\usepackage[maxnames=1,style=numeric,sorting=none]{biblatex}
+\addbibresource{ref.bib}
+\usepackage{csquotes}
+
+\usepackage[yyyymmdd]{datetime}
+\usepackage{ulem}
+
+
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,arrows}
+\tikzset{basic/.style={draw,fill=none,
+                       text badly centered,minimum width=3em}}
+\tikzset{input/.style={basic,circle,minimum width=3.5em}}
+\tikzset{weights/.style={basic,rectangle,minimum width=2em}}
+\tikzset{functions/.style={basic,circle, minimum width=4em}}
+\tikzset{bias/.style={basic,circle, minimum width=4em}}
+\tikzset{myarrow/.style=-{Stealth[length=3mm, width=2mm]}}
+
+\newcommand{\addaxes}{\draw (0em,1em) -- (0em,-1em)
+                            (-1em,0em) -- (1em,0em);}
+\newcommand{\relu}{\draw[line width=1.5pt] (-1em,0) -- (0,0)
+                                (0,0) -- (0.75em,0.75em);}
+\newcommand{\stepfunc}{\draw[line width=1.5pt] (0.65em,0.65em) -- (0,0.65em) 
+                                    -- (0,-0.65em) -- (-0.65em,-0.65em);}
+
+% Input layer neurons'number
+\newcommand{\inputnum}{3} 
+ 
+% Hidden layer neurons'number
+\newcommand{\hiddennum}{5}  
+ 
+% Output layer neurons'number
+\newcommand{\outputnum}{1} 
+
+\usepackage{tikz-3dplot}
+\usetikzlibrary{3d}
+\definecolor{dgreen}{RGB}{63,127,0}
+\definecolor{dred}{RGB}{144,14,3}
+\tdplotsetmaincoords{60}{50}
+
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+
+\usepackage{amssymb}
+\usepackage{bm}
+\usetikzlibrary{arrows.meta}
+\usetikzlibrary{decorations.pathreplacing}
+
+\usepackage{pgfplots}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\renewcommand*\contentsname{Indice}
+
+% \unisalento command
+\newcommand{\unisalento}{\href{http://www.unisalento.it}{\textbf{\emph{Università del Salento}}}}
+
+% colors for code snippets
+\definecolor{codegreen}{rgb}{0,0.7,0.5}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codeblue}{rgb}{0,0.5,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.95}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{orange},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codeblue},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+
+\lstset{style=mystyle}
+\title{
+    \includegraphics[scale=1]{Tesis/media/logo-utn-ba.png}
+    
+    \vspace{1cm}
+    {\Huge{\textbf{Universidad Tecnológica Nacional}}}
+    
+    \normalfont{Curso de grado}
+    \par\noindent\rule{\textwidth}{0.4pt}
+    
+    \vspace{0.3cm}
+
+    \par \Large{\textbf{Sistema de navegación inteligente acelerado por hardware}}
+    
+    \vspace{1.0cm}
+
+    \begin{flushleft} \large
+    \textsc{ \textbf{Director:} Ing. Silvio Abel Tapino}\\
+    \hfill \break
+    \textsc{ \textbf{Tutor:} Ing. Alejandro Furfaro}\\
+    \hfill \break
+    \textsc{ \textbf{Co-tutor:} Ing. Luciano Ferreyro}\\
+    \hfill \break
+    \textsc{ \textbf{Tutor por la cátedra:} Dr. Ing. Matias Hampel}\\
+    \hfill \break
+    \textsc{ \textbf{Tutor por la cátedra:} Ing. Maria Alejandra Gutierrez}\\
+    \hfill \break
+    \textsc{ \textbf{Autor:} Martín Fuschetto} % Your name
+    \emph{(mfuschetto@frba.utn.edu.ar)}\\[1cm]
+    
+    \end{flushleft}
+
+    \vspace{5cm}
+    
+    \par\noindent\rule{\textwidth}{0.4pt}
+    \vspace{0.1cm}
+    
+    \small{AÑO ACADÉMICO 2021/2022}
+    \thispagestyle{empty}
+    }
+    
+\author{} % lasciare vuoto
+\date{}   % lasciare vuoto
+
+\hypersetup{hidelinks}
+
+\begin{document}
+    % frontispiece creation
+    \maketitle
+
+    % blank page
+    \mbox{}
+    \thispagestyle{empty}
+    
+    % index creation
+    \newpage
+    \hypersetup{hidelinks}
+    \tableofcontents
+    \thispagestyle{empty}
+
+    % Chapter: "Credits"
+    \newpage
+    \hypersetup{hidelinks}
+    \input{Tesis/Capitulos/00_AGRADECIMIENTOS/00_AGRADECIMIENTOS}
+    
+    % Introduccion
+    \newpage
+    \hypersetup{hidelinks}
+    \input{Tesis/Capitulos/01_INTRODUCCION/01_INTRODUCCION}
+
+    % MArco teorico
+    \newpage
+    \hypersetup{hidelinks}
+    \input{Tesis/Capitulos/02_MARCO_TEORICO/02_MARCO_TEORICO}
+
+    % Chapter 1
+    \newpage
+    \hypersetup{hidelinks}
+    \input{Tesis/Capitulos/03_CAPITULO_1/03_CAPITULO_1}
+    
+    % Chapter 2
+    \newpage
+    \hypersetup{hidelinks}
+    \input{Tesis/Capitulos/04_CAPITULO_2/04_CAPITULO_2}
+    
+    % Chapter 3
+    \newpage
+    \hypersetup{hidelinks}
+    \input{Tesis/Capitulos/05_CAPITULO_3/05_CAPITULO_3}
+    
+    % Resultados
+    \newpage
+    \hypersetup{hidelinks}
+    \input{Tesis/Capitulos/07_RESULTADOS/07_RESULTADOS}
+    
+    % Conclusión
+    \newpage
+    \hypersetup{hidelinks}
+    \input{Tesis/Capitulos/06_CONCLUSION/06_CONCLUSION}
+
+    % 00. Matriz de requisitos
+    \newpage
+    \hypersetup{hidelinks}
+    \input{Tesis/Capitulos/APENDICE_A/APENDICE_02_MatrizDeRequisitos}
+
+    % 01. Gantt
+    \newpage
+    \hypersetup{hidelinks}
+    \input{Tesis/Capitulos/APENDICE_A/APENDICE_01_Gantt}
+
+    % 02. Riesgos
+    \newpage
+    \hypersetup{hidelinks}
+    \input{Tesis/Capitulos/APENDICE_A/APENDICE_00_Riesgos}
+
+    % 02. Plan de calidad
+    \newpage
+    \hypersetup{hidelinks}
+    \input{Tesis/Capitulos/APENDICE_A/APENDICE_03_PlanDeCalidad}
+    
+    % APENDICE B
+    \newpage
+    \hypersetup{hidelinks}
+    \input{Tesis/Capitulos/APENDICE_B/APENDICE_B}
+    
+    % List of figures
+    \newpage
+    \listoffigures
+    
+    % List of tables
+    \newpage
+    \listoftables
+    
+    % Bibliografía
+    \newpage
+    \printbibliography
+
+\end{document}
