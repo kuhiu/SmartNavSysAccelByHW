@@ -126,8 +126,105 @@ Average Pooling consiste en tomar una ''ventana'' de la matriz de entrada y efec
     \label{fig:averagepooling}
 \end{figure}
 
-\paragraph{Acá explicar la capa de SqueezeDet}\mbox{}\\
+\paragraph{Capa de concatenación}\mbox{}\\
+
+Esta capa es la encargada de tomar las entradas y concatenarlas a lo largo de una dimensión especifica, la única condición es que las entradas deben tener el mismo tamaño en todas las dimensiones excepto en la dimensión de concatenación.\par
+
+\paragraph{Otras capas que suelen aparecer en una red neuronal convolucional}\mbox{}\\
+
+Existen otras capas que suelen aparecer en algunas redes neuronales convolucionales como por ejemplo la capa de Dropout la cual consiste en desconectar un porcentaje de las neuronas en cada iteración del entrenamiento lo cual mejor la generalización de la red y ayuda a converger el entrenamiento.\par
+La Normalización por lotes (mas conocida en ingles por ''Batch normalization'') que consiste en añadir un capa entre las neuronas y la función de activación para normalizar las activaciones de salida.\par
+Existen algunas capas como la capa de convolución transpuesta (también conocida como capa de deconvolucion o capa de convolución fraccional) la cual se la utiliza para recuperar las dimensiones reducidas. Por ejemplo, luego de realizar una convolución con un step mayor que uno lo cual reduce el tamaño de la matriz de salida.\par
+
 
 \subsubsection{Arquitectura de una red neuronal convolucional}
 
+Una arquitectura de una red neuronal convolucional normalmente esta formada por una pila de capas distintas que transforman la matriz de entrada en una matriz de salida a través de una función diferenciable.\par
+Algunas características importantes en las arquitecturas son: Los formatos de entrada/salida, la cantidad de capas de la red, parámetros de cada capa, la secuencia y forma de conexión de las capas entre si, y el algoritmo de entrenamiento. \par
+
+Algunas redes y sus arquitecturas:
+
+\begin{itemize}
+    \item LeNet-5: 2 capas convolucionales y 3 ''fully connected''. Al rededor de 60.000 parámetros. Año 1998.
+    \begin{center}
+        \includegraphics[scale=0.6]{Tesis/Capitulos/02_MARCO_TEORICO/img/LeNet5.png}
+        \captionof{figure}{LeNet-5}
+    \end{center}
+    
+    \item AlexNet: 8 capas, 3 ''fully connected'' y 5 convolucionales. Al rededor de 60 millones de parametros. Año 2012.
+    
+    \item VGG-16: 13 capas convolucionales y 3 ''fully connected''. Al rededor de 138 millones de parametros. Año 2014.
+    
+    \item ResNet-50: 50 capas, con modulos llamados ''ResNet'' (cada uno de 2 o 3 capas convolucionales). Al rededor de 26 millones de parametros. Año 2015.
+    \begin{center}
+        \includegraphics[scale=0.35]{Tesis/Capitulos/02_MARCO_TEORICO/img/ResNet50.png}
+        \captionof{figure}{ResNet-50, de Raimi Karim, towardsdatascience}
+    \end{center}
+\end{itemize}
+
+\subsubsection{Micro-arquitectura de una red neuronal convolucional}
+
+La micro-arquitectura hace referencia a las capas individuales y/o módulos. A modo de ejemplo observemos el modulo ''ResNet'' de la red neuronal convolucionar ResNet-50.\par
+
+\begin{figure}[H]
+\hfill
+\subfigure["Conv block" (Bloque de convolución)]{\includegraphics[width=5cm]{Tesis/Capitulos/02_MARCO_TEORICO/img/ResNetBlock1.png}}
+\hfill
+\subfigure[Identity block (Bloque de identidad)]{\includegraphics[width=5cm]{Tesis/Capitulos/02_MARCO_TEORICO/img/ResNetBlock2.png}}
+\hfill
+\caption{ResNet-50 modulo}
+\end{figure}
+
+
 \subsubsection{Entrenamiento de la red}
+
+\paragraph{Introducción}\mbox{}\\
+
+La fase de entrenamiento de la red neuronal convolucional consiste en, a partir de un set de imágenes de entrenamiento y sus respectivas etiquetas de los objetos a reconocer realizar iteraciones (también llamadas épocas) para ir determinando los pesos de cada uno de las neuronas en la red. Esta determinación se realiza a través del método de calculo conocido como ''Backpropagation''.\par
+\bigbreak
+Entonces en cada época, la etapa de entrenamiento se divide en dos etapas: Una fase directa (o hacia adelante) en donde una matriz de entrada pasa a través de toda la red neuronal. Se comparan las salidas obtenidas con las deseadas y se calcula el error para una de las salidas.\par
+Y una fase inversa (o hacia atrás) donde los gradientes se pasan hacia atrás y los pesos se actualizan. Cada capa recibe un gradiente de perdida respecto a la salida y devuelve un gradiente de perdida respecto a la entrada. \par
+
+Algo a tener en cuenta es que la fase de retroceso necesita datos que son almacenados durante la fase hacia adelante ya que se guardan datos de cada capas (entradas y valores intermedios) por lo que antes de realizar la propagación hacia atrás ''backpropagation'' es necesario una propagación hacia adelante ''forward propagation''. \par
+
+\paragraph{Función de perdida}\mbox{}\\
+
+Como mencione anteriormente finalizando la fase directa o de propagación hacia adelante se comparan las salidas obtenidas con las deseadas y se calcula el error para cada una de ellas. Esto se realiza a través de la Función de perdida $J_{(W)}$.\par
+Es una tarea importante, en este proceso, la elección de la función de perdida que se va a minimizar. Ésta relaciona el valor esperado con los valores obtenido en la propagación hacia adelante.\par
+
+\subparagraph{Entropía cruzada}\mbox{}\\
+
+La entropía cruzada es una función de perdida típicamente utilizada para la clasificación de imágenes.\par
+
+\begin{equation}
+\tcboxmath[colback=white!25!white,colframe=black]
+{ L = -ln(p_c) }  
+\end{equation}
+
+En donde ''c'' es la clase correcta y $p_c$ es la probabilidad predicha para la clase ''c''.\par
+
+\paragraph{Desarrollo matemático}\mbox{}\\
+
+Entonces, en la fase de la propagación hacia adelante, matemáticamente hablando se parte de una red en donde $a^{(l)}=f(z^{(l)})$ es la salida de la capa ''l'', tal que $z^{(l)}$ es el vector de pre-activación y se puede generalizar como $z^{(l)}=W^{(l)}*a^{(l-1)}$ siendo W los coeficientes de la capa y ''a'' la salida de la capa anterior y por ultimo $f()$, la función de activación de la capa l. \par
+\bigbreak
+Por otro lado, en la fase de propagación hacia atrás, matemáticamente hablando se utiliza un método de calculo de gradiente conocido como retropropagación y para poder utilizar este método es necesario encontrar las derivadas parciales de la función de perdida respecto a cada uno de los parámetros de la red $\frac{\partial J(W)}{\partial W^{l}_{ij}}$.\par
+
+\begin{itemize}
+    \item Se parte de Calcular el error y el delta de salida:
+    \begin{enumerate}
+        \item $e^{(L)} = d - a^{(L)}$ tal que ''L'' es la ultima capa, ''d'' el valor que debería dar a la salida y ''a'' el valor de la salida obtenido previamente en la propagación hacia adelante.
+        \item $ \delta ^{(L)} = f'(z^{(L)}) \cdot e^{(L)}$ siendo $f'(z^{(L)}$ la derivada de la función de activación de la capa de salida.
+    \end{enumerate}
+    \item Para cada capa de la red neuronal se procede a calcular sus errores y deltas.
+    \begin{enumerate}
+        \item $e^{(L)} = W^{(l+1)^T} - \delta ^{(l+1)}$ tal que ''L'' es la ultima capa, ''d'' el valor que debería dar a la salida y ''a'' el valor de la salida obtenido previamente en la propagación hacia adelante.
+        \item $ \delta ^{(L)} = f'(z^{(L)}) \cdot e^{(L)}$ siendo $f'(z^{(L)}$ la derivada de la función de activación de la capa de salida.
+    \end{enumerate}
+    \item Actualizamos las matrices de pesos.
+    \begin{enumerate}
+        \item $\Delta W^{(l)} = \lambda * (\delta^{(l)} \times a^{(l-1)} )$ tal que $\lambda$ se define como el factor de aprendizaje, y $a^{(l-1)}$ la salida de la neurona anterior.
+        \item Actualización: $ W^{(l)} \leftarrow W^{(l)} + \Lambda W^{(l)} $
+    \end{enumerate}
+\end{itemize}
+
+Este proceso se repite periódicamente (épocas) hasta alcanzar el entrenamiento deseado de la red.\par
