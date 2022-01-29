@@ -47,7 +47,7 @@ static struct state {
     struct cdev chardev;    // cdev_add()
 
     //void __iomem *_reg_cm_per;
-    __s64 *TX_buff;
+    //__s64 *TX_buff;
     __s64 *RX_buff;
 
     int irq;
@@ -199,19 +199,22 @@ static int driver_open(struct inode *inode, struct file *file)
     pr_info("Hola! Entre a open! \n");
 
 
-    pr_info("Consigo memoria para el buffer de recepcion y de transmision\n");
+    pr_info("Consigo memoria para el buffer de recepcion y de transmision, 2do encoder\n");
 
     if ((state.RX_buff = (__s64 *) kmalloc(BYTE2READ, GFP_KERNEL)) == NULL)
     {
       pr_err ("Insuficiente memoria\n");
       return -ENODEV; /* No such device */
     }
+    pr_info("Termine de pedir memoria\n");
 
-    if ((state.TX_buff = (__s64 *) kmalloc(BYTE2READ, GFP_KERNEL)) == NULL)
-    {
-      pr_err ("Insuficiente memoria\n");
-      return -ENODEV; /* No such device */
-    }
+    // if ((state.TX_buff = (__s64 *) kmalloc(BYTE2READ, GFP_KERNEL)) == NULL)
+    // {
+    //   pr_err ("Insuficiente memoria\n");
+    //   return -ENODEV; /* No such device */
+    // }
+
+    pr_info("base_addr_EMIOgpio es: %08X \n", *(uint32_t*)(state.base_addr_EMIOgpio));
 
     // Configure the portS as input 
     set_registers(state.base_addr_EMIOgpio, OFFSET_GPIO_TRI, (uint32_t) (0x03<<0), (uint32_t) (0x03<<0) );
@@ -221,7 +224,6 @@ static int driver_open(struct inode *inode, struct file *file)
 
     // Habilito la interrupciones globales
     set_registers(state.base_addr_EMIOgpio, OFFSET_GIER, (uint32_t) (0x01<<31) , (uint32_t) (0x01<<31) );
-
 
     pr_info("Chau! Sali de open! \n");
     return 0;
@@ -241,7 +243,7 @@ static int driver_release(struct inode *inode, struct file *file)
 {
   pr_info("driver_release: Entre a driver_release\n");
 
-  kfree(state.TX_buff);
+  //kfree(state.TX_buff);
   kfree(state.RX_buff);  
 
   pr_info("driver_release: Salgo a driver_release\n");
@@ -262,16 +264,16 @@ static ssize_t driver_read(struct file *file, char __user *ubuff, size_t size, l
 {
     int counter;
 
-    pr_info("Entre a driver_read\n"); 
+    //pr_info("Entre a driver_read\n"); 
 
-    pr_info("Verifico si es valido el tamanio del buffer\n");  
+    //pr_info("Verifico si es valido el tamanio del buffer\n");  
     if(size != BYTE2READ)
     {
         pr_info("El tamanio del buffer no es valido\n");
         return -1;
     }
 
-    pr_info("Verifico si es valido el buffer\n");  
+   // pr_info("Verifico si es valido el buffer\n");  
     if( (access_ok(VERIFY_WRITE, ubuff, size)) == 0)
     {
         pr_info("access_ok: El buffer es invalido\n");  
@@ -284,7 +286,7 @@ static ssize_t driver_read(struct file *file, char __user *ubuff, size_t size, l
       counter++;
       // Out of range
       if (counter>10) {
-              pr_info("Break \n"); 
+              //pr_info("Break \n"); 
               break;
 		  }
 		  msleep(1);
@@ -298,17 +300,17 @@ static ssize_t driver_read(struct file *file, char __user *ubuff, size_t size, l
 
     state.RX_buff[1] = nro_vueltas1;
 
-    pr_info("Tiempo en useg en kernel 2: %lld \n", state.RX_buff[0] );
+    //pr_info("Tiempo en useg en kernel 2: %lld \n", state.RX_buff[0] );
 
     /* Cargo el dato en el buffer del usuario */
-    pr_info("Cargo el buffer del usuario con la informacion\n");
+    //pr_info("Cargo el buffer del usuario con la informacion\n");
     if(__copy_to_user(ubuff, state.RX_buff, size) != 0)
     {
         pr_info("__copy_to_user: Fallo __copy_to_user\n");
         return -1;
     }
 
-    pr_info("Salgo de driver_read\n"); 
+    //pr_info("Salgo de driver_read\n"); 
     return 0;
 }
 
@@ -456,7 +458,7 @@ static int driver_probe (struct platform_device *pdev)
     pr_info("driver_remove: Remuevo el dispositivo!\n");
 
     /* Free irq */
-    free_irq(state.irq, driver_isr);
+    free_irq(state.irq, NULL);
 
     /* Release mapped virtual address */
     iounmap(state.base_addr_EMIOgpio);

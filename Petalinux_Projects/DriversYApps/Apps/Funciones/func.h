@@ -35,7 +35,7 @@ long long int to_distance_cm (long long int time);
 /* Variables brujula */
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#define HMC5883L_cal_loop         200
+#define HMC5883L_cal_loop         300
 #define CALIBRACION_ENABLE          0
 #define HMC5883L_I2C_ADDRESS     0x0D       // Fake board: 0x0D, original board: 0x1E
 
@@ -60,7 +60,8 @@ int get_raw_y(int fd);
 int get_raw_z(int fd);
 int calibracion_HMC5883L(int fd, int *xlow, int *xhigh, int *ylow, int *yhigh);
 int get_headeing_degree(int fd, int xlow, int xhigh, int ylow, int yhigh);
-
+int calibracion_HMC5883L_yz(int fd, int *zlow, int *zhigh, int *ylow, int *yhigh);
+int get_headeing_degree_yz(int fd, int zlow, int zhigh, int ylow, int yhigh);
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 /* Variables encoder */
 //////////////////////////////////////////////////////////////////////////////////////////////////////

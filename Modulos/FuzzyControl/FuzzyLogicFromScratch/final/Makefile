@@ -7,4 +7,4 @@ FuzzyControl:
 	$(GCC) -o readSTATE.bin readSTATE.c initsem.c -Wall 
 
 send:
-	scp -r ../develop root@192.168.100.130:/home/root/Tesis
+	scp -r ../final root@192.168.100.130:/home/root/Tesis

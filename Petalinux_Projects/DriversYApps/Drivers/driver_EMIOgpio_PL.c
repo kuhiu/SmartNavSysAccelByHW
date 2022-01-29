@@ -127,16 +127,16 @@ static int driver_release(struct inode *inode, struct file *file)
 
  static ssize_t driver_read(struct file *file, char __user *ubuff, size_t size, loff_t *offset) 
 {
-    pr_info("Entre a driver_read\n"); 
+    //pr_info("Entre a driver_read\n"); 
 
-    pr_info("Verifico si es valido el tamanio del buffer\n");  
+    //pr_info("Verifico si es valido el tamanio del buffer\n");  
     if(size != BYTE2READ)
     {
         pr_info("El tamanio del buffer no es valido\n");
         return -1;
     }
 
-    pr_info("Verifico si es valido el buffer\n");  
+    //pr_info("Verifico si es valido el buffer\n");  
     if( (access_ok(VERIFY_WRITE, ubuff, size)) == 0)
     {
         pr_info("access_ok: El buffer es invalido\n");  
@@ -147,14 +147,14 @@ static int driver_release(struct inode *inode, struct file *file)
     *(state.RX_buff) = ioread32(state.base_addr);
     
     /* Cargo el dato en el buffer del usuario */
-    pr_info("Cargo el buffer del usuario con la informacion\n");
+    //pr_info("Cargo el buffer del usuario con la informacion\n");
     if(__copy_to_user(ubuff, state.RX_buff, size) != 0)
     {
         pr_info("__copy_to_user: Fallo __copy_to_user\n");
         return -1;
     }
 
-    pr_info("Salgo de driver_read\n"); 
+    //pr_info("Salgo de driver_read\n"); 
     return 0;
 }
 
@@ -169,9 +169,9 @@ static int driver_release(struct inode *inode, struct file *file)
 
  static ssize_t driver_write(struct file *file, const char __user *ubuff, size_t size, loff_t *offset) 
 {
-    pr_info("Entre a driver_write\n"); 
+    //pr_info("Entre a driver_write\n"); 
 
-    pr_info("Verifico si es valido el tamanio del buffer\n");  
+    //pr_info("Verifico si es valido el tamanio del buffer\n");  
     if(size != BYTE2READ)
     {
         pr_info("El tamanio del buffer no es valido\n");
@@ -179,19 +179,19 @@ static int driver_release(struct inode *inode, struct file *file)
     }
     
     /* Cargo el dato en el buffer del kernel */
-    pr_info("Cargo el buffer del usuario con la informacion\n");
+    //pr_info("Cargo el buffer del usuario con la informacion\n");
     if(copy_from_user(state.TX_buff, ubuff, size) != 0)
     {
         pr_info("Fallo __copy_from_user\n");
         return -1;
     }
 
-    pr_info("Voy a escribir = %08X \n", *(state.TX_buff)); 
+    //pr_info("Voy a escribir = %08X \n", *(state.TX_buff)); 
 
     /* Escribo el dato del AXI GPIO (esta en la base de la pagina) */
     iowrite32(*(state.TX_buff), state.base_addr);
 
-    pr_info("Salgo de driver_write\n"); 
+    //pr_info("Salgo de driver_write\n"); 
     return 0;
 }
 

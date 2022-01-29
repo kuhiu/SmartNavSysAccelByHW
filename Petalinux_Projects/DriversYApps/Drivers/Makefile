@@ -1,4 +1,4 @@
-obj-m 		:= driver_encoder_EMIOgpio_PL_2.o
+obj-m 		:= driver_encoder_EMIOgpio_PL_1.o driver_encoder_EMIOgpio_PL_2.o driver_i2c_PS_ov7670.o driver_vdma.o driver_MIOgpio_PS.o driver_pwm_EMIOgpio_PL.o driver_EMIOgpio_PL.o driver_i2c_PS_hmc5883L.o
 PWD 		:= $(shell pwd)
 
 KERNEL_DIR  = /home/martin/Escritorio/Tesis/Petalinux_Projects/Imagen/build/tmp/work/plnx_zynq7-xilinx-linux-gnueabi/linux-xlnx/4.19-xilinx-v2019.1+gitAUTOINC+9811303824-r0/linux-plnx_zynq7-standard-build

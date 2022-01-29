@@ -275,9 +275,9 @@ static int driver_release(struct inode *inode, struct file *file)
 {
     uint32_t Freq_pwm_high_time_2set;
 
-    pr_info("Entre a driver_write\n"); 
+    //pr_info("Entre a driver_write\n"); 
 
-    pr_info("Verifico si es valido el tamanio del buffer\n");  
+    //pr_info("Verifico si es valido el tamanio del buffer\n");  
     if(size != BYTE2READ)
     {
         pr_info("El tamanio del buffer no es valido\n");
@@ -285,7 +285,7 @@ static int driver_release(struct inode *inode, struct file *file)
     }
     
     /* Cargo el dato en el buffer del kernel */
-    pr_info("Cargo el buffer del usuario con la informacion\n");
+    //pr_info("Cargo el buffer del usuario con la informacion\n");
     if(copy_from_user(state.TX_buff, ubuff, size) != 0)
     {
         pr_info("Fallo __copy_from_user\n");
@@ -299,26 +299,26 @@ static int driver_release(struct inode *inode, struct file *file)
         return -1;
     }        
 
-	  pr_info("Reseteando... \n");
-    iowrite32( (uint32_t)0x00, state.base_addr_EMIOgpio);
-    mdelay(100);
-	  iowrite32( (uint32_t)0x01, state.base_addr_EMIOgpio);
+	  //pr_info("Reseteando... \n");
+    //iowrite32( (uint32_t)0x00, state.base_addr_EMIOgpio);
+    //mdelay(100);
+	  //iowrite32( (uint32_t)0x01, state.base_addr_EMIOgpio);
 
     // Load Register for Timer 0
-    pr_err("Load Register T0: %d ", (uint32_t)( (AXI_CLOCK_FREQ/PWM_FREQ)-2 ) );
+    //pr_err("Load Register T0: %d ", (uint32_t)( (AXI_CLOCK_FREQ/PWM_FREQ)-2 ) );
     set_registers(state.base_addr, OFFSET_TLR0, (uint32_t) 0xFFFFFFFF , (uint32_t)( (AXI_CLOCK_FREQ/PWM_FREQ)-2 ) );
 
     // Load Register for Timer 1
-    pr_err("Load Register T1: %d", (uint32_t)( (AXI_CLOCK_FREQ/PWM_HIGH_TIME_FREQ)-2 ) );
+    //pr_err("Load Register T1: %d", (uint32_t)( (AXI_CLOCK_FREQ/PWM_HIGH_TIME_FREQ)-2 ) );
 
     if( *(state.TX_buff) == 0)
       set_registers(state.base_addr, OFFSET_TLR1, (uint32_t) 0xFFFFFFFF , (uint32_t)( 0 ) );
     else
     {
-      pr_info("Voy a escribir = %d \n", *(state.TX_buff)); 
+      //pr_info("Voy a escribir = %d \n", *(state.TX_buff)); 
       Freq_pwm_high_time_2set = (PWM_FREQ*100) / *(state.TX_buff);
-      pr_info("Freq equivalente = %d \n", Freq_pwm_high_time_2set ); 
-      pr_info("Cargo en el registro = %d \n", (uint32_t)( ((uint32_t)AXI_CLOCK_FREQ/Freq_pwm_high_time_2set)-2 ));
+      //pr_info("Freq equivalente = %d \n", Freq_pwm_high_time_2set ); 
+      //pr_info("Cargo en el registro = %d \n", (uint32_t)( ((uint32_t)AXI_CLOCK_FREQ/Freq_pwm_high_time_2set)-2 ));
       set_registers(state.base_addr, OFFSET_TLR1, (uint32_t) 0xFFFFFFFF , (uint32_t)( ((uint32_t)AXI_CLOCK_FREQ/Freq_pwm_high_time_2set) ) );
     }
     // Set Load Timer 0 y Timer 1
@@ -362,8 +362,7 @@ static int driver_release(struct inode *inode, struct file *file)
     // Enable Timer 0 and Timer 1 
     set_registers(state.base_addr, OFFSET_TCSR0, (uint32_t) (0x1<<10) , (uint32_t) (0x1<<10) );
 
-
-    pr_info("Salgo de driver_write\n"); 
+    //pr_info("Salgo de driver_write\n"); 
     return 0;
 }
 

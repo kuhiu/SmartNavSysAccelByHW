@@ -200,9 +200,9 @@ int main(void)
   rule_0           = add_rule(rule_0, "CERCA, CERCA , CERCA = DERECHA", if_side_0_left, then_side_0, rule_1);
 
   // Output
-  membership_functions_outputs_goRight  = initialize_membership_inputs("goRight",  0,    5, 355, (float)1/5, (float)1/5, NULL);
-  membership_functions_outputs_goCenter = initialize_membership_inputs("goCenter", 0,  -10,  10, (float)1/5, (float)1/5, membership_functions_outputs_goRight);
-  membership_functions_outputs_goLeft   = initialize_membership_inputs("goLeft",   0, -355,  -5, (float)1/5, (float)1/5, membership_functions_outputs_goCenter);
+  membership_functions_outputs_goRight  = initialize_membership_inputs("goRight",  0,   20, 340, (float)1/10, (float)1/10, NULL);
+  membership_functions_outputs_goCenter = initialize_membership_inputs("goCenter", 0,  -20,  20, (float)1/10, (float)1/10, membership_functions_outputs_goRight);
+  membership_functions_outputs_goLeft   = initialize_membership_inputs("goLeft",   0, -340, -20, (float)1/10, (float)1/10, membership_functions_outputs_goCenter);
 
   System_Outputs   = initialize_system_io("Angulo", 0, membership_functions_outputs_goLeft, NULL);
   if (System_Outputs == NULL)

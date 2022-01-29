@@ -1,7 +1,7 @@
 #include "./Funciones/func.h"
 
 int saveSTATE(FILE *fdd_State, long long int rightSensor, long long int centerSensor, long long int leftSensor, float heading, 
-float revoluciones_rpm_s1, float revoluciones_rpm_s2, float distance_cm_s1, float distance_cm_s2)
+float revoluciones_rpm_s1, float revoluciones_rpm_s2, float distance_cm_s1, float distance_cm_s2, float real_distance_s1, float real_distance_s2)
 {
     ssize_t loffset, lread;
     char * line = NULL;
@@ -146,15 +146,36 @@ float revoluciones_rpm_s1, float revoluciones_rpm_s2, float distance_cm_s1, floa
                 fseek(fdd_State, (loffset), SEEK_SET);
                 break;
         }
-    }  
 
+        switch (sscanf(line, "Encoder, Distancia REAL = %s - %s", aux, aux ))
+        {
+            case EOF:       // Error
+                perror("sscanf");
+                exit(1);
+                break;
+            case 0:         // No encontro
+                //printf("No se encontro: Brujula, Angulo\n");
+                break;
+            default:        // Encontro
+                sprintf(line, "Encoder, Distancia REAL = %d - %d", (unsigned int)real_distance_s1, (unsigned int)real_distance_s1); 
+                fseek(fdd_State, (loffset-lread), SEEK_SET);
+                if ( ( fwrite(line, sizeof(char), strlen(line), fdd_State)) != strlen(line))
+                {
+                    printf("Error escribiendo\n");
+                    return -1;
+                }
+                fseek(fdd_State, (loffset), SEEK_SET);
+                break;
+        }
+   
+    }  
     return 0;
 }
 
 int main (int argc, char *argv[])
 {
     /* state file */
-        FILE* fdd_State;
+        FILE* fdd_State = NULL;
 
     /* Variables sensores de distancia*/
         int fd_MIOgpio_PS;
@@ -165,11 +186,18 @@ int main (int argc, char *argv[])
         int fd_brujula;                 // File descriptor para brujula
         int addr_brujula = 0x0D;        // The I2C address brujula
         float heading=0;                // Angulo absoluto al norte
-        int xlow  = -12391;             // Calibracion
-        int xhigh =   1301;
-        int ylow  =  -6210;
-        int yhigh =     75;   
-
+        int xlow  = -10356;             // Calibracion
+        int xhigh =   9126;
+        int ylow  =   -177;
+        int yhigh =   1047;  
+        int zlow  =   -233;
+        int zhigh =    858;
+        //int xlow  = 100000000;
+        //int xhigh = -100000000;
+        //int ylow  = 100000000;
+        //int yhigh = -100000000;
+        //int zlow  = 100000000;
+        //int zhigh = -100000000;
     /* Variables encoder */
         int fd_encoder_1, fd_encoder_2;
         __s64 rb_encoder_1[BYTE2READ_encoder], rb_encoder_2[BYTE2READ_encoder];
@@ -186,6 +214,22 @@ int main (int argc, char *argv[])
         sb.sem_op = -1; /* set to allocate resource */
         sb.sem_flg = SEM_UNDO;
 
+    /* Para leer state */
+        ssize_t loffset, lread;
+        char * line = NULL;
+        size_t len = 0; 
+        char readed[10], desplazamiento_state[10];
+
+        float real_distance_s1=0, real_distance_s2=0, dist_previa=0;
+
+    if (CALIBRACION_ENABLE==1){
+        int xlow  = 100000000;
+        int xhigh = -100000000;
+        int ylow  = 100000000;
+        int yhigh = -100000000;
+        int zlow  = 100000000;
+        int zhigh = -100000000;
+    }
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     //////////////////////////////////// Inicializar semaforo  /////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -236,12 +280,12 @@ int main (int argc, char *argv[])
     //////////////////////////////////////////////////////////////////////////////////////////////////////
     if ( (fd_encoder_1 = open("/dev/chardev_encoder_EMIOgpio_PL_1", O_RDWR)) == -1)
     {
-        printf("Error abriendo chardev_encoder_EMIOgpio_PL\n");
+        printf("Error abriendo chardev_encoder_EMIOgpio_PL, fd_encoder_1 = %d\n", fd_encoder_1);
         return -1;
     }
     if ( (fd_encoder_2 = open("/dev/chardev_encoder_EMIOgpio_PL_2", O_RDWR)) == -1)
     {
-        printf("Error abriendo chardev_encoder_EMIOgpio_PL\n");
+        printf("Error abriendo chardev_encoder_EMIOgpio_PL, fd_encoder_2 = %d\n", fd_encoder_2);
         return -1;
     }
     //////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -249,20 +293,22 @@ int main (int argc, char *argv[])
     //////////////////////////////////////////////////////////////////////////////////////////////////////
     if (CALIBRACION_ENABLE){
         printf("HMC5883L: Calibracion... \n");
-        if ( calibracion_HMC5883L(fd_brujula, &xlow, &xhigh, &ylow, &yhigh) == -1)
+        //if ( calibracion_HMC5883L(fd_brujula, &xlow, &xhigh, &ylow, &yhigh) == -1)
+        if ( calibracion_HMC5883L_yz(fd_brujula, &zlow, &zhigh, &ylow, &yhigh) == -1)
         {
             printf("HMC5883L: Fallo la Calibracion... \n");
             return -1;
         }
         printf("HMC5883L: La calibracion termino.\n");
         //printf("HMC5883L: xlow: %d, xhigh: %d, ylow: %d, yhigh: %d\n", xlow, xhigh, ylow, yhigh);
+        printf("HMC5883L: zlow: %d, zhigh: %d, ylow: %d, yhigh: %d\n", zlow, zhigh, ylow, yhigh);
     }
-    printf("Llegue3 \n" );
     //////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////  Lecturas  //////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////////////////////////////////////
     while(1)
     {
+
         ///////////////////////////////////////////// Sensores ///////////////////////////////////////////////
         if ( read(fd_MIOgpio_PS, rb_MIOgpio_PS, BYTE2READ_MIOgpio_PS) == -1)
         {
@@ -278,15 +324,16 @@ int main (int argc, char *argv[])
 
         ///////////////////////////////////////////// Brujula ///////////////////////////////////////////////
         while (1){
-            heading = get_headeing_degree(fd_brujula, xlow, xhigh, ylow, yhigh);
+            //heading = get_headeing_degree(fd_brujula, xlow, xhigh, ylow, yhigh);
+            heading = get_headeing_degree_yz(fd_brujula, zlow, zhigh, ylow, yhigh);
             if (heading == -1){   // hubo ov
-                continue;
+                return -1;
             }
             if (heading == -2){   // Data skipped
                 continue;
             }
             if (heading == -3){   // Data no available
-                usleep(10000); // Sleep 80 mseg
+                usleep(10000); // Sleep 10 mseg
                 continue;
             }
             //printf("heading: %f \n", heading);
@@ -304,15 +351,67 @@ int main (int argc, char *argv[])
             printf("Error leyendo chardev_encoder_EMIOgpio_PL\n");
             return -1;
         }
-        printf("Tiempo en useg: %lld - %lld \n", rb_encoder_1[0], rb_encoder_2[0] );
-        printf("Ranuras: %lld - %lld \n", rb_encoder_1[1], rb_encoder_2[1] );
+        //printf("Tiempo en useg: %lld - %lld \n", rb_encoder_1[0], rb_encoder_2[0] );
+        //printf("Ranuras: %lld - %lld \n", rb_encoder_1[1], rb_encoder_2[1] );
         revoluciones_rpm_s1 = get_revoluciones_rpm(rb_encoder_1[0]);
         revoluciones_rpm_s2 = get_revoluciones_rpm(rb_encoder_1[0]);
-        printf("Revoluciones: %d - %d rpm \n", (int)revoluciones_rpm_s1, (int)revoluciones_rpm_s2 );
+        //printf("Revoluciones: %d - %d rpm \n", (int)revoluciones_rpm_s1, (int)revoluciones_rpm_s2 );
         distance_cm_s1 = get_distance_m(rb_encoder_1[1]);
         distance_cm_s2 = get_distance_m(rb_encoder_2[1]);
-        printf("Distancia recorrida Total: %f - %f ms \n", distance_cm_s1, distance_cm_s2);
+        //printf("Distancia recorrida Total: %f - %f ms \n", distance_cm_s1, distance_cm_s2);
 
+        // Voy a sumar unicamente la distancia con el "Desplazamiento = ADELANTE"
+        fseek(fdd_State, 0, SEEK_SET);
+        // Leo el archivo buscando las entradas
+        while ( (lread=getline(&line, &len, fdd_State )) != -1)
+        {
+            switch (sscanf(line, "Desplazamiento = %s\n", readed ))
+            {
+            case EOF:       // Error
+                perror("sscanf");
+                exit(1);
+                break;
+            case 0:         // No encontro
+                //printf("No se encontro la linea: Sensores, rightSensor \n");
+                break;
+            default:        // Encontro
+                strcpy(desplazamiento_state,readed);
+                break;
+            }
+            switch (sscanf(line, "Encoder, Distancia = %s\n", readed ))
+            {
+            case EOF:       // Error
+                perror("sscanf");
+                exit(1);
+                break;
+            case 0:         // No encontro
+                //printf("No se encontro la linea: Sensores, rightSensor \n");
+                break;
+            default:        // Encontro
+                dist_previa = atof(readed);
+                break;
+            }
+            switch (sscanf(line, "Encoder, Distancia REAL = %s\n", readed ))
+            {
+            case EOF:       // Error
+                perror("sscanf");
+                exit(1);
+                break;
+            case 0:         // No encontro
+                //printf("No se encontro la linea: Sensores, rightSensor \n");
+                break;
+            default:        // Encontro
+                real_distance_s1 = atof(readed);
+                break;
+            }
+        }
+
+        if (strstr(desplazamiento_state, "ADELANTE") != NULL){
+            real_distance_s1 += (distance_cm_s1 - dist_previa);
+            real_distance_s2 += (distance_cm_s2 - dist_previa);
+        }
+        //printf("real_distance_s1 es = %f, distance_cm_s1 = %f \n", real_distance_s1, distance_cm_s1);
+        
         //////////////////////////////////////////////////////////////////////////////////////////////////////
         /////////////////////////////////////////  State.txt update  /////////////////////////////////////////
         //////////////////////////////////////////////////////////////////////////////////////////////////////    
@@ -324,7 +423,7 @@ int main (int argc, char *argv[])
         }
         //printf("Locked.\n");
 
-        saveSTATE(fdd_State, rightSensor, centerSensor, leftSensor, heading, revoluciones_rpm_s1, revoluciones_rpm_s2, distance_cm_s1, distance_cm_s2);
+        saveSTATE(fdd_State, rightSensor, centerSensor, leftSensor, heading, revoluciones_rpm_s1, revoluciones_rpm_s2, distance_cm_s1, distance_cm_s2, real_distance_s1, real_distance_s2);
 
         sb.sem_op = 1;          /* Libera el recurso */
         if (semop(semid, &sb, 1) == -1) {
@@ -333,7 +432,7 @@ int main (int argc, char *argv[])
         }
         //printf("Unlocked\n");
 
-        usleep(200000);
+        //usleep(10000);
     }
     //////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////  Close all  /////////////////////////////////////////////

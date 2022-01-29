@@ -378,16 +378,16 @@ static ssize_t driver_read(struct file *file, char __user *ubuff, size_t size, l
 {
     int counter;
 
-    pr_info("Entre a driver_read\n"); 
+    //pr_info("Entre a driver_read\n"); 
 
-    pr_info("Verifico si es valido el tamanio del buffer\n");  
+    //pr_info("Verifico si es valido el tamanio del buffer\n");  
     if(size != BYTE2READ)
     {
         pr_info("El tamanio del buffer no es valido\n");
         return -1;
     }
 
-    pr_info("Verifico si es valido el buffer\n");  
+    //pr_info("Verifico si es valido el buffer\n");  
     if( (access_ok(VERIFY_WRITE, ubuff, size)) == 0)
     {
         pr_info("access_ok: El buffer es invalido\n");  
@@ -455,24 +455,24 @@ static ssize_t driver_read(struct file *file, char __user *ubuff, size_t size, l
       udelay(1);
 	  }
 
-    pr_info("Llego la interrupcion. rv: %d, cv: %d, lv: %d\n", right_valid_value, center_valid_value, left_valid_value); 
-    pr_info("Sensores r c l %lld %lld %lld\n", ktime_to_us( ktime_sub(right_echo_end,  right_echo_start) ), ktime_to_us( ktime_sub(center_echo_end, center_echo_start) ),  ktime_to_us( ktime_sub(left_echo_end,   left_echo_start) ) );
+    //pr_info("Llego la interrupcion. rv: %d, cv: %d, lv: %d\n", right_valid_value, center_valid_value, left_valid_value); 
+    //pr_info("Sensores r c l %lld %lld %lld\n", ktime_to_us( ktime_sub(right_echo_end,  right_echo_start) ), ktime_to_us( ktime_sub(center_echo_end, center_echo_start) ),  ktime_to_us( ktime_sub(left_echo_end,   left_echo_start) ) );
     
     state.RX_buff[0] = ktime_to_us( ktime_sub(right_echo_end,  right_echo_start) );
     state.RX_buff[1] = ktime_to_us( ktime_sub(center_echo_end, center_echo_start) );
     state.RX_buff[2] = ktime_to_us( ktime_sub(left_echo_end,   left_echo_start) );
 
-    pr_info("Sensores r c l %lld %lld %lld\n", *(state.RX_buff + 8*0), *(state.RX_buff + 8*1), *(state.RX_buff + 8*2) );
+    //pr_info("Sensores r c l %lld %lld %lld\n", *(state.RX_buff + 8*0), *(state.RX_buff + 8*1), *(state.RX_buff + 8*2) );
 
     /* Cargo el dato en el buffer del usuario */
-    pr_info("Cargo el buffer del usuario con la informacion\n");
+    //pr_info("Cargo el buffer del usuario con la informacion\n");
     if(__copy_to_user(ubuff, state.RX_buff, size) != 0)
     {
         pr_info("__copy_to_user: Fallo __copy_to_user\n");
         return -1;
     }
 
-    pr_info("Salgo de driver_read\n"); 
+    //pr_info("Salgo de driver_read\n"); 
     return 0;
 }
 
@@ -487,9 +487,9 @@ static ssize_t driver_read(struct file *file, char __user *ubuff, size_t size, l
 
 static ssize_t driver_write(struct file *file, const char __user *ubuff, size_t size, loff_t *offset) 
 {
-    pr_info("Entre a driver_write\n"); 
+    //pr_info("Entre a driver_write\n"); 
 
-    pr_info("Verifico si es valido el tamanio del buffer\n");  
+    //pr_info("Verifico si es valido el tamanio del buffer\n");  
     if(size != BYTE2READ)
     {
         pr_info("El tamanio del buffer no es valido\n");
@@ -497,21 +497,21 @@ static ssize_t driver_write(struct file *file, const char __user *ubuff, size_t 
     }
     
     /* Cargo el dato en el buffer del kernel */
-    pr_info("Cargo el buffer del usuario con la informacion\n");
+    //pr_info("Cargo el buffer del usuario con la informacion\n");
     if(copy_from_user(state.TX_buff, ubuff, size) != 0)
     {
         pr_info("Fallo __copy_from_user\n");
         return -1;
     }
 
-    pr_info("Voy a escribir = %08llX \n", *(state.TX_buff)); 
+    //pr_info("Voy a escribir = %08llX \n", *(state.TX_buff)); 
 
-    pr_info("Set GPIO Pin Data \n");
+    //pr_info("Set GPIO Pin Data \n");
     //set_registers(state.xgpiops_addr, OFFSET_GPIO_DATA_0, (uint32_t)0xFFFFFFFF, (*(state.TX_buff) & ((0x1<<0) | (0x1<<13))) );
     //msleep(10);
     set_registers(state.xgpiops_addr, OFFSET_GPIO_DATA_0, (uint32_t)0xFFFFEFFF, *(state.TX_buff) );
 
-    pr_info("Salgo de driver_write\n"); 
+    //pr_info("Salgo de driver_write\n"); 
     return 0;
 }
 

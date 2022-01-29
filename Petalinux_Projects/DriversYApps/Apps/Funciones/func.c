@@ -82,9 +82,8 @@ int calibracion_HMC5883L(int fd, int *xlow, int *xhigh, int *ylow, int *yhigh)
 
     for(i=0;i<HMC5883L_cal_loop;)
     {
-        usleep(80000); // Sleep 50 mseg
         status = i2c_smbus_read_byte_data (fd , QMC5883L_STATUS) & 0x7;
-
+        printf("status es= %d e i es = %d\n", status, i);
         if ( (status & 0x02) == 0X02){   // hubo ov
             return -1;
         }
@@ -104,6 +103,7 @@ int calibracion_HMC5883L(int fd, int *xlow, int *xhigh, int *ylow, int *yhigh)
         }
 
         else {                  // Data no available
+            usleep(10000); // Sleep 10 mseg
             continue;
         }
         if(raw_x < *xlow) 
@@ -119,11 +119,55 @@ int calibracion_HMC5883L(int fd, int *xlow, int *xhigh, int *ylow, int *yhigh)
     return 0;
 }
 
+int calibracion_HMC5883L_yz(int fd, int *zlow, int *zhigh, int *ylow, int *yhigh)
+{
+    int i;
+    int status;
+    int raw_x=0, raw_y=0, raw_z=0;
+
+    for(i=0;i<HMC5883L_cal_loop;)
+    {
+        status = i2c_smbus_read_byte_data (fd , QMC5883L_STATUS) & 0x7;
+        printf("status es= %d e i es = %d\n", status, i);
+        if ( (status & 0x02) == 0X02){   // hubo ov
+            return -1;
+        }
+
+        if ( (status & 0x04) == 0X04){   // Data skipped
+            raw_x = get_raw_x(fd);
+            raw_y = get_raw_y(fd);
+            raw_z = get_raw_z(fd);
+            continue;
+        }
+
+        if ( (status & 0x01) == 0X01){   // New data available
+            raw_x = get_raw_x(fd);
+            raw_y = get_raw_y(fd);
+            raw_z = get_raw_z(fd);
+            i++;
+        }
+
+        else {                  // Data no available
+            usleep(10000); // Sleep 10 mseg
+            continue;
+        }
+        if(raw_z < *zlow) 
+            *zlow = raw_z;
+        if(raw_z > *zhigh) 
+            *zhigh = raw_z;
+        if(raw_y < *ylow) 
+            *ylow = raw_y;
+        if(raw_y > *yhigh) 
+            *yhigh = raw_y;
+    }
+
+    return 0;
+}
 
 int get_headeing_degree(int fd, int xlow, int xhigh, int ylow, int yhigh)
 {
     int status;
-    int raw_x=0, raw_y=0, raw_z=0;
+    float raw_x=0, raw_y=0, raw_z=0;
     float fx=0;
     float fy=0;
     float heading=0;
@@ -157,15 +201,17 @@ int get_headeing_degree(int fd, int xlow, int xhigh, int ylow, int yhigh)
         return -3;
     }
 
-    //printf("raw_x: %d, raw_y: %d \n", raw_x, raw_y);
+    printf("raw_x: %f, raw_y: %f \n", raw_x, raw_y);
 
-    raw_x = raw_x - (xhigh+xlow)/2;
-    raw_y = raw_y - (yhigh+ylow)/2;
+    raw_x = raw_x - ((float)xhigh+(float)xlow)/2;
+    raw_y = raw_y - ((float)yhigh+(float)ylow)/2;
 
-    fx = (float)raw_x/((float)xhigh-(float)xlow);
-    fy = (float)raw_y/((float)yhigh-(float)ylow);
+    printf("POST OFFSET= raw_x: %f, raw_y: %f \n", raw_x, raw_y);
 
-    //printf("Fx: %f, Fy: %f \n", fx, fy);
+    fx = (float)raw_x / (((float)xhigh-(float)xlow)/2);
+    fy = (float)raw_y / (((float)yhigh-(float)ylow)/2);
+
+    printf("Fx: %f, Fy: %f \n", fx, fy);
 
     heading = 180.0*atan2(fy,fx)/M_PI ;
 
@@ -177,6 +223,64 @@ int get_headeing_degree(int fd, int xlow, int xhigh, int ylow, int yhigh)
     return heading;
 }
 
+int get_headeing_degree_yz(int fd, int zlow, int zhigh, int ylow, int yhigh)
+{
+    int status;
+    float raw_x=0, raw_y=0, raw_z=0;
+    float fz=0;
+    float fy=0;
+    float heading=0;
+
+    status = i2c_smbus_read_byte_data (fd , QMC5883L_STATUS);
+    status = status & 0x07; // Me quedo con los ultimos 3 bits
+
+    //printf("status: %08X \n", status);
+
+    if ( (status & 0x02) == 0X02){   // hubo ov
+        raw_x = get_raw_x(fd);
+        raw_y = get_raw_y(fd);
+        raw_z = get_raw_z(fd);
+        return -1;
+    }
+
+    if ( (status & 0x04) == 0X04){   // Data skipped
+        raw_x = get_raw_x(fd);
+        raw_y = get_raw_y(fd);
+        raw_z = get_raw_z(fd);
+        return -2;
+    }
+
+    if ( (status & 0x01) == 0X01){   // New data available
+        raw_x = get_raw_x(fd);
+        raw_y = get_raw_y(fd);
+        raw_z = get_raw_z(fd);
+    }
+
+    else {                  // Data no available
+        return -3;
+    }
+
+    printf("raw_z: %f, raw_y: %f \n", raw_z, raw_y);
+
+    raw_z = raw_z - ((float)zhigh+(float)zlow)/2;
+    raw_y = raw_y - ((float)yhigh+(float)ylow)/2;
+
+    printf("POST OFFSET= raw_z: %f, raw_y: %f \n", raw_z, raw_y);
+
+    fz = (float)raw_z / (((float)zhigh-(float)zlow)/2);
+    fy = (float)raw_y / (((float)yhigh-(float)ylow)/2);
+
+    printf("Fz: %f, Fy: %f \n", fz, fy);
+
+    heading = 180.0*atan2(fy,fz)/M_PI ;
+
+    //printf("Heading: %f \n", heading);
+
+    if(heading<=0) 
+        heading += 360;
+
+    return heading;
+}
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 /* Variables encoder */
