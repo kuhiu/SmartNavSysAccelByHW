@@ -66,3 +66,23 @@ float compute_area_of_trapezoid(struct mf_type *mf);
 void add_rule (struct rule_type **rule, char *name, struct rule_element_type *if_side, struct rule_element_type *then_side, struct rule_type *next);
 void add_rule_element( struct rule_element_type **element,  float value, struct rule_element_type *next);
 void update_rule (struct rule_type *rule, char *name);
+void charge_rules(  char *rule_7_text, char *rule_6_text, char *rule_5_text, char *rule_4_text, 
+                    char *rule_3_text, char *rule_2_text, char *rule_1_text, char *rule_0_text,
+                    struct rule_element_type **if_side_7_right, struct rule_element_type **if_side_7_center, struct rule_element_type **if_side_7_left,
+                    struct rule_element_type **then_side_7, struct rule_type **rule_7,
+                    struct rule_element_type **if_side_6_right, struct rule_element_type **if_side_6_center, struct rule_element_type **if_side_6_left,
+                    struct rule_element_type **then_side_6, struct rule_type **rule_6,
+                    struct rule_element_type **if_side_5_right, struct rule_element_type **if_side_5_center, struct rule_element_type **if_side_5_left,
+                    struct rule_element_type **then_side_5, struct rule_type **rule_5,
+                    struct rule_element_type **if_side_4_right, struct rule_element_type **if_side_4_center, struct rule_element_type **if_side_4_left,
+                    struct rule_element_type **then_side_4, struct rule_type **rule_4,
+                    struct rule_element_type **if_side_3_right, struct rule_element_type **if_side_3_center, struct rule_element_type **if_side_3_left,
+                    struct rule_element_type **then_side_3, struct rule_type **rule_3,
+                    struct rule_element_type **if_side_2_right, struct rule_element_type **if_side_2_center, struct rule_element_type **if_side_2_left,
+                    struct rule_element_type **then_side_2, struct rule_type **rule_2,
+                    struct rule_element_type **if_side_1_right, struct rule_element_type **if_side_1_center, struct rule_element_type **if_side_1_left,
+                    struct rule_element_type **then_side_1, struct rule_type **rule_1,
+                    struct rule_element_type **if_side_0_right, struct rule_element_type **if_side_0_center, struct rule_element_type **if_side_0_left,
+                    struct rule_element_type **then_side_0, struct rule_type **rule_0,
+                    struct io_type *System_Inputs_rightSensor, struct io_type *System_Inputs_centerSensor, struct io_type *System_Inputs_leftSensor);
+void read_from_state_string(FILE* fdd_State, char recurso[], struct sembuf sb, int semid, char *readed);

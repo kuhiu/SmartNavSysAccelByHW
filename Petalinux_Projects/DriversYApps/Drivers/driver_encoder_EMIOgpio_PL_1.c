@@ -202,9 +202,7 @@ static int driver_open(struct inode *inode, struct file *file)
 
 
     pr_info("Consigo memoria para el buffer de recepcion y de transmision, encoder 1\n");
-
-    if ((state.RX_buff = (__s64 *) kmalloc(BYTE2READ, GFP_KERNEL)) == NULL)
-    {
+    if ((state.RX_buff = (__s64 *) kmalloc(BYTE2READ, GFP_KERNEL)) == NULL){
       pr_err ("Insuficiente memoria\n");
       return -ENODEV; /* No such device */
     }
@@ -261,8 +259,6 @@ static int driver_release(struct inode *inode, struct file *file)
   @returns 0: sin error, -1: error
 **/
 /*************************************************************************************************/
-
-
 static ssize_t driver_read(struct file *file, char __user *ubuff, size_t size, loff_t *offset) 
 {
     int counter;

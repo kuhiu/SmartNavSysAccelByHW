@@ -7,10 +7,11 @@
 #include <linux/platform_device.h>      /* Se necesita para Platform Driver Functions */
 #include <linux/of_platform.h>          
 #include <linux/cdev.h>                 /* Se necesita para crear el Char Device */
+#include <uapi/linux/stat.h> /* S_IRUSR */
 
 #define DEVICE_NAME "chardev_EMIOgpio_PL"                /* Define Driver Name */
 #define DEVICE_CLASS_NAME "class_EMIOgpio_PL"
-#define BYTE2READ 1*4                                     /* Cantidad de word de 32 bits que tengo que leer * 4 = Bytes 2 read */
+#define BYTE2READ 4                                     /* Cantidad de word de 32 bits que tengo que leer * 4 = Bytes 2 read */
 #define BASE_MINOR 0                                      /* Base del numero menor */
 #define MINOR_COUNT 1                                     /* Cantidad de numeros menores que voy a usar */
 #define DEVICE_PARENT NULL
@@ -169,7 +170,7 @@ static int driver_release(struct inode *inode, struct file *file)
 
  static ssize_t driver_write(struct file *file, const char __user *ubuff, size_t size, loff_t *offset) 
 {
-    //pr_info("Entre a driver_write\n"); 
+    uint32_t aux;
 
     //pr_info("Verifico si es valido el tamanio del buffer\n");  
     if(size != BYTE2READ)
@@ -177,19 +178,19 @@ static int driver_release(struct inode *inode, struct file *file)
         pr_info("El tamanio del buffer no es valido\n");
         return -1;
     }
-    
-    /* Cargo el dato en el buffer del kernel */
+
+    // /* Cargo el dato en el buffer del kernel */
     //pr_info("Cargo el buffer del usuario con la informacion\n");
-    if(copy_from_user(state.TX_buff, ubuff, size) != 0)
+    if(copy_from_user(&aux, ubuff, size) != 0)
     {
         pr_info("Fallo __copy_from_user\n");
         return -1;
     }
 
-    //pr_info("Voy a escribir = %08X \n", *(state.TX_buff)); 
-
-    /* Escribo el dato del AXI GPIO (esta en la base de la pagina) */
-    iowrite32(*(state.TX_buff), state.base_addr);
+    // aux = atoi(state.TX_buff);
+    pr_info("Voy a escribir = %d \n", aux); 
+    // /* Escribo el dato del AXI GPIO (esta en la base de la pagina) */
+    iowrite32(aux, state.base_addr);
 
     //pr_info("Salgo de driver_write\n"); 
     return 0;

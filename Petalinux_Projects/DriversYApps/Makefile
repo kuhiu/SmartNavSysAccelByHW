@@ -18,7 +18,7 @@ clean:
 	make ARCH=arm CROSS_COMPILE=$(GCC) -C $(KERNEL_DIR) M=$(PWD) clean
 
 send:
-	scp -r ./Apps ./Drivers ./ServidorPNG root@192.168.100.130:/home/root/Tesis
+	scp -r ./Apps ./Drivers ./ServidorPNG run.sh root@192.168.100.130:/home/root/Tesis
 	
 source:
 	cd /tools/Xilinx/Vivado/2019.1/

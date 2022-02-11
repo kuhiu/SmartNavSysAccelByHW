@@ -17,29 +17,29 @@
 int main (int argc, char *argv[])
 {
     int fd;
-    uint32_t buff_send[BYTE2READ];
+    uint32_t buff_send;
 
-    *buff_send = atoi(argv[1]) ;
+    buff_send = atoi(argv[1]) ;
 
-    switch (*buff_send)
+    switch (buff_send)
     {
         case 0:
-            *buff_send = FRENAR;
+            buff_send = FRENAR;
             break;
         case 1:
-            *buff_send = ADELANTE;
+            buff_send = ADELANTE;
             break;
         case 2:
-            *buff_send = IZQUIERDA;
+            buff_send = IZQUIERDA;
             break;
         case 3:
-            *buff_send = DERECHA;
+            buff_send = DERECHA;
             break;
         case 4:
-            *buff_send = ATRAS;
+            buff_send = ATRAS;
             break;
         default:
-            *buff_send = FRENAR;
+            buff_send = FRENAR;
             break;
     }
 
@@ -50,7 +50,7 @@ int main (int argc, char *argv[])
         return -1;
     }
 
-    if ( ( write(fd, buff_send, BYTE2READ)) == -1)
+    if ( ( write(fd, &buff_send, BYTE2READ)) == -1)
     {
         //perror("close"):
         printf("Error escribiendo leds_control_chardev\n");

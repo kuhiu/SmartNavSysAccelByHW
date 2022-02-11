@@ -1,6 +1,8 @@
 #include "./Funciones/func.h"
 
-int saveSTATE(FILE *fdd_State, long long int rightSensor, long long int centerSensor, long long int leftSensor, float heading, 
+void read_from_state_string(FILE* fdd_State, char recurso[], struct sembuf *sb, int semid, char *readed);
+
+int saveSTATE(struct sembuf *sb, int semid, FILE *fdd_State, long long int rightSensor, long long int centerSensor, long long int leftSensor, float heading, 
 float revoluciones_rpm_s1, float revoluciones_rpm_s2, float distance_cm_s1, float distance_cm_s2, float real_distance_s1, float real_distance_s2)
 {
     ssize_t loffset, lread;
@@ -9,7 +11,12 @@ float revoluciones_rpm_s1, float revoluciones_rpm_s2, float distance_cm_s1, floa
     int lineNro;
     char aux[10];
 
-    //printf("22222 Distancia = Left: %lld cms, Center: %lld cms, Right: %lld cms \n", leftSensor, centerSensor, rightSensor);
+    // Tomo el recurso
+    sb->sem_op = -1;         
+    if (semop(semid, sb, 1) == -1) {          
+        perror("semop");
+        exit(1);
+    }
 
     /* Busco a lo largo del archivo "Sensores, rightSensor =" */
     lineNro = 0;
@@ -168,9 +175,58 @@ float revoluciones_rpm_s1, float revoluciones_rpm_s2, float distance_cm_s1, floa
                 break;
         }
    
-    }  
+    } 
+    // Libero el recurso
+    sb->sem_op = 1;          
+    if (semop(semid, sb, 1) == -1) {
+        perror("semop");
+        exit(1);
+    }
+    free(line); 
     return 0;
 }
+
+void read_from_state_string(FILE* fdd_State, char recurso[], struct sembuf *sb, int semid, char *readed){
+    ssize_t lread;
+    char * line = NULL;
+    size_t len = 0;  
+
+    // Tomo el recurso
+    sb->sem_op = -1;         
+    if (semop(semid, sb, 1) == -1) {          
+        perror("semop");
+        exit(1);
+    }
+
+    // Leo el state.txt
+    // Antes de empezar el ciclo, veo cual es el angulo absoluto del robot y la distancia que ya recorrio
+    fseek(fdd_State, 0, SEEK_SET);
+    while ( (lread=getline(&line, &len, fdd_State )) != -1)
+    {
+        switch (sscanf(line, recurso, readed ))
+        {
+        case EOF:       // Error
+            perror("sscanf");
+            exit(1);
+            break;
+        case 0:         // No encontro
+            //printf("No se encontro la linea: Sensores, rightSensor \n");
+            break;
+        default:        // Encontro
+            break;
+        }
+    }
+    free(line);
+    // Libero el recurso
+    sb->sem_op = 1;          
+    if (semop(semid, sb, 1) == -1) {
+        perror("semop");
+        exit(1);
+    }
+
+    return;
+}
+
 
 int main (int argc, char *argv[])
 {
@@ -214,11 +270,8 @@ int main (int argc, char *argv[])
         sb.sem_op = -1; /* set to allocate resource */
         sb.sem_flg = SEM_UNDO;
 
-    /* Para leer state */
-        ssize_t loffset, lread;
-        char * line = NULL;
-        size_t len = 0; 
-        char readed[10], desplazamiento_state[10];
+    /* Para leer state */ 
+        char readed[50], recurso[50], desplazamiento_state[10];
 
         float real_distance_s1=0, real_distance_s2=0, dist_previa=0;
 
@@ -360,79 +413,32 @@ int main (int argc, char *argv[])
         distance_cm_s2 = get_distance_m(rb_encoder_2[1]);
         //printf("Distancia recorrida Total: %f - %f ms \n", distance_cm_s1, distance_cm_s2);
 
-        // Voy a sumar unicamente la distancia con el "Desplazamiento = ADELANTE"
-        fseek(fdd_State, 0, SEEK_SET);
-        // Leo el archivo buscando las entradas
-        while ( (lread=getline(&line, &len, fdd_State )) != -1)
-        {
-            switch (sscanf(line, "Desplazamiento = %s\n", readed ))
-            {
-            case EOF:       // Error
-                perror("sscanf");
-                exit(1);
-                break;
-            case 0:         // No encontro
-                //printf("No se encontro la linea: Sensores, rightSensor \n");
-                break;
-            default:        // Encontro
-                strcpy(desplazamiento_state,readed);
-                break;
-            }
-            switch (sscanf(line, "Encoder, Distancia = %s\n", readed ))
-            {
-            case EOF:       // Error
-                perror("sscanf");
-                exit(1);
-                break;
-            case 0:         // No encontro
-                //printf("No se encontro la linea: Sensores, rightSensor \n");
-                break;
-            default:        // Encontro
-                dist_previa = atof(readed);
-                break;
-            }
-            switch (sscanf(line, "Encoder, Distancia REAL = %s\n", readed ))
-            {
-            case EOF:       // Error
-                perror("sscanf");
-                exit(1);
-                break;
-            case 0:         // No encontro
-                //printf("No se encontro la linea: Sensores, rightSensor \n");
-                break;
-            default:        // Encontro
-                real_distance_s1 = atof(readed);
-                break;
-            }
-        }
+        strcpy(recurso,"Desplazamiento = %s\n");
+        read_from_state_string(fdd_State, recurso, &sb, semid, readed);
+        strcpy(desplazamiento_state, readed);
+
+        printf("desplazamiento_state : %s\n",desplazamiento_state);
+
+        strcpy(recurso,"Encoder, Distancia = %s\n");
+        read_from_state_string(fdd_State, recurso, &sb, semid, readed);
+        dist_previa = atof(readed);
+
+        strcpy(recurso,"Encoder, Distancia REAL = %s\n");
+        read_from_state_string(fdd_State, recurso, &sb, semid, readed);
+        real_distance_s1 = atof(readed);
 
         if (strstr(desplazamiento_state, "ADELANTE") != NULL){
             real_distance_s1 += (distance_cm_s1 - dist_previa);
             real_distance_s2 += (distance_cm_s2 - dist_previa);
         }
-        //printf("real_distance_s1 es = %f, distance_cm_s1 = %f \n", real_distance_s1, distance_cm_s1);
+        printf("real_distance_s1 es = %f, distance_cm_s1 = %f \n", real_distance_s1, distance_cm_s1);
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////
         /////////////////////////////////////////  State.txt update  /////////////////////////////////////////
         //////////////////////////////////////////////////////////////////////////////////////////////////////    
-        //printf("Trying to lock...\n");
-        sb.sem_op = -1;         /* Asignar recurso */
-        if (semop(semid, &sb, 1) == -1) {           /* semop setea, chequea o limpia uno o varios semaforos */
-            perror("semop");
-            exit(1);
-        }
-        //printf("Locked.\n");
+        saveSTATE( &sb, semid, fdd_State, rightSensor, centerSensor, leftSensor, heading, revoluciones_rpm_s1, revoluciones_rpm_s2, distance_cm_s1, distance_cm_s2, real_distance_s1, real_distance_s2);
 
-        saveSTATE(fdd_State, rightSensor, centerSensor, leftSensor, heading, revoluciones_rpm_s1, revoluciones_rpm_s2, distance_cm_s1, distance_cm_s2, real_distance_s1, real_distance_s2);
-
-        sb.sem_op = 1;          /* Libera el recurso */
-        if (semop(semid, &sb, 1) == -1) {
-            perror("semop");
-            exit(1);
-        }
-        //printf("Unlocked\n");
-
-        //usleep(10000);
+        usleep(10000);
     }
     //////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////  Close all  /////////////////////////////////////////////
