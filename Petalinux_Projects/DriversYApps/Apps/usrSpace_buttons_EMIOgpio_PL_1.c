@@ -40,13 +40,13 @@ int main (void)
             system("./home/root/Tesis/Apps/usrSpace_drive_v3 100 0");
             break;
         case 2:
-            system("ls");
+            system("./home/root/Tesis/Apps/usrSpace_drive_v3 200 0");
             break;
         case 3:
-            /* code */
+            system("./home/root/Tesis/Apps/usrSpace_drive_v3 100 100");
             break;
         case 4:
-            /* code */
+            system("./home/root/Tesis/Apps/usrSpace_drive");
             break;
         default:
             printf("Error, el boton no existe\n"); 

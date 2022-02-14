@@ -129,16 +129,16 @@ int main(void)
 
   // Cargo las funciones de pertenencias 
   // Funciones de pertenencia para rightSensor
-  membership_functions_inputs_lejos_right = initialize_membership_inputs("Lejos", 0,  10, 990, (float)1/60, (float)1/60, NULL);
-  membership_functions_inputs_cerca_right = initialize_membership_inputs("Cerca", 0, -70,  70, (float)1/60, (float)1/60, membership_functions_inputs_lejos_right);
+  membership_functions_inputs_lejos_right = initialize_membership_inputs("Lejos", 0,   70,  860, (float)1/30, (float)1/30, NULL);
+  membership_functions_inputs_cerca_right = initialize_membership_inputs("Cerca", 0, -100,   100, (float)1/30, (float)1/30, membership_functions_inputs_lejos_right);
 
   // Funciones de pertenencia para centerSensor
-  membership_functions_inputs_lejos_center = initialize_membership_inputs("Lejos", 0,  10, 990, (float)1/60, (float)1/60, NULL);
-  membership_functions_inputs_cerca_center = initialize_membership_inputs("Cerca", 0, -70,  70, (float)1/60, (float)1/60, membership_functions_inputs_lejos_center);
+  membership_functions_inputs_lejos_center = initialize_membership_inputs("Lejos", 0,  70,  860,  (float)1/30, (float)1/30, NULL);
+  membership_functions_inputs_cerca_center = initialize_membership_inputs("Cerca", 0,-100,  100,  (float)1/30, (float)1/30, membership_functions_inputs_lejos_center);
 
   // Funciones de pertenencia para leftSensor
-  membership_functions_inputs_lejos_left = initialize_membership_inputs("Lejos", 0,  10,  990, (float)1/60, (float)1/60, NULL);
-  membership_functions_inputs_cerca_left = initialize_membership_inputs("Cerca", 0, -70,  70, (float)1/60, (float)1/60, membership_functions_inputs_lejos_left);
+  membership_functions_inputs_lejos_left = initialize_membership_inputs("Lejos", 0,   70,   860,  (float)1/30, (float)1/30, NULL);
+  membership_functions_inputs_cerca_left = initialize_membership_inputs("Cerca", 0,  -100,  100,  (float)1/30, (float)1/30, membership_functions_inputs_lejos_left);
 
   // Cargo las estructuras de las entradas (lo tengo que hacer aca porque las entradas varian)
   System_Inputs_rightSensor  = initialize_system_io("Right", 0, membership_functions_inputs_cerca_right, NULL);
@@ -178,25 +178,25 @@ int main(void)
                   &then_side_0, &rule_0,
                   System_Inputs_rightSensor, System_Inputs_centerSensor, System_Inputs_leftSensor);
   // Outputs
-  membership_functions_outputs_high_speed = initialize_membership_inputs("high_speed",     0,  0.2, 0.6, (float)1/0.2, (float)1/0.2, NULL);
-  membership_functions_outputs_normal_speed = initialize_membership_inputs("normal_speed", 0,    0, 0.4, (float)1/0.2, (float)1/0.2, membership_functions_outputs_high_speed);
-  membership_functions_outputs_low_speed  = initialize_membership_inputs("low_speed",      0, -0.2, 0.2, (float)1/0.2, (float)1/0.2, membership_functions_outputs_normal_speed);
+  membership_functions_outputs_high_speed = initialize_membership_inputs("high_speed",     0,  0.3, 0.5, (float)1/0.1, (float)1/0.1, NULL);
+  membership_functions_outputs_normal_speed = initialize_membership_inputs("normal_speed", 0,  0.2, 0.4, (float)1/0.1, (float)1/0.1, membership_functions_outputs_high_speed);
+  membership_functions_outputs_low_speed  = initialize_membership_inputs("low_speed",      0,  0.1, 0.3, (float)1/0.1, (float)1/0.1, membership_functions_outputs_normal_speed);
   
   //membership_functions_outputs_high_speed = initialize_membership_inputs("high_speed",  0,  0.3, 0.7, (float)1/0.2, (float)1/0.2, NULL);
   //membership_functions_outputs_low_speed  = initialize_membership_inputs("low_speed",   0,  0.1, 0.5, (float)1/0.2, (float)1/0.2, membership_functions_outputs_high_speed);
 
   // membership_functions_outputs_high_W   = initialize_membership_inputs("high_W",  0, -0.75, 0.75, (float)1/0.5, (float)1/0.5, NULL);
   // membership_functions_outputs_low_W    = initialize_membership_inputs("low_W", 0,  0.25, 1.75, (float)1/0.5, (float)1/0.5, membership_functions_outputs_high_W);
-  membership_functions_outputs_high_W   = initialize_membership_inputs("high_W",  0, 0, 2, (float)1/1, (float)1/1, NULL);
-  membership_functions_outputs_low_W    = initialize_membership_inputs("low_W",   0,-1, 1, (float)1/1, (float)1/1, membership_functions_outputs_high_W);
+  membership_functions_outputs_high_W   = initialize_membership_inputs("high_W",  0, 0, 2, (float)1/0.5, (float)1/0.5, NULL);
+  membership_functions_outputs_low_W    = initialize_membership_inputs("low_W",   0,-0.5, 0.5, (float)1/0.5, (float)1/0.5, membership_functions_outputs_high_W);
 
   //membership_functions_outputs_goRight  = initialize_membership_inputs("goRight",  0,    0, 180, (float)1/25, (float)1/25, NULL);
   //membership_functions_outputs_goCenter = initialize_membership_inputs("goCenter", 0,  -25,  25, (float)1/25, (float)1/25, membership_functions_outputs_goRight);
   //membership_functions_outputs_goLeft   = initialize_membership_inputs("goLeft",   0, -180,   0, (float)1/25, (float)1/25, membership_functions_outputs_goCenter);
 
-  membership_functions_outputs_goRight  = initialize_membership_inputs("goRight",  0,    0,  90, (float)1/25, (float)1/25, NULL);
-  membership_functions_outputs_goCenter = initialize_membership_inputs("goCenter", 0,  -25,  25, (float)1/25, (float)1/25, membership_functions_outputs_goRight);
-  membership_functions_outputs_goLeft   = initialize_membership_inputs("goLeft",   0,  -90,   0, (float)1/25, (float)1/25, membership_functions_outputs_goCenter);
+  membership_functions_outputs_goRight  = initialize_membership_inputs("goRight",  0,    0,  60, (float)1/30, (float)1/30, NULL);
+  membership_functions_outputs_goCenter = initialize_membership_inputs("goCenter", 0,  -30,  30, (float)1/30, (float)1/30, membership_functions_outputs_goRight);
+  membership_functions_outputs_goLeft   = initialize_membership_inputs("goLeft",   0,  -60,   0, (float)1/30, (float)1/30, membership_functions_outputs_goCenter);
 
   System_Outputs_speed = initialize_system_io("Speed", 0, membership_functions_outputs_low_speed, NULL);
   if (System_Outputs_speed == NULL)
@@ -281,18 +281,18 @@ int main(void)
 
       if( strcmp(img_proc_tipo, "TOMATE") == 0){
         //printf("Reconoci un tomate, cambio el set de reglas\n");
-        update_rule(rule_7, "LEJOS, LEJOS , LEJOS = IZQUIERDA, W_ALTO, S_RAPIDA");
-        update_rule(rule_6, "LEJOS, LEJOS , CERCA = IZQUIERDA, W_ALTO, S_RAPIDA");
-        update_rule(rule_5, "LEJOS, CERCA , LEJOS = IZQUIERDA, W_ALTO, S_RAPIDA");
-        update_rule(rule_4, "LEJOS, CERCA , CERCA = IZQUIERDA, W_ALTO, S_RAPIDA");
-        update_rule(rule_3, "CERCA, LEJOS , LEJOS = IZQUIERDA, W_ALTO, S_RAPIDA");
-        update_rule(rule_2, "CERCA, LEJOS , CERCA = IZQUIERDA, W_ALTO, S_RAPIDA");
-        update_rule(rule_1, "CERCA, CERCA , LEJOS = IZQUIERDA, W_ALTO, S_RAPIDA");
-        update_rule(rule_0, "CERCA, CERCA , CERCA = IZQUIERDA, W_ALTO, S_RAPIDA");
+        update_rule(rule_7, "LEJOS, LEJOS , LEJOS = IZQUIERDA, W_ALTO, S_NORMAL");
+        update_rule(rule_6, "LEJOS, LEJOS , CERCA = IZQUIERDA, W_ALTO, S_NORMAL");
+        update_rule(rule_5, "LEJOS, CERCA , LEJOS = IZQUIERDA, W_ALTO, S_NORMAL");
+        update_rule(rule_4, "LEJOS, CERCA , CERCA = IZQUIERDA, W_ALTO, S_NORMAL");
+        update_rule(rule_3, "CERCA, LEJOS , LEJOS = IZQUIERDA, W_ALTO, S_NORMAL");
+        update_rule(rule_2, "CERCA, LEJOS , CERCA = IZQUIERDA, W_ALTO, S_NORMAL");
+        update_rule(rule_1, "CERCA, CERCA , LEJOS = IZQUIERDA, W_ALTO, S_NORMAL");
+        update_rule(rule_0, "CERCA, CERCA , CERCA = IZQUIERDA, W_ALTO, S_NORMAL");
       }
       if( strcmp(img_proc_tipo, "DESCONOCIDO") == 0){
-        //printf("No reconoci ningun objeto, set de reglas por default\n");
-        // update_rule(rule_7, "LEJOS, LEJOS , LEJOS = CENTRO, W_BAJO, S_RAPIDA");
+        /* Con destino */
+        // update_rule(rule_7, "LEJOS, LEJOS , LEJOS = CENTRO, W_BAJO, S_LENTA");
         // update_rule(rule_6, "LEJOS, LEJOS , CERCA = CENTRO, W_ALTO, S_LENTA");
         // update_rule(rule_5, "LEJOS, CERCA , LEJOS = IZQUIERDA, W_ALTO, S_LENTA");
         // update_rule(rule_4, "LEJOS, CERCA , CERCA = IZQUIERDA, W_ALTO, S_LENTA");
@@ -301,14 +301,15 @@ int main(void)
         // update_rule(rule_1, "CERCA, CERCA , LEJOS = DERECHA, W_ALTO, S_LENTA");
         // update_rule(rule_0, "CERCA, CERCA , CERCA = IZQUIERDA, W_ALTO, S_LENTA");
 
-        update_rule(rule_7, "LEJOS, LEJOS , LEJOS = CENTRO, W_BAJO, S_NORMAL");
+        /* Libre */
+        update_rule(rule_7, "LEJOS, LEJOS , LEJOS = CENTRO, W_BAJO, S_LENTA");
         update_rule(rule_6, "LEJOS, LEJOS , CERCA = IZQUIERDA, W_ALTO, S_LENTA");
         update_rule(rule_5, "LEJOS, CERCA , LEJOS = IZQUIERDA, W_ALTO, S_LENTA");
         update_rule(rule_4, "LEJOS, CERCA , CERCA = IZQUIERDA, W_ALTO, S_LENTA");
         update_rule(rule_3, "CERCA, LEJOS , LEJOS = DERECHA, W_ALTO, S_LENTA");
         update_rule(rule_2, "CERCA, LEJOS , CERCA = CENTRO, W_ALTO, S_LENTA");
         update_rule(rule_1, "CERCA, CERCA , LEJOS = DERECHA, W_ALTO, S_LENTA");
-        update_rule(rule_0, "CERCA, CERCA , CERCA = IZQUIERDA, W_ALTO, S_LENTA");
+        update_rule(rule_0, "CERCA, CERCA , CERCA = IZQUIERDA, W_ALTO, S_LENTA"); 
       }
 
 
@@ -334,7 +335,7 @@ int main(void)
           exit(1);
       }
       
-      usleep(50000);
+      //usleep(20000);
   }
 
   // Libero toda la memoria pedida y los file descriptors

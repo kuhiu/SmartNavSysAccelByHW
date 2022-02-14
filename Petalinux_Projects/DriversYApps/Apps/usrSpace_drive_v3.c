@@ -24,6 +24,9 @@
 #define IZQUIERDA   (0x0<<0) | (0x1<<1) | (0x1<<2) | (0x0<<3) 
 #define ATRAS       (0x0<<0) | (0x1<<1) | (0x0<<2) | (0x1<<3) 
 
+#define MAX_HEADING_ERROR       15
+#define MAX_DIST2TARGET_ERROR   15
+
 int initsem(key_t key, int nsems);
 int go2abs_angle(FILE* fdd_State, float abs_angle2target, struct sembuf *sb, int semid, int fd_drive, int fd_speed, uint32_t *speed);
 float read_from_state(FILE* fdd_State, char recurso[], struct sembuf *sb, int semid);
@@ -174,90 +177,95 @@ int go2abs_angle(FILE* fdd_State, float abs_angle2target, struct sembuf *sb, int
     char recurso2[50] = "Brujula, Angulo = %s\n";
     char dir_send[50], readed[50], desplazamiento_state[10];
 
-    while (1) {
-        absolue = read_from_state(fdd_State, recurso2, sb, semid);
-        heading = abs_angle2target - absolue;
+    absolue = read_from_state(fdd_State, recurso2, sb, semid);
+    heading = abs_angle2target - absolue;
 
-        if ((heading > 180) || (heading < (-180)))
-            heading = (int)heading % 360;
+    if(heading > MAX_HEADING_ERROR || heading < -MAX_HEADING_ERROR){
+        while (1) {
+            absolue = read_from_state(fdd_State, recurso2, sb, semid);
+            heading = abs_angle2target - absolue;
 
-        //printf("absolue %f, abs_angle2target %f \n", absolue, abs_angle2target);
-        if (heading > 10){
-            // Leo la direccion actual            
-            strcpy(recurso,"Desplazamiento = %s\n");
-            read_from_state_string(fdd_State, recurso, sb, semid, readed);
-            strcpy(desplazamiento_state, readed);
+            if ((heading > 180) || (heading < (-180)))
+                heading = (int)heading % 360;
 
-            //printf("en heading positivo desplazamiento_state : %s\n",desplazamiento_state);
+            //printf("absolue %f, abs_angle2target %f \n", absolue, abs_angle2target);
+            if (heading > MAX_HEADING_ERROR){
+                // Leo la direccion actual            
+                strcpy(recurso,"Desplazamiento = %s\n");
+                read_from_state_string(fdd_State, recurso, sb, semid, readed);
+                strcpy(desplazamiento_state, readed);
 
-            if ( strcmp(desplazamiento_state, "IZQUIERDA") != 0){ // Si no es igual, hubo un cambio de direccion
-                //printf("Cambio de direccion izq\n");
-                // Dead time para evitar tanto consumo de energia
-                if ( ( write(fd_speed, &zero_speed, BYTE2READ_speed)) == -1){
+                //printf("en heading positivo desplazamiento_state : %s\n",desplazamiento_state);
+
+                if ( strcmp(desplazamiento_state, "IZQUIERDA") != 0){ // Si no es igual, hubo un cambio de direccion
+                    //printf("Cambio de direccion izq\n");
+                    // Dead time para evitar tanto consumo de energia
+                    if ( ( write(fd_speed, &zero_speed, BYTE2READ_speed)) == -1){
+                        printf("Error escribiendo leds_control_chardev\n");
+                        return -1;
+                    }
+                    // Espero que se detenga para no gastar tanta energia
+                    usleep(500000); 
+                    // Cambio la direccion
+                    buff_send = IZQUIERDA;
+                    if ( ( write(fd_drive, &buff_send, BYTE2READ_drive)) == -1){
+                        printf("Error escribiendo leds_control_chardev\n");
+                        return -1;
+                    }
+                    // Actualizo la direccion en state
+                    strcpy(dir_send, "IZQUIERDA");
+                    write_to_state(fdd_State, dir_send, sb, semid);
+                    usleep(20000);
+                    // Restauro velocidad
+                    if ( ( write(fd_speed, speed, BYTE2READ_speed)) == -1){
+                        printf("Error escribiendo leds_control_chardev\n");
+                        return -1;
+                    }
+                }
+            }
+            else if (heading < -MAX_HEADING_ERROR) {
+                strcpy(recurso,"Desplazamiento = %s\n");
+                read_from_state_string(fdd_State, recurso, sb, semid, readed);
+                strcpy(desplazamiento_state, readed);
+                //printf("en heading negativo desplazamiento_state : %s\n",desplazamiento_state);
+                if ( strcmp(desplazamiento_state, "DERECHA") != 0){ // Si no es igual, hubo un cambio de direccion
+                    //printf("Cambio de direccion der\n");
+                    // Dead time para evitar tanto consumo de energia
+                    if ( ( write(fd_speed, &zero_speed, BYTE2READ_speed)) == -1){
+                        printf("Error escribiendo leds_control_chardev\n");
+                        return -1;
+                    }
+                    // Espero que se detenga para no gastar tanta energia
+                    usleep(500000); 
+                    // Cambio la direccion
+                    buff_send = DERECHA;
+                    if ( ( write(fd_drive, &buff_send, BYTE2READ_drive)) == -1){
+                        printf("Error escribiendo leds_control_chardev\n");
+                        return -1;
+                    }
+                    // Actualizo la direccion en state
+                    strcpy(dir_send, "DERECHA  ");
+                    write_to_state(fdd_State, dir_send, sb, semid);
+                    usleep(20000);
+                    // Restauro velocidad
+                    if ( ( write(fd_speed, speed, BYTE2READ_speed)) == -1){
+                        printf("Error escribiendo leds_control_chardev\n");
+                        return -1;
+                    }
+                }
+            }
+            else{
+                buff_send = FRENAR;
+                if ( ( write(fd_drive, &buff_send, BYTE2READ_drive)) == -1)
+                {
+                    //perror("close"):
                     printf("Error escribiendo leds_control_chardev\n");
                     return -1;
                 }
-                // Espero que se detenga para no gastar tanta energia
-                usleep(500000); 
-                // Cambio la direccion
-                buff_send = IZQUIERDA;
-                if ( ( write(fd_drive, &buff_send, BYTE2READ_drive)) == -1){
-                    printf("Error escribiendo leds_control_chardev\n");
-                    return -1;
-                }
-                // Actualizo la direccion en state
-                strcpy(dir_send, "IZQUIERDA");
+                strcpy(dir_send, "FRENAR   ");
                 write_to_state(fdd_State, dir_send, sb, semid);
-                usleep(20000);
-                // Restauro velocidad
-                if ( ( write(fd_speed, speed, BYTE2READ_speed)) == -1){
-                    printf("Error escribiendo leds_control_chardev\n");
-                    return -1;
-                }
+                break;
             }
-        }
-        else if (heading < -10) {
-            strcpy(recurso,"Desplazamiento = %s\n");
-            read_from_state_string(fdd_State, recurso, sb, semid, readed);
-            strcpy(desplazamiento_state, readed);
-            //printf("en heading negativo desplazamiento_state : %s\n",desplazamiento_state);
-            if ( strcmp(desplazamiento_state, "DERECHA") != 0){ // Si no es igual, hubo un cambio de direccion
-                //printf("Cambio de direccion der\n");
-                // Dead time para evitar tanto consumo de energia
-                if ( ( write(fd_speed, &zero_speed, BYTE2READ_speed)) == -1){
-                    printf("Error escribiendo leds_control_chardev\n");
-                    return -1;
-                }
-                // Espero que se detenga para no gastar tanta energia
-                usleep(500000); 
-                // Cambio la direccion
-                buff_send = DERECHA;
-                if ( ( write(fd_drive, &buff_send, BYTE2READ_drive)) == -1){
-                    printf("Error escribiendo leds_control_chardev\n");
-                    return -1;
-                }
-                // Actualizo la direccion en state
-                strcpy(dir_send, "DERECHA  ");
-                write_to_state(fdd_State, dir_send, sb, semid);
-                usleep(20000);
-                // Restauro velocidad
-                if ( ( write(fd_speed, speed, BYTE2READ_speed)) == -1){
-                    printf("Error escribiendo leds_control_chardev\n");
-                    return -1;
-                }
-            }
-        }
-        else{
-            buff_send = FRENAR;
-            if ( ( write(fd_drive, &buff_send, BYTE2READ_drive)) == -1)
-            {
-                //perror("close"):
-                printf("Error escribiendo leds_control_chardev\n");
-                return -1;
-            }
-            strcpy(dir_send, "FRENAR   ");
-            write_to_state(fdd_State, dir_send, sb, semid);
-            break;
         }
     }
 
@@ -397,7 +405,7 @@ int main (int argc, char* argv[])
     start_angle = read_from_state(fdd_State, recurso, &sb, semid);
 
     // Seteo la velocidad de comienzo para el robot
-    speed = 50;
+    speed = 20;
     if ( ( write(fd_speed, &zero_speed, BYTE2READ_speed)) == -1){
         printf("Error escribiendo leds_control_chardev\n");
         return -1;
@@ -484,7 +492,7 @@ int main (int argc, char* argv[])
         previous_speed = speed;
 
         // Salgo si llegue al target
-        if( dist2target < 15 ){
+        if( dist2target < MAX_DIST2TARGET_ERROR ){
             printf("Llegue a mi destino!!\n");
             buff_send = FRENAR;
             if ( ( write(fd_drive, &buff_send, BYTE2READ_drive)) == -1){
@@ -497,10 +505,10 @@ int main (int argc, char* argv[])
         }
 
         //Para debuggear
-        printf("ang2target %f, W %f, rel_ang_robot %f, theta %f, (x_robot,y_robot) = (%f,%f), speed = %d\n", ang2target, W, rel_ang_robot, theta, x_robot, y_robot, speed);
+        //printf("ang2target %f, W %f, rel_ang_robot %f, theta %f, (x_robot,y_robot) = (%f,%f), speed = %d\n", ang2target, W, rel_ang_robot, theta, x_robot, y_robot, speed);
         
-        // Duermo 10ms
-        usleep(200000);
+        // Duermo 100ms
+        usleep(300000);
     }
     return 0;
 }

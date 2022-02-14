@@ -97,7 +97,7 @@ int main (void)
         return -1;
     }
 
-    speed = 30;
+    speed = 20;
     if ( ( write(fd_speed, &speed, BYTE2READ_speed)) == -1)
     {
         //perror("close"):

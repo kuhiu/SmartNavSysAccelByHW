@@ -82,7 +82,7 @@ int main(void)
         //printf("press to read again\n"); 
         //getchar();
 
-        usleep(50000);
+        usleep(100000);
     }
 
      /* remove it: */
