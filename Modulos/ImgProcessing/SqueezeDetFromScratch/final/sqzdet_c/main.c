@@ -112,6 +112,10 @@ int main(void)
     // File
     FILE* fdd_State;
 
+    // Leds
+    int fd_leds;
+    uint32_t leds;
+
   //////////////////////////////////////////////////////////////////////////////////////////////////////
   //////////////////////////////////////   State TXT  //////////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -137,6 +141,15 @@ int main(void)
         close(fdp);
         exit(1);
     }
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////// Control de leds       /////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    if ( (fd_leds = open("/dev/chardev_leds_EMIOgpio_PL", O_RDWR)) == -1){
+        //perror("open");
+        printf("Error abriendo/dev/chardev_leds_EMIOgpio_PL %d\n", fd_leds);
+        return -1;
+    }
+
 ////////////////////////////////        Leo el header       ////////////////////////////////////////////////////////
     //read_png_file("./test5.png");
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -560,25 +573,37 @@ while(keepRunning)
 
         strcpy(Tipo,"TOMATE      ");
 
+        // Enciendo el led de reconocimiento
+        if ( read(fd_leds, &leds, BYTE2READ) == -1){
+            perror("read");
+            return -1;
+        }
+        leds = leds | 0x01;    /* Seteo el leds[0] */
+        printf("Voy a escribir leds = %d\n", leds);
+        if ( ( write(fd_leds, &leds, BYTE2READ)) == -1){
+            printf("Error escribiendo\n");
+            return -1;
+        }
+
         sb.sem_op = -1;         /* Asignar recurso */
         if (semop(semid, &sb, 1) == -1) {           /* semop setea, chequea o limpia uno o varios semaforos */
             perror("semop");
             exit(1);
         }
-            if ( DeltaX_left >=  DeltaX_right)
-            {
-                // Escribo en STATE que tengo que ir a la derecha 
-                printf("Tengo que ir a la derecha \n");
-                strcpy(Direccion,"DERECHA     ");
-                put_system_outputs(fdd_State, Tipo, Direccion);
-            }
-            else 
-            {
-                // Escribo en STATE que tengo que ir a la izquierda
-                printf("Tengo que ir a la izquierda \n");
-                strcpy(Direccion,"IZQUIERDA   ");
-                put_system_outputs(fdd_State, Tipo, Direccion);
-            }
+        if ( DeltaX_left >=  DeltaX_right)
+        {
+            // Escribo en STATE que tengo que ir a la derecha 
+            printf("Tengo que ir a la derecha \n");
+            strcpy(Direccion,"DERECHA     ");
+            put_system_outputs(fdd_State, Tipo, Direccion);
+        }
+        else 
+        {
+            // Escribo en STATE que tengo que ir a la izquierda
+            printf("Tengo que ir a la izquierda \n");
+            strcpy(Direccion,"IZQUIERDA   ");
+            put_system_outputs(fdd_State, Tipo, Direccion);
+        }
         sb.sem_op = 1;          /* Libera el recurso */
         if (semop(semid, &sb, 1) == -1) {
             perror("semop");
@@ -592,6 +617,18 @@ while(keepRunning)
         strcpy(Direccion,"DESCONOCIDO ");
         strcpy(Tipo,"DESCONOCIDO ");
         put_system_outputs(fdd_State, Tipo, Direccion);
+        // Apago el led de reconocimiento
+        if ( read(fd_leds, &leds, BYTE2READ) == -1){
+            perror("read");
+            return -1;
+        }
+        leds = leds & ~(uint32_t)0x01;    /* Borro el leds[0] */
+        printf("Voy a escribir leds = %d\n", leds);
+        if ( ( write(fd_leds, &leds, BYTE2READ)) == -1){
+            printf("Error escribiendo\n");
+            return -1;
+        }
+
     }
     // Guardo la imagen
     //write_png_file("./test5MODIF.png");

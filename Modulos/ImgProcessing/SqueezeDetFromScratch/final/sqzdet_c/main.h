@@ -15,7 +15,9 @@
 #include <signal.h>
 #include <sys/ipc.h>
 #include <sys/sem.h>
+#include <stdint.h>
 
+#define BYTE2READ 4
 
 #define FRAMEBUFFER_READ_OFFSET  0x01000000  // Image ram position
 #define FRAMEBUFFER_WRITE_OFFSET 0x02000000

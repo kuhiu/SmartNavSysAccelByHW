@@ -17,6 +17,7 @@
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 #define BYTE2READ_drive 1*4
 #define BYTE2READ_speed 1*4
+#define BYTE2READ_leds  1*4
 
 #define ADELANTE    (0x1<<0) | (0x0<<1) | (0x1<<2) | (0x0<<3) 
 #define FRENAR      (0x0<<0) | (0x0<<1) | (0x0<<2) | (0x0<<3)
@@ -353,6 +354,10 @@ int main (int argc, char* argv[])
     // Para leer state
     char recurso[50], dir_send[50];
 
+    // Control de leds
+    uint32_t leds;
+    int fd_leds;
+
     // Medir el tiempo 
     //struct timespec begin, end; 
 
@@ -361,6 +366,25 @@ int main (int argc, char* argv[])
         printf("Espero una coordenada: x y ej. 1 2\n");
         return -1;
     }
+
+    /* Leds driver fd */
+    if ( (fd_leds = open("/dev/chardev_leds_EMIOgpio_PL", O_RDWR)) == -1){
+        printf("Error abriendo/dev/chardev_leds_EMIOgpio_PL %d\n", fd_leds);
+        return -1;
+    }
+
+    // Apago el led de meta
+    if ( read(fd_leds, &leds, BYTE2READ_leds) == -1){
+        perror("read");
+        return -1;
+    }
+    leds = leds & ~(uint32_t)0x02;    /* Borro el leds[0] */
+    printf("Voy a escribir leds = %d\n", leds);
+    if ( ( write(fd_leds, &leds, BYTE2READ_leds)) == -1){
+        printf("Error escribiendo\n");
+        return -1;
+    }
+
 
     // Argumentos de main, coordenadas x e y deseadas (TARGET)
     x_target = atof(argv[1]);
@@ -501,6 +525,19 @@ int main (int argc, char* argv[])
             }
             strcpy(dir_send, "FRENAR  ");
             write_to_state(fdd_State, dir_send, &sb, semid);
+
+            // Enciendo el led de la meta
+            if ( read(fd_leds, &leds, BYTE2READ_leds) == -1){
+                perror("read");
+                return -1;
+            }
+            leds = leds | 0x02;    /* Seteo el leds[0] */
+            printf("Voy a escribir leds = %d\n", leds);
+            if ( ( write(fd_leds, &leds, BYTE2READ_leds)) == -1){
+                printf("Error escribiendo\n");
+                return -1;
+            }
+
             break;
         }
 
