@@ -70,6 +70,7 @@ Este repositorio describe los avances de mi tesis de grado, un sistema de navega
 11) El robot es capaz de modificar su comportamiento al reconocer el tomate.
 12) A partir de las variables de estado controlar la velocidad del robot. (Implementado pero no es posible utilizarlo debido a la lentitud de la brujula)
 13) Driver para leds para saber cuando hay un reconocimiento de la red neuronal y cuando el robot llega a su target (version3 del sistema difuso).
+14) Alimentacion por baterias.
 
 ## Pendientes 
 -
