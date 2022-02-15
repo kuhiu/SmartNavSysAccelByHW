@@ -66,16 +66,25 @@ Este repositorio describe los avances de mi tesis de grado, un sistema de navega
 7) A partir de las variables de estado controlar los motores del robot.
 8) Escribir el sistema de control difuso en C.
 9) Mejorar encoder.
+10) El sistema de control difuso es capaz de dirigirse a un punto especifico evitando colisionar.
+11) El robot es capaz de modificar su comportamiento al reconocer el tomate.
+12) A partir de las variables de estado controlar la velocidad del robot. (Implementado pero no es posible utilizarlo debido a la lentitud de la brujula)
+13) Driver para leds para saber cuando hay un reconocimiento de la red neuronal y cuando el robot llega a su target (version3 del sistema difuso).
 
 ## Pendientes 
-
-1) Aplicaciones (sistema difuso + procesamiento de imagenes).
-2) El sistema de control difuso es capaz de dirigirse a un punto especifico evitando colisionar.
-3) El robot es capaz de modificar su comportamiento al reconocer distintos obstaculos.
+-
 
 ## Proxima version del robot
 
 0) Mejorar rendimiento de la CNN.
 1) Desarrollo en la FPGA y su driver.
-2) A partir de las variables de estado controlar la velocidad del robot.
-3) Convertir el archivo a una share memory, para poder loggear las variables de estado.
+2) Convertir el archivo a una share memory, para poder loggear las variables de estado.
+3) Modificar su apariencia. Referencia: https://www.thingiverse.com/thing:4910801
+
+<p float="left">
+    <img src="./imagenes/cozmo.jpg" width="225" />
+    <img src="./imagenes/cozmo2.png" width="300" />
+</p>
+
+
+4) Darle mucha mas inteligencia al robot.
