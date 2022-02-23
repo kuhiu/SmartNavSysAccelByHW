@@ -25,11 +25,11 @@
 #define IZQUIERDA   (0x0<<0) | (0x1<<1) | (0x1<<2) | (0x0<<3) 
 #define ATRAS       (0x0<<0) | (0x1<<1) | (0x0<<2) | (0x1<<3) 
 
-#define MAX_HEADING_ERROR       15
-#define MAX_DIST2TARGET_ERROR   15
+#define MAX_HEADING_ERROR        5
+#define MAX_DIST2TARGET_ERROR   20
 
 int initsem(key_t key, int nsems);
-int go2abs_angle(FILE* fdd_State, float abs_angle2target, struct sembuf *sb, int semid, int fd_drive, int fd_speed, uint32_t *speed);
+float go2abs_angle(FILE* fdd_State, float abs_angle2target, struct sembuf *sb, int semid, int fd_drive, int fd_speed, uint32_t *speed);
 float read_from_state(FILE* fdd_State, char recurso[], struct sembuf *sb, int semid);
 float from_rel_2_abs(float rel_angle2target, float start_angle);
 int write_to_state(FILE* fdd_State, char recurso[], struct sembuf *sb, int semid);
@@ -170,7 +170,7 @@ float read_from_state(FILE* fdd_State, char recurso[], struct sembuf *sb, int se
     return value;
 }
 
-int go2abs_angle(FILE* fdd_State, float abs_angle2target, struct sembuf *sb, int semid, int fd_drive, int fd_speed, uint32_t *speed){
+int go2abs_angle_save(FILE* fdd_State, float abs_angle2target, struct sembuf *sb, int semid, int fd_drive, int fd_speed, uint32_t *speed){
     float absolue, heading;
     uint32_t buff_send;
     const uint32_t zero_speed=0;
@@ -274,6 +274,56 @@ int go2abs_angle(FILE* fdd_State, float abs_angle2target, struct sembuf *sb, int
     return absolue;
 }
 
+float go2abs_angle(FILE* fdd_State, float abs_angle2target, struct sembuf *sb, int semid, int fd_drive, int fd_speed, uint32_t *speed){
+    float absolue, heading;
+    int speed2heading = 23;
+    uint32_t buff_send;
+    char recurso2[50] = "Brujula, Angulo = %s\n";
+    char dir_send[50];
+
+    absolue = read_from_state(fdd_State, recurso2, sb, semid);
+    heading = abs_angle2target - absolue;
+
+    if(heading > MAX_HEADING_ERROR || heading < -MAX_HEADING_ERROR){
+        while (1) {
+            absolue = read_from_state(fdd_State, recurso2, sb, semid);
+            heading = abs_angle2target - absolue;
+
+            if ((heading > 180) || (heading < (-180)))
+                heading = (int)heading % 360;
+
+            if ( ( write(fd_speed, &speed2heading, BYTE2READ_speed)) == -1){
+                printf("Error escribiendo leds_control_chardev\n");
+                return -1;
+            }
+            //printf("absolue %f, abs_angle2target %f \n", absolue, abs_angle2target);
+            if (heading > MAX_HEADING_ERROR){
+                buff_send = IZQUIERDA;      /* Cambio la direccion */
+                if ( ( write(fd_drive, &buff_send, BYTE2READ_drive)) == -1){
+                    printf("Error escribiendo leds_control_chardev\n");
+                    return -1;
+                }
+                strcpy(dir_send, "IZQUIERDA");      /* Actualizo la direccion en state */
+                write_to_state(fdd_State, dir_send, sb, semid);
+            }
+            else if (heading < -MAX_HEADING_ERROR) { 
+                buff_send = DERECHA;    /* Cambio la direccion */
+                if ( ( write(fd_drive, &buff_send, BYTE2READ_drive)) == -1){
+                    printf("Error escribiendo leds_control_chardev\n");
+                    return -1;
+                }
+                strcpy(dir_send, "DERECHA  ");      /* Actualizo la direccion en state */
+                write_to_state(fdd_State, dir_send, sb, semid);
+            }
+            else
+                break;
+        }
+    }
+
+    //absolue = read_from_state(fdd_State, recurso2, sb, semid);
+    return heading;
+}
+
 void read_from_state_string(FILE* fdd_State, char recurso[], struct sembuf *sb, int semid, char *readed){
     ssize_t lread;
     char * line = NULL;
@@ -361,6 +411,8 @@ int main (int argc, char* argv[])
     // Medir el tiempo 
     //struct timespec begin, end; 
 
+    float heading=0;
+
     // Chequeo argumentos de main
     if (argc != 3){
         printf("Espero una coordenada: x y ej. 1 2\n");
@@ -384,7 +436,6 @@ int main (int argc, char* argv[])
         printf("Error escribiendo\n");
         return -1;
     }
-
 
     // Argumentos de main, coordenadas x e y deseadas (TARGET)
     x_target = atof(argv[1]);
@@ -429,40 +480,28 @@ int main (int argc, char* argv[])
     start_angle = read_from_state(fdd_State, recurso, &sb, semid);
 
     // Seteo la velocidad de comienzo para el robot
-    speed = 20;
-    if ( ( write(fd_speed, &zero_speed, BYTE2READ_speed)) == -1){
-        printf("Error escribiendo leds_control_chardev\n");
-        return -1;
-    }
+    speed = 18;
+    // if ( ( write(fd_speed, &speed, BYTE2READ_speed)) == -1){
+    //     printf("Error escribiendo leds_control_chardev\n");
+    //     return -1;
+    // }
 
     // Angulo relativo al comienzo del target
-    rel_ang_robot = atan2(y_target,x_target)*180/M_PI;
+    //rel_ang_robot = atan2(y_target,x_target)*180/M_PI;
     //printf("rel_angle2target: %f \n", rel_angle2target);
 
     // Pasar de relativo a absoluto
-    abs_ang_robot = from_rel_2_abs(rel_ang_robot, start_angle);
+    //abs_ang_robot = from_rel_2_abs(rel_ang_robot, start_angle);
 
     //printf("abs_angle2target: %f \n", abs_angle2target);
-    abs_ang_robot = go2abs_angle(fdd_State, abs_ang_robot, &sb, semid, fd_drive, fd_speed, &speed);
-    printf("Con este angulo comienza la evasion abs_angle2target: %f \n", abs_ang_robot);
+    //abs_ang_robot = go2abs_angle(fdd_State, abs_ang_robot, &sb, semid, fd_drive, fd_speed, &speed);
+    //printf("Con este angulo comienza la evasion abs_angle2target: %f \n", abs_ang_robot);
 
     // Para saber la distancia anterior
     strcpy(recurso,"Encoder, Distancia REAL = %s\n");
     past_dist = read_from_state(fdd_State, recurso, &sb, semid);
 
     while(1){   // Cada pasada es un delta
-        //Busco saber donde esta el target todo el tiempo
-        dx = x_target-x_robot;
-        dy = y_target-y_robot;
-        dist2target = pow(dx,2) + pow(dy,2);
-        dist2target = pow(dist2target,0.5);
-        ang2target = atan2(dy,dx)*180/M_PI;  	// ang al target from +x (1,0)
-
-        // Leo la distancia 
-        strcpy(recurso,"Encoder, Distancia REAL = %s\n");
-        actual_dist = read_from_state(fdd_State, recurso, &sb, semid);
-        delta_dist = actual_dist - past_dist;
-        
         // Leo theta, el angulo de evasion
         strcpy(recurso,"Angulo requerido = %s\n");
         theta = read_from_state(fdd_State, recurso, &sb, semid);
@@ -476,14 +515,12 @@ int main (int argc, char* argv[])
 
         // Actualizo el angulo del robot
         abs_ang_robot = from_rel_2_abs( rel_ang_robot , start_angle);
-        go2abs_angle(fdd_State, abs_ang_robot, &sb, semid, fd_drive, fd_speed, &speed); 
-        
-        // Dead time
-        // if ( ( write(fd_speed, &zero_speed, BYTE2READ_speed)) == -1){
-        //     printf("Error escribiendo leds_control_chardev\n");
-        //     return -1;
-        // }
-        // usleep(1000);
+        heading = go2abs_angle(fdd_State, abs_ang_robot, &sb, semid, fd_drive, fd_speed, &speed); 
+
+        if ( ( write(fd_speed, &speed, BYTE2READ_speed)) == -1){
+            printf("Error escribiendo leds_control_chardev\n");
+            return -1;
+        }
 
         // Avanzo ,Envio la accion
         buff_send = ADELANTE;
@@ -494,20 +531,39 @@ int main (int argc, char* argv[])
         strcpy(dir_send, "ADELANTE ");
         write_to_state(fdd_State, dir_send, &sb, semid);
 
-        // Leo la velocidad de la salida del sistema difuso
-        strcpy(recurso,"Pwm, Velocidad = %s\n");
-        speed = (uint32_t)read_from_state(fdd_State, recurso, &sb, semid);
-        //speed = soft_start_pwm(speed, previous_speed);
+        // Duermo 1 segundo 
+        sleep(1);
 
-        // Envio la velocidad del robot
-        if ( ( write(fd_speed, (int*)&speed, BYTE2READ_speed)) == -1){
-            printf("Error escribiendo leds_control_chardev\n");
-            return -1;
-        }
+        // // Leo la velocidad de la salida del sistema difuso
+        // strcpy(recurso,"Pwm, Velocidad = %s\n");
+        // speed = (uint32_t)read_from_state(fdd_State, recurso, &sb, semid);
+        // //speed = soft_start_pwm(speed, previous_speed);
 
-        // Actualizo la posicion del robot
+        // // Envio la velocidad del robot
+        // if ( ( write(fd_speed, (int*)&speed, BYTE2READ_speed)) == -1){
+        //     printf("Error escribiendo leds_control_chardev\n");
+        //     return -1;
+        // }
+
+        // Leo la distancia recorrida 
+        strcpy(recurso,"Encoder, Distancia REAL = %s\n");
+        actual_dist = read_from_state(fdd_State, recurso, &sb, semid);
+        delta_dist = actual_dist - past_dist;
+        
+        // Actualizo la posicion del robot, a partir del delta de distancia y el heading utilizado en el ciclo anterior
         x_robot += delta_dist * cos(rel_ang_robot*M_PI/180); 
         y_robot += delta_dist * sin(rel_ang_robot*M_PI/180); 
+
+        //Busco saber donde esta el target todo el tiempo
+        dx = x_target-x_robot;
+        dy = y_target-y_robot;
+        dist2target = pow(dx,2) + pow(dy,2);
+        dist2target = pow(dist2target,0.5);
+        ang2target = atan2(dy,dx)*180/M_PI;  	// ang al target from +x (1,0)
+
+        //Para debuggear
+        printf("ang2target %f, W %f, rel_ang_robot %f, theta %f, (x_robot,y_robot) = (%f,%f), speed = %d, heading = %f, delta_dist = %f\n", 
+        ang2target, W, rel_ang_robot, theta, x_robot, y_robot, speed, heading, delta_dist);
 
         // Actualizo la distancia anterior
         past_dist = actual_dist;
@@ -537,15 +593,19 @@ int main (int argc, char* argv[])
                 printf("Error escribiendo\n");
                 return -1;
             }
-
+            //Para debuggear
+            printf("ang2target %f, W %f, rel_ang_robot %f, theta %f, (x_robot,y_robot) = (%f,%f), speed = %d, heading = %f, delta_dist = %f\n", 
+            ang2target, W, rel_ang_robot, theta, x_robot, y_robot, speed, heading, delta_dist);
             break;
         }
 
-        //Para debuggear
-        //printf("ang2target %f, W %f, rel_ang_robot %f, theta %f, (x_robot,y_robot) = (%f,%f), speed = %d\n", ang2target, W, rel_ang_robot, theta, x_robot, y_robot, speed);
-        
-        // Duermo 100ms
-        usleep(300000);
+        if ( ( write(fd_speed, &zero_speed, BYTE2READ_speed)) == -1){
+            printf("Error escribiendo leds_control_chardev\n");
+            return -1;
+        }
+
+        printf("Press Enter to Continue");
+        while( getchar() != '\n' );
     }
     return 0;
 }

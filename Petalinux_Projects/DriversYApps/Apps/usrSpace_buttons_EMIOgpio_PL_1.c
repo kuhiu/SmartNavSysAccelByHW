@@ -37,16 +37,16 @@ int main (void)
         switch (ubuff)
         {
         case 1:
-            system("./home/root/Tesis/Apps/usrSpace_drive_v3 100 0");
+            system("/home/root/Tesis/Apps/usrSpace_drive_v3 100 0");
             break;
         case 2:
-            system("./home/root/Tesis/Apps/usrSpace_drive_v3 200 0");
+            system("/home/root/Tesis/Apps/usrSpace_drive_v3 200 0");
             break;
         case 3:
-            system("./home/root/Tesis/Apps/usrSpace_drive_v3 100 100");
+            system("/home/root/Tesis/Apps/usrSpace_drive_v3 100 100");
             break;
         case 4:
-            system("./home/root/Tesis/Apps/usrSpace_drive");
+            system("/home/root/Tesis/Apps/usrSpace_drive");
             break;
         default:
             printf("Error, el boton no existe\n"); 

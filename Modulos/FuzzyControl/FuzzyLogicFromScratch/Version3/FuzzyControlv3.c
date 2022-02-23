@@ -129,16 +129,16 @@ int main(void)
 
   // Cargo las funciones de pertenencias 
   // Funciones de pertenencia para rightSensor
-  membership_functions_inputs_lejos_right = initialize_membership_inputs("Lejos", 0,   70,  860, (float)1/30, (float)1/30, NULL);
-  membership_functions_inputs_cerca_right = initialize_membership_inputs("Cerca", 0, -100,   100, (float)1/30, (float)1/30, membership_functions_inputs_lejos_right);
+  membership_functions_inputs_lejos_right = initialize_membership_inputs("Lejos", 0,   30,  940, (float)1/30, (float)1/30, NULL);
+  membership_functions_inputs_cerca_right = initialize_membership_inputs("Cerca", 0,  -60,   60, (float)1/30, (float)1/30, membership_functions_inputs_lejos_right);
 
   // Funciones de pertenencia para centerSensor
-  membership_functions_inputs_lejos_center = initialize_membership_inputs("Lejos", 0,  70,  860,  (float)1/30, (float)1/30, NULL);
-  membership_functions_inputs_cerca_center = initialize_membership_inputs("Cerca", 0,-100,  100,  (float)1/30, (float)1/30, membership_functions_inputs_lejos_center);
+  membership_functions_inputs_lejos_center = initialize_membership_inputs("Lejos", 0,  30,  940,  (float)1/30, (float)1/30, NULL);
+  membership_functions_inputs_cerca_center = initialize_membership_inputs("Cerca", 0, -60,   60,  (float)1/30, (float)1/30, membership_functions_inputs_lejos_center);
 
   // Funciones de pertenencia para leftSensor
-  membership_functions_inputs_lejos_left = initialize_membership_inputs("Lejos", 0,   70,   860,  (float)1/30, (float)1/30, NULL);
-  membership_functions_inputs_cerca_left = initialize_membership_inputs("Cerca", 0,  -100,  100,  (float)1/30, (float)1/30, membership_functions_inputs_lejos_left);
+  membership_functions_inputs_lejos_left = initialize_membership_inputs("Lejos", 0,    30,   940,  (float)1/30, (float)1/30, NULL);
+  membership_functions_inputs_cerca_left = initialize_membership_inputs("Cerca", 0,   -60,   60,  (float)1/30, (float)1/30, membership_functions_inputs_lejos_left);
 
   // Cargo las estructuras de las entradas (lo tengo que hacer aca porque las entradas varian)
   System_Inputs_rightSensor  = initialize_system_io("Right", 0, membership_functions_inputs_cerca_right, NULL);
@@ -194,9 +194,9 @@ int main(void)
   //membership_functions_outputs_goCenter = initialize_membership_inputs("goCenter", 0,  -25,  25, (float)1/25, (float)1/25, membership_functions_outputs_goRight);
   //membership_functions_outputs_goLeft   = initialize_membership_inputs("goLeft",   0, -180,   0, (float)1/25, (float)1/25, membership_functions_outputs_goCenter);
 
-  membership_functions_outputs_goRight  = initialize_membership_inputs("goRight",  0,    0,  60, (float)1/30, (float)1/30, NULL);
-  membership_functions_outputs_goCenter = initialize_membership_inputs("goCenter", 0,  -30,  30, (float)1/30, (float)1/30, membership_functions_outputs_goRight);
-  membership_functions_outputs_goLeft   = initialize_membership_inputs("goLeft",   0,  -60,   0, (float)1/30, (float)1/30, membership_functions_outputs_goCenter);
+  membership_functions_outputs_goRight  = initialize_membership_inputs("goRight",  0,    0,  90, (float)1/45, (float)1/45, NULL);
+  membership_functions_outputs_goCenter = initialize_membership_inputs("goCenter", 0,  -45,  45, (float)1/45, (float)1/45, membership_functions_outputs_goRight);
+  membership_functions_outputs_goLeft   = initialize_membership_inputs("goLeft",   0,  -90,   0, (float)1/45, (float)1/45, membership_functions_outputs_goCenter);
 
   System_Outputs_speed = initialize_system_io("Speed", 0, membership_functions_outputs_low_speed, NULL);
   if (System_Outputs_speed == NULL)
@@ -276,12 +276,12 @@ int main(void)
       fuzzification(System_Inputs_leftSensor);  // left -> center -> right
 
       // // Antes de evaluar las reglas, chequeo el estado del sistema de procesamiento de imagenes
-      strcpy(recurso,"ImgProc, Tipo = %s\n");
+      strcpy(recurso,"ImgProc, Direccion = %s\n");
       read_from_state_string(fdd_State, recurso, sb, semid, img_proc_tipo);
 
-      if( strcmp(img_proc_tipo, "TOMATE") == 0){
+      if( strcmp(img_proc_tipo, "IZQUIERDA") == 0){
         //printf("Reconoci un tomate, cambio el set de reglas\n");
-        update_rule(rule_7, "LEJOS, LEJOS , LEJOS = IZQUIERDA, W_ALTO, S_NORMAL");
+        update_rule(rule_7, "LEJOS, LEJOS , LEJOS = IZQUIERDA, W_BAJO, S_NORMAL");
         update_rule(rule_6, "LEJOS, LEJOS , CERCA = IZQUIERDA, W_ALTO, S_NORMAL");
         update_rule(rule_5, "LEJOS, CERCA , LEJOS = IZQUIERDA, W_ALTO, S_NORMAL");
         update_rule(rule_4, "LEJOS, CERCA , CERCA = IZQUIERDA, W_ALTO, S_NORMAL");
@@ -290,6 +290,18 @@ int main(void)
         update_rule(rule_1, "CERCA, CERCA , LEJOS = IZQUIERDA, W_ALTO, S_NORMAL");
         update_rule(rule_0, "CERCA, CERCA , CERCA = IZQUIERDA, W_ALTO, S_NORMAL");
       }
+      if( strcmp(img_proc_tipo, "DERECHA") == 0){
+        //printf("Reconoci un tomate, cambio el set de reglas\n");
+        update_rule(rule_7, "LEJOS, LEJOS , LEJOS = DERECHA, W_BAJO, S_NORMAL");
+        update_rule(rule_6, "LEJOS, LEJOS , CERCA = DERECHA, W_ALTO, S_NORMAL");
+        update_rule(rule_5, "LEJOS, CERCA , LEJOS = DERECHA, W_ALTO, S_NORMAL");
+        update_rule(rule_4, "LEJOS, CERCA , CERCA = DERECHA, W_ALTO, S_NORMAL");
+        update_rule(rule_3, "CERCA, LEJOS , LEJOS = DERECHA, W_ALTO, S_NORMAL");
+        update_rule(rule_2, "CERCA, LEJOS , CERCA = DERECHA, W_ALTO, S_NORMAL");
+        update_rule(rule_1, "CERCA, CERCA , LEJOS = DERECHA, W_ALTO, S_NORMAL");
+        update_rule(rule_0, "CERCA, CERCA , CERCA = DERECHA, W_ALTO, S_NORMAL");
+      }
+
       if( strcmp(img_proc_tipo, "DESCONOCIDO") == 0){
         /* Con destino */
         // update_rule(rule_7, "LEJOS, LEJOS , LEJOS = CENTRO, W_BAJO, S_LENTA");
@@ -304,12 +316,12 @@ int main(void)
         /* Libre */
         update_rule(rule_7, "LEJOS, LEJOS , LEJOS = CENTRO, W_BAJO, S_LENTA");
         update_rule(rule_6, "LEJOS, LEJOS , CERCA = IZQUIERDA, W_ALTO, S_LENTA");
-        update_rule(rule_5, "LEJOS, CERCA , LEJOS = IZQUIERDA, W_ALTO, S_LENTA");
+        update_rule(rule_5, "LEJOS, CERCA , LEJOS = DERECHA, W_ALTO, S_LENTA");
         update_rule(rule_4, "LEJOS, CERCA , CERCA = IZQUIERDA, W_ALTO, S_LENTA");
         update_rule(rule_3, "CERCA, LEJOS , LEJOS = DERECHA, W_ALTO, S_LENTA");
         update_rule(rule_2, "CERCA, LEJOS , CERCA = CENTRO, W_ALTO, S_LENTA");
         update_rule(rule_1, "CERCA, CERCA , LEJOS = DERECHA, W_ALTO, S_LENTA");
-        update_rule(rule_0, "CERCA, CERCA , CERCA = IZQUIERDA, W_ALTO, S_LENTA"); 
+        update_rule(rule_0, "CERCA, CERCA , CERCA = DERECHA, W_ALTO, S_LENTA"); 
       }
 
 

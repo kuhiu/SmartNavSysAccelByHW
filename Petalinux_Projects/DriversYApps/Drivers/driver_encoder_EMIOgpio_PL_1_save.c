@@ -26,10 +26,16 @@
 #define OFFSET_IPIER        (uint32_t) 0x00000128
 #define OFFSET_IPISR        (uint32_t) 0x00000120
 
+#define _BSD_SOURCE
+
 static int driver_probe (struct platform_device *pdev);
 static int driver_remove (struct platform_device *pdev);
 
+static int sensor_1 = 0;
 static uint32_t nro_vueltas1 = 0;
+static int valid_value1 = 0;
+static volatile ktime_t echo_start1;
+static volatile ktime_t echo_end1;
 
 static struct state {
 
@@ -112,12 +118,69 @@ void set_registers (volatile void *base, uint32_t offset, uint32_t mask, uint32_
 /*************************************************************************************************/
 static irqreturn_t driver_isr(int irq, void *data)
 {
-    if (  ioread32(state.base_addr_EMIOgpio + OFFSET_IPISR) == 0x01 ){
-        if ( (ioread32(state.base_addr_EMIOgpio + OFFSET_GPIO1_DATA) & 0x01) == 0x01) 
-          nro_vueltas1 += 1; 
+	  ktime_t ktime_dummy1;
+
+    //pr_info("Hola entre a driver_isr \n");
+
+    if (  ioread32(state.base_addr_EMIOgpio + OFFSET_IPISR) == 0x01 )
+    {
+        //pr_info("Hola channel 1 interrupt \n");
+
+        //pr_info("Es %08X \n", ioread32(state.base_addr_EMIOgpio + OFFSET_GPIO1_DATA) );
+
+        if ( (ioread32(state.base_addr_EMIOgpio + OFFSET_GPIO1_DATA) & 0x01) == (uint32_t) 0x01) // Primer sensor interrumpio
+        {
+            //pr_info("Interumpio bit 0, sensor_1: %d \n", sensor_1);
+            //if (valid_value1==0) {
+            ktime_dummy1=ktime_get();
+            if (sensor_1 == 0){  
+                echo_start1=ktime_dummy1;
+                valid_value1 = 0;
+            }
+
+            sensor_1++;
+
+            if (sensor_1 >= 5){  // 1/4 REVOLUCIONES
+                echo_end1=ktime_dummy1;
+                nro_vueltas1 = nro_vueltas1 + 5; 
+                sensor_1 = 0;
+                valid_value1 = 1;
+            }
+            //}
+
+        }
+
+        // if ( (ioread32(state.base_addr_EMIOgpio + OFFSET_GPIO1_DATA) & 0x02) == (uint32_t) 0x02) // Segundo sensor interrumpio
+        // {
+        //     //pr_info("Interumpio bit 1 \n");
+        //     //if (valid_value2==0) {
+        //     ktime_dummy2=ktime_get();
+        //     if (sensor_2 == 0){  
+        //         echo_start2=ktime_dummy2;
+        //         valid_value2 = 0;
+        //     }
+
+        //     sensor_2++;
+
+        //     if (sensor_2 >= 1){  // 1 REVOLUCIONES
+        //         echo_end2=ktime_dummy2; 
+        //         nro_vueltas2++;
+        //         sensor_2 = 0;
+        //         valid_value2 = 1;
+        //     }
+        //     //}
+        // }
+
         // Clear int status channel
         set_registers(state.base_addr_EMIOgpio, OFFSET_IPISR, (uint32_t) 0x3, (uint32_t)0x01 );
     }
+
+    // if (  ioread32(state.base_addr_EMIOgpio + OFFSET_IPISR) == 0x02 )
+    // {
+    //     //pr_info("Hola channel 2 interrupt  \n");  
+    //     set_registers(state.base_addr_EMIOgpio, OFFSET_IPISR, (uint32_t) 0x3, (uint32_t)0x02 );
+    // }
+    
 	return IRQ_HANDLED;
 }
 /*************************************************************************************************/
@@ -133,8 +196,10 @@ static irqreturn_t driver_isr(int irq, void *data)
 **/
 /*************************************************************************************************/
 
-static int driver_open(struct inode *inode, struct file *file) {
+static int driver_open(struct inode *inode, struct file *file) 
+{
     pr_info("Hola! Entre a open! \n");
+
 
     pr_info("Consigo memoria para el buffer de recepcion y de transmision, encoder 1\n");
     if ((state.RX_buff = (__s64 *) kmalloc(BYTE2READ, GFP_KERNEL)) == NULL){
@@ -144,6 +209,13 @@ static int driver_open(struct inode *inode, struct file *file) {
 
     pr_info("Consegui memoria para, encoder 1\n");
 
+    // if ((state.TX_buff = (__s64 *) kmalloc(BYTE2READ, GFP_KERNEL)) == NULL)
+    // {
+    //   pr_err ("Insuficiente memoria\n");
+    //   return -ENODEV; /* No such device */
+    // }
+
+    pr_info("base_addr_EMIOgpio es: %08X \n", *(uint32_t*)(state.base_addr_EMIOgpio));
     // Configure the portS as input 
     set_registers(state.base_addr_EMIOgpio, OFFSET_GPIO_TRI, (uint32_t) (0x03<<0), (uint32_t) (0x03<<0) );
 
@@ -152,6 +224,7 @@ static int driver_open(struct inode *inode, struct file *file) {
 
     // Habilito la interrupciones globales
     set_registers(state.base_addr_EMIOgpio, OFFSET_GIER, (uint32_t) (0x01<<31) , (uint32_t) (0x01<<31) );
+
 
     pr_info("Chau! Sali de open! \n");
     return 0;
@@ -167,10 +240,15 @@ static int driver_open(struct inode *inode, struct file *file) {
   @returns 0: sin error, -1: error
 **/
 /*************************************************************************************************/
-static int driver_release(struct inode *inode, struct file *file) {
+static int driver_release(struct inode *inode, struct file *file) 
+{
   pr_info("driver_release: Entre a driver_release\n");
+
+  // kfree(state.TX_buff);
   kfree(state.RX_buff);  
+
   pr_info("driver_release: Salgo a driver_release\n");
+
   return 0;
 }
 
@@ -183,24 +261,50 @@ static int driver_release(struct inode *inode, struct file *file) {
 /*************************************************************************************************/
 static ssize_t driver_read(struct file *file, char __user *ubuff, size_t size, loff_t *offset) 
 {
+    int counter;
+
     //pr_info("Entre a driver_read\n"); 
+
     //pr_info("Verifico si es valido el tamanio del buffer\n");  
-    if(size != BYTE2READ){
+    if(size != BYTE2READ)
+    {
         pr_info("El tamanio del buffer no es valido\n");
         return -1;
     }
 
     //pr_info("Verifico si es valido el buffer\n");  
-    if( (access_ok(VERIFY_WRITE, ubuff, size)) == 0){
+    if( (access_ok(VERIFY_WRITE, ubuff, size)) == 0)
+    {
         pr_info("access_ok: El buffer es invalido\n");  
         return -1;
     }
 
+    // Tengo que esperar que interrumpa y tenga el resultado
+    counter=0;
+	  while ( (valid_value1==0) ) {
+      counter++;
+      // Out of range
+      if (counter>10) {
+              //pr_info("Break \n"); 
+              break;
+		  }
+		  msleep(1);
+    }
+
+    //pr_info("Llego la interrupcion1 \n"); 
+    if (valid_value1!=0)
+      state.RX_buff[0] = ktime_to_us( ktime_sub(echo_end1,echo_start1) );
+    else
+      state.RX_buff[0] = -1;
+
     state.RX_buff[1] = nro_vueltas1;
+
+    //pr_info("Tiempo en useg en kernel 1: %lld \n", state.RX_buff[0] );
 
     /* Cargo el dato en el buffer del usuario */
     //pr_info("Cargo el buffer del usuario con la informacion\n");
-    if(__copy_to_user(ubuff, state.RX_buff, size) != 0){
+    if(__copy_to_user(ubuff, state.RX_buff, size) != 0)
+    {
         pr_info("__copy_to_user: Fallo __copy_to_user\n");
         return -1;
     }
@@ -208,6 +312,48 @@ static ssize_t driver_read(struct file *file, char __user *ubuff, size_t size, l
     //pr_info("Salgo de driver_read\n"); 
     return 0;
 }
+
+/*************************************************************************************************/
+/**
+  @brief Funcion que se ejecutara con el uso de la syscall write()
+
+  @returns 0: sin error, -1: error
+**/
+/*************************************************************************************************/
+
+
+//  static ssize_t driver_write(struct file *file, const char __user *ubuff, size_t size, loff_t *offset) 
+// {
+//     pr_info("Entre a driver_write\n"); 
+
+//     pr_info("Verifico si es valido el tamanio del buffer\n");  
+//     if(size != BYTE2READ)
+//     {
+//         pr_info("El tamanio del buffer no es valido\n");
+//         return -1;
+//     }
+    
+//     /* Cargo el dato en el buffer del kernel */
+//     pr_info("Cargo el buffer del usuario con la informacion\n");
+//     if(copy_from_user(state.TX_buff, ubuff, size) != 0)
+//     {
+//         pr_info("Fallo __copy_from_user\n");
+//         return -1;
+//     }
+
+//     pr_info("Voy a escribir = %08X \n", *(state.TX_buff)); 
+
+//     /* Escribo el dato del AXI GPIO (esta en la base de la pagina) */
+//     iowrite32( (uint32_t) 0x01), state.base_addr_EMIOgpio + OFFSET_GPIO2_DATA);
+//     udelay(10);
+//     iowrite32( (uint32_t) 0x00), state.base_addr_EMIOgpio + OFFSET_GPIO2_DATA);
+
+
+
+//     pr_info("Salgo de driver_write\n"); 
+//     return 0;
+// }
+
 
 /*************************************************************************************************/
 /******************************** Estructura file_operations *************************************/
@@ -224,6 +370,9 @@ static const struct file_operations myled_control_operations = {
     .release = driver_release,
     //.unlocked_ioctl = driver_ioctl,
 };
+ 
+
+
 
 /*************************************************************************************************/
 /**
@@ -235,7 +384,8 @@ static const struct file_operations myled_control_operations = {
 **/
 /*************************************************************************************************/
 
-static int driver_probe (struct platform_device *pdev){
+static int driver_probe (struct platform_device *pdev)
+{
     int status=0; // request_irq
 
     pr_info(" Hola! Entre a driver probed! \n");
@@ -263,6 +413,7 @@ static int driver_probe (struct platform_device *pdev){
         pr_err("No se pudo conseguir ioremap memory\n");
         return -ENODEV;
     }
+
 
     /* Voy a pedir la interrupcion */
     pr_info("%s: Pido interrupcion al kernel \n", pdev->name);
@@ -301,7 +452,8 @@ static int driver_probe (struct platform_device *pdev){
 **/
 /*************************************************************************************************/
 
- static int driver_remove(struct platform_device *pdev){
+ static int driver_remove(struct platform_device *pdev)
+ {
     pr_info("driver_remove: Remuevo el dispositivo!\n");
 
     /* Free irq */
@@ -419,4 +571,4 @@ module_exit(my_pdrv_remove);
 /************************************ Module Information *****************************************/
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("Martin Fuschetto");
-MODULE_DESCRIPTION("My encoder driver");
+MODULE_DESCRIPTION("My platform leds control");
