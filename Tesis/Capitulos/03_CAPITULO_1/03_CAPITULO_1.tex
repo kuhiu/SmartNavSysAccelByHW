@@ -29,7 +29,7 @@ Tres estrategias se utilizaron para lograr esta compresión:
     \item \textbf{Estrategia 3:} Disminuir la resolución al final de la red para que las capas de convolución tengan mapas de activación grandes. Normalmente la reducción de resolución se diseña en arquitecturas de CNN al establecer el step>1 en algunas de las capas de convolución o agrupación.
 \end{itemize}
 
-\subsubsection{Macroarquitectura SqueezeDet}
+\paragraph{Macroarquitectura SqueezeDet}\mbox{}\\
 
 La macro-arquitectura se refiere a la organización del nivel de organización del sistema de múltiples módulos dentro de la arquitectura completa de la CNN.\par
 
@@ -40,11 +40,11 @@ En la figura se puede ver la arquitectura de la SqueezeDet. Comienza con una cap
     \captionof{figure}{Arquitectura SqueezeDet}
 \end{center}
 
-\subsubsection{Microarquitectura SqueezeDet}
+\paragraph{Microarquitectura SqueezeDet}\mbox{}\\
 
 La micro-arquitectura hace referencia a las capas individuales y los módulos. La operación de convolución ha sido utilizada por al menos 25 años en las CNN. Cuando el desarrollo de las CNN se aplica a imágenes típicamente los filtros de la CNN tienen 3 canales en su primer layer (ej,RGB) y en cada layer siguiente los filtros tienen el mismo numero de canales que el numero de filtros que tuvo la layer anterior. Al diseñar CNN muy profundos, se vuelve tedioso el hecho de estar seleccionando manualmente las dimensiones del filtro, para abordar esto se propuso varios bloques de construcción de nivel superior, o módulos, que luego se combinan para formar una red completa.
 
-\paragraph{The fire module}\mbox{}\\
+\subparagraph{The fire module}\mbox{}\\
 
 Este modulo permite alcanzar las 3 estrategias. Un "Fire Module" se compone de una capa de convolución de compresión (solo tiene filtros de 1x1) que se alimenta a una capa de expansión que tiene una mezcla de filtros de convolución de 1x1 y 3x3 ver figura. El uso de los filtros 1x1 en este modulo es con el propósito de satisfacer la Estrategia 1.
 
