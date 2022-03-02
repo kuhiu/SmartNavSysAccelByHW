@@ -1,0 +1,166 @@
+\algdef{SE}{Begin}{End}{\textbf{begin}}{\textbf{end}}
+\algdef{SE}% flags used internally to indicate we're defining a new block statement
+[STRUCT]% new block type, not to be confused with loops or if-statements
+{Struct}% "\Struct{name}" will indicate the start of the struct declaration
+{EndStruct}% "\EndStruct" ends the block indent
+[1]% There is one argument, which is the name of the data structure
+{\textbf{struct} \textsc{#1}}% typesetting of the start of a struct
+{\textbf{end struct}}% typesetting the end of the struct
+\algnewcommand\algorithmicforeach{\textbf{for each}}
+\algdef{S}[FOR]{ForEach}[1]{\algorithmicforeach\ #1\ \algorithmicdo}
+\algnewcommand{\LeftComment}[1]{\Statex \(\triangleright\) #1}
+
+Estructuras importantes:
+\bigbreak
+\begin{algorithmic}[H]
+\Struct{$mf\_type$}
+  \State $char$ : name[MAXNAME]; \Comment{Nombre de la funcion de pertenencia}  
+  \State $float$ : value; \Comment{Grado de pertenencia o fuerza de la regla}
+  \State $int$ : point1; \Comment{Punto del eje x más a la izquierda de la función}
+  \State $int$ : point2; \Comment{Punto del eje x más a la derecha de la función}  
+  \State $float$ : slope1; \Comment{Pendiente del lado izquierdo de la función de pertenencia}  
+  \State $float$ : slope2; \Comment{Pendiente del lado derecho de la función de pertenencia}  
+  \State $struct$ :$ mf_type$ *next; \Comment{Puntero a la siguiente función de pertenencia}
+\EndStruct
+\end{algorithmic}
+\bigbreak
+\begin{algorithmic}[H]
+\Struct{$io\_type$}
+    \State $char*$ : name; \Comment{Nombre de la entrada o salida}
+    \State $float$ : value; \Comment{Valor de la entrada o salida}
+    \State struct $mf\_type $ : $membership\_functions$; \Comment{Lista de las funciones de pertenencia}
+    \State $io\_type$ : next; \Comment{Puntero a la siguiente entrada o salida}
+\EndStruct
+\end{algorithmic}
+\bigbreak
+\begin{algorithmic}[H]
+\Struct{$rule\_element\_type$}
+    \State $float*$ : value; \Comment{Puntero al valor del antecedente o consecuente}
+    \State $struct*$ : next; \Comment{Próximo antecedente o consecuente en la regla}
+\EndStruct
+\end{algorithmic}
+\bigbreak
+\begin{algorithmic}[H]
+\Struct{$rule\_type$}
+    \State $char*$ : name; \Comment{Nombre de la regla}
+    \State struct $rule\_element\_type*$ : $if\_side$; \Comment{Lista de antecedentes de esta regla.}
+    \State struct $rule\_element\_type*$ : $then\_side$; \Comment{Lista de consecuentes.}
+    \State struct $rule\_type*$ : next; \Comment{Próxima regla}
+\EndStruct
+\end{algorithmic}
+
+\begin{algorithm}[H]
+\caption{Pseudocódigo del programa FuzzyControl.c}\label{alg:cap}
+\begin{algorithmic}
+\Begin
+\State $InitializeSystem()$
+\While {!finish}
+    \State $getSystemInputs()$
+    \State $fuzzification()$
+    \State $ruleEvaluation()$
+    \State $defuzzification()$
+    \State $putSystemOutputs()$
+\EndWhile
+\End
+\end{algorithmic}
+\end{algorithm}
+
+Puede tener una referencia al archivo "state.txt" \ref{fig:state.txt}. 
+
+\begin{algorithm}[H]
+\caption{Pseudocódigo de InitializeSystem()}\label{alg:cap}
+\begin{algorithmic}
+\Procedure{InitializeSystem()}{}
+  \State $initSemaphore()$ \Comment{Inicializa un semáforo}
+  \State $openStateFile()$ \Comment{Abre state.txt}
+    \ForEach {$ \text{entrada en el sistema de control difuso} $} 
+        \ForEach {$ \text{función de pertenencia en cada entrada} $}  
+            \State $initializeMembershipInputs()$ \Comment{Crea una funcion de pertenencia $*mf\_type$}
+        \EndFor
+        \State $initializeSystemIo()$ \Comment{Crea una entrada del sistema $*io\_type$}
+    \EndFor
+    \bigbreak
+    \ForEach {$ \text{regla} $} 
+        \ForEach {$ \text{elemento de la regla} $}  
+            \State $addRuleElement()$ \Comment{Crea antecedentes o consecuentes $*rule\_element\_type$}
+        \EndFor
+        \State $addRule()$ \Comment{Crea reglas del sistema difuso, $*rule\_type$}
+    \EndFor
+    \bigbreak
+    \ForEach {$ \text{salida en el sistema de control difuso} $} 
+        \ForEach {$ \text{función de pertenencia en cada salida} $}  
+            \State $initializeMembershipOutputs()$ \Comment{Crea una función de pertenencia $*mf\_type$}
+        \EndFor
+        \State $initializeSystemIo()$ \Comment{Crea una salida del sistema $*io\_type$}
+    \EndFor
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}[H]
+\caption{Pseudocódigo de getSystemInputs()}
+\begin{algorithmic}
+\Procedure{getSystemInputs()}{}
+  \State $takeSemaphore()$ \Comment{Toma el recurso}
+  \State $readFromState()$ \Comment{Lee de state.txt los sensores de distancia}
+  \State $leaveSemaphore()$ \Comment{Deja el recurso}
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}[H]
+\caption{Pseudocódigo de fuzzification()}
+\begin{algorithmic}
+\Procedure{fuzzification()}{}
+    \ForEach {$ \text{entrada en el sistema de control difuso} $} 
+    \ForEach {$ \text{función de pertenencia} $}
+        \State $compute\_degree\_of\_membership()$ \Comment{Grado de pertenencia}
+    \EndFor 
+    \EndFor 
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+
+En la sección \ref{fuzzymarker} del marco teórico puede recordar como calcular el grado de pertenencia.
+
+\begin{algorithm}[H]
+\caption{Pseudocódigo de $rule\_evaluation$()}
+\begin{algorithmic}
+\Procedure{$rule\_evaluation$()}{}
+    \LeftComment{Una regla es evaluada, unión o intersección según corresponda}
+    \ForEach {$ \text{regla del sistema de control difuso} $} 
+    \ForEach {$ \text{antecedente de la regla} $}
+        \State $strength = fmin(strength, rule\rightarrow if\_side \rightarrow value)$ 
+    \EndFor 
+    \LeftComment{A continuación se aplica la fuerza a cada una de las funciones de pertenencia de cada salidas enumeradas en las reglas. Si a una salida ya se le asigno una fuerza de una regla, durante el pase de inferencia actual, se usa una función máxima para determinar que fuerza aplicar}
+    \ForEach {$ \text{procedente de la regla} $}
+        \State $*(rule\rightarrow then\_side \rightarrow value) = max(strength,*(rule\rightarrow then\_side\rightarrow value))$
+    \EndFor 
+    \EndFor 
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}[H]
+\caption{Pseudocódigo de $defuzzification$()}
+\begin{algorithmic}
+\Procedure{$defuzzification$()}{}
+    \ForEach {$ \text{salida del sistema de control difuso} $} 
+    \ForEach {$ \text{función de pertenencia} $}
+        \State $center\_of\_gravity\_method()$ \Comment{Método del centro de gravedad}
+    \EndFor 
+    \EndFor 
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}[H]
+\caption{Pseudocódigo de $put\_system\_outputs$()}
+\begin{algorithmic}
+\Procedure{$put\_system\_outputs$()}{}
+  \State $takeSemaphore()$ \Comment{Toma el recurso}
+  \State $writeFromState()$ \Comment{Escribe state.txt}
+  \State $leaveSemaphore()$ \Comment{Deja el recurso}
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}

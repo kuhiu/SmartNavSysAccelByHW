@@ -27,7 +27,7 @@ Funciones características mas utilizadas: Gaussiana, Sigmoidal, Gamma, Pi, Camp
     \subfigure[]{\includegraphics[width=0.2\textwidth]{Tesis/Capitulos/02_MARCO_TEORICO/img/logaritmica.png}} 
     \subfigure[]{\includegraphics[width=0.2\textwidth]{Tesis/Capitulos/02_MARCO_TEORICO/img/trapezoidal.png}}
     \subfigure[]{\includegraphics[width=0.2\textwidth]{Tesis/Capitulos/02_MARCO_TEORICO/img/triangular.png}}
-    \caption{(a) Gaussiana (b) Sigmoidal (c) Rectangular (d) Triangular}
+    \caption{(a) Gaussiana (b) Sigmoidal (c) Trapezoidal (d) Triangular}
     \label{fig:foobar}
 \end{figure}
 
@@ -95,7 +95,7 @@ El conjunto de reglas se definen en lenguaje natural, según el grado de pertene
 
 Se puede descomponer el proceso de control difuso en tres etapas principales.\par
 
-\paragraph{Fuzzificación} 
+\paragraph{Fuzzificación} \label{fuzzymarker}
 
 Primera parte del proceso, dados los valores de entrada se calcula el grado de pertenencia a cada uno de los conjuntos difusos considerados, mediante las funciones características asociadas a estos conjuntos difusos.\par
 
@@ -137,7 +137,7 @@ A cada una de las salidas difusas se les asigna un valor (grado de aplicabilidad
 
 \paragraph{Defuzzificación}
 
-De la etapa anterior del proceso tenemos varias salidas difusas (''baje'', ''no modifique'', ''aumente'') cada una de ellas con un valor de verdad o de aplicabilidad (un numero de 0 a 1) para cada variable de salida del sistema (en este caso la potencia del motor).\par
+De la etapa anterior del proceso tenemos varias salidas difusas (''baje'', ''aumente'') cada una de ellas con un valor de verdad o de aplicabilidad (un numero de 0 a 1) para cada conjunto difuso de cada salida del sistema (en este caso la potencia del motor).\par
 \bigbreak
 Ahora la pregunta es, cual es la potencia del motor? Una forma fácil y efectiva de determinarlo es realizando la operación denominada C.O.G (Centro de gravedad en ingles) el cual consiste en: \par
 

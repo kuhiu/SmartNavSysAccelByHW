@@ -13,23 +13,34 @@ Algunas consideraciones que se tuvieron en cuenta para el armado de reglas y fun
     \item Para todos los valores de entrada la suma del grado de pertenencia de los distintos conjuntos debe ser 1.
 \end{itemize}
 
-El desarrollo de la solución se puede dividir en versiones que van desde menor a mayor complejidad. Partiendo de un ejemplo de simulación y control difuso implementado en matlab que muestra como ajustar un sistema de lógica difusa y que se puede encontrar \href{https://www.mathworks.com/help/fuzzy/tune-fuzzy-systems-using-custom-cost-function.html}{\textbf{aqui}}, a partir de ahora llamado "MySimAvoidObs1".
+El desarrollo de la solución se puede dividir en versiones que van desde menor a mayor complejidad. Partiendo de un ejemplo de simulación y control difuso implementado en matlab y que se puede encontrar \href{https://www.mathworks.com/help/fuzzy/tune-fuzzy-systems-using-custom-cost-function.html}{\textbf{aqui}}, a partir de ahora llamado "MySimAvoidObs1".
 
 \subsubsection{MySimAvoidObs1}
 
 Nuestra idea base, fue controlar con el sistema difuso la variación del ángulo actual del robot para evadir un obstáculo. En este planteo el robot no tiene información sobre el destino, solo se encarga de evadir obstáculos. De este modo se representa el control con el siguiente esquema.
 
-\begin{center}
-    \includegraphics[scale=0.6]{Tesis/Capitulos/04_CAPITULO_2/img/MySimAvoidObs1_env.png}
-    \captionof{figure}{}
-\end{center}
+\begin{figure}[ht]
+\begin{minipage}[t]{0.5\linewidth}
+\centering
+\includegraphics[width=0.9\linewidth, valign=t]{Tesis/Capitulos/04_CAPITULO_2/img/MySimAvoidObs1_env.png}
+\caption{test}
+\label{GIS_Mapping_Software}
+\end{minipage}%
+\begin{minipage}[t]{0.5\linewidth}
+\begin{equation}\alpha = \frac{\text{distancia al obstáculo}}{\text{distancia al target}} \end{equation}
+\begin{equation}\theta = \text{Angulo al target} - \text{Angulo al obstáculo}\end{equation}
+\end{minipage}
+\end{figure}
 
 \begin{center}
     \includegraphics[scale=0.6]{Tesis/Capitulos/04_CAPITULO_2/img/MySimAvoidObs1_system.png}
     \captionof{figure}{Esquema de entradas y salidas MySimAvoidObs1.}
 \end{center}
 
-En donde $\alpha$ representa un ratio de distancia (distancia al obstáculo / distancia al target) mientras que $\theta$ la diferencia entre la dirección al target y la dirección al obstáculo.
+\input{Tesis/Capitulos/04_CAPITULO_2/rules_1}
+\bigbreak
+En donde $\alpha$ representa un ratio de distancia (distancia al obstáculo / distancia al target) mientras que $\theta$ la diferencia entre la dirección al target y la dirección al obstáculo.\par
+Por lo que un $\alpha$ bajo representa que el obstáculo se encuentra mas lejos que el target, un $\theta$ bajo significa que me dirijo hacia la dirección del obstáculo, mientras que un W bajo indica ir a la ubicación del target y un W alto la evasión del obstáculo.
 \bigbreak
 Ecuación a controlar con el sistema difuso:
 \begin{equation}\boxed{
@@ -70,8 +81,10 @@ En esta versión proponemos un nuevo sistema de control difuso el cual únicamen
     \captionof{figure}{Esquema de entradas y salidas MySimAvoidObs2.}
 \end{center}
 
-En donde Sleft, Sfront, y Sright representa las distancias al obstáculo y Theta el ángulo que deberá girar el robot para evadirlo.
-
+\input{Tesis/Capitulos/04_CAPITULO_2/rules_2}
+\bigbreak
+En donde Sleft, Sfront, y Sright representa las distancias al o los obstáculos obtenidas desde los sensores de proximidad y Theta el ángulo que deberá girar el robot para evadirlos.
+\bigbreak
 Ecuación a controlar con el sistema difuso:
 \begin{equation}\boxed{
 \begin{array}{rcl}
@@ -97,11 +110,12 @@ A continuación en la imagen \ref{fig:MySymAvoidObs2_1} del simulador y sus reco
 
 En esta versión la tarea de navegación se trata de combinar dos vectores, la variación del ángulo actual (ángulo que proporciona una dirección libre de colisión para el robot) y el ángulo al target. La salida w varía entre 0 y 1 e indica el peso que tendrá cada ángulo en el ángulo resultado tal como se muestra en la ecuación de control. Es una combinación de los sistemas implementados en las versiones anteriores "MySimAvoidObs1" y "MySimAvoidObs2".
 
-
 \begin{center}
     \includegraphics[scale=0.5]{Tesis/Capitulos/04_CAPITULO_2/img/esquema2.png}
     \captionof{figure}{Esquema de entradas y salidas MySimReachTarget.}
 \end{center}
+
+\input{Tesis/Capitulos/04_CAPITULO_2/rules_3}
 
 Ecuación a controlar con el sistema difuso:
 
@@ -142,12 +156,14 @@ A continuación en las imágenes \ref{fig:MySimReachTarget_1} y \ref{fig:MySimRe
 
 \subsubsection{MySimReachTargetVelControl}
 
-En la cuarta versión la ecuación de control se mantiene igual, pero se agrega a la como salida del control difuso el control de la velocidad del robot, permitiéndole así ser capaz de controlar su velocidad.
+En la cuarta versión la ecuación de control se mantiene igual, pero se agrega a la salida del control difuso el control de la velocidad del robot, permitiéndole así ser capaz de controlar su velocidad.
 
 \begin{center}
     \includegraphics[scale=0.5]{Tesis/Capitulos/04_CAPITULO_2/img/esquema4.png}
-    \captionof{figure}{Esquema de entradas y salidas MySimReachTarget.}
+    \captionof{figure}{Esquema de entradas y salidas MySimReachTargetVelControl.}
 \end{center}
+
+\input{Tesis/Capitulos/04_CAPITULO_2/rules_4}
 
 \begin{equation}\boxed{
 \begin{array}{rcl}
@@ -179,9 +195,12 @@ Para la salida w se definieron los conjuntos “bajo” y “alto” según la p
     \captionof{figure}{Detalle de funciones de pertenencia de salida w.}
 \end{center}
 
-Finalmente la variable de salida "Vel" permite que el robot modifique la velocidad según la ubicación de los obstáculos. Se definieron las funciones “LENTO”, “MEDIO” y “RAPIDO”. 
+Finalmente la variable de salida "Vel" permite que el robot modifique la velocidad según la ubicación de los obstáculos. Se definieron las funciones “BAJA”, “MEDIA” y “ALTA”. 
 
-AGREGAR FOTO ACA!!!!!!!
+\begin{center}
+    \includegraphics[scale=0.7]{Tesis/Capitulos/04_CAPITULO_2/img/varfuzzy5.png}
+    \captionof{figure}{Detalle de funciones de pertenencia de salida Vel.}
+\end{center}
 
 El esquema del control difuso de la última versión con estas entradas y salidas se muestra en la figura \ref{fig:esquema}.
 
@@ -191,7 +210,8 @@ El esquema del control difuso de la última versión con estas entradas y salida
     \label{fig:esquema}
 \end{center}
 
-\subsubsection{Sets de reglas}
+\subsection{Algoritmo del sistema de control difuso}
 
-
-\subsection{Implementación en C del sistema de control difuso}
+Partiendo como referencia \MYhref{http://www.chebucto.ns.ca/Science/AIMET/archive/ddj/fuzzy_logic_in_C/}{Fuzzy Logic in C} se llevo a cabo la siguiente implementación.
+\bigbreak
+\input{Tesis/Capitulos/04_CAPITULO_2/pseudocodigo_fuzzylogic}

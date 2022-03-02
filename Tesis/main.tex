@@ -56,9 +56,10 @@
 \usepackage[yyyymmdd]{datetime}
 \usepackage{ulem}
 
+\usepackage[export]{adjustbox}
 
 \usepackage{tikz}
-\usetikzlibrary{arrows.meta,arrows}
+\usetikzlibrary{shapes.geometric, arrows.meta,arrows}
 \tikzset{basic/.style={draw,fill=none,
                        text badly centered,minimum width=3em}}
 \tikzset{input/.style={basic,circle,minimum width=3.5em}}
@@ -73,6 +74,8 @@
                                 (0,0) -- (0.75em,0.75em);}
 \newcommand{\stepfunc}{\draw[line width=1.5pt] (0.65em,0.65em) -- (0,0.65em) 
                                     -- (0,-0.65em) -- (-0.65em,-0.65em);}
+
+\newcommand{\MYhref}[3][blue]{\href{#2}{\color{#1}{#3}}}%
 
 % Input layer neurons'number
 \newcommand{\inputnum}{3} 

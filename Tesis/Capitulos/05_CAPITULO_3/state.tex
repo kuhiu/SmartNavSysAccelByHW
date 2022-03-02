@@ -1,0 +1,31 @@
+{\huge\textbf {state.txt}}
+\bigbreak
+\textbf{Variables escritas por el sistema de control difuso}
+\begin{itemize}
+    \item Ángulo requerido = 0.000000 [grados] \Comment{Indica la dirección para la evasión [grados]}
+    \item W = 0 \Comment{Prioridad evasión - alcanzar el target}
+    \item Desplazamiento = ADELANTE \Comment{[ADELANTE-FRENAR-DERECHA-IZQUIERDA]}
+    \item Pwm, Velocidad = 0 \% \Comment{Indica velocidad del robot 0-100\% [\%]}
+\end{itemize}
+\bigbreak
+\textbf{Variables escritas por $\textbf{usrSpace\_drive}$}
+\begin{itemize}
+    \item Target = 0, 0 \Comment{Target (relativo al inicio)}
+    \item PosicionActual = 0, 0 \Comment{Indica la posición actual del robot (relativo al inicio).}
+\end{itemize}
+\bigbreak
+\textbf{Variables escritas por el sistema de procesamiento de imágenes}
+\begin{itemize}
+    \item ImgProc, Direccion = NINGUNA \Comment{[DERECHA - IZQUIERDA - NINGUNA]}
+    \item ImgProc, Tipo = DESCONOCIDO \Comment{Tipo de obstáculo reconocido.}
+\end{itemize}
+\textbf{Variables de estado actual del robot, escritas por drivers}
+\begin{itemize}
+    \item Encoder, Rev = 0 - 0 \Comment{Indica las revoluciones del motor [rpm]}
+    \item Encoder, Distancia = 0 - 0 \Comment{Indica la distancia recorrida [cms]}
+    \item Encoder, Distancia REAL = 0 - 0 \Comment{Indica la distancia recorrida [cms]}
+    \item Brujula, Angulo = 0 \Comment{Indica angulo absoluto al Norte terrestre [grados]}
+    \item Sensores, rightSensor = 1 \Comment{Sensor de distancia a la derecha [cms]}
+    \item Sensores, centerSensor = 1 \Comment{Sensor de distancia en el centro [cms]}
+    \item Sensores, leftSensor = 1 \Comment{Sensor de distancia a la izquierda [cms]}
+\end{itemize}

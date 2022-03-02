@@ -21,7 +21,7 @@ La entrada de la función de activación se calcula como la suma ponderada de to
 
 \subsubsection{¿Que es una red neuronal?}
 
-Una red neuronal es un grupo interconecto de distintos elementos procesadores simples que operan en paralelo, cuya función se determina a partir de distintas características de la red, su estructura, la fuerza o pesos en las conexiones y el procesamiento realizado en cada nodo.\par
+Una red neuronal es un grupo interconectado de distintos elementos procesadores simples que operan en paralelo, cuya función se determina a partir de distintas características de la red, su estructura, la fuerza o pesos en las conexiones y el procesamiento realizado en cada nodo.\par
 Muchas veces se la define como un aproximador universal. El modelo conocido como perceptrón multicapa esta compuesto por ''k'' capas de neuronas que están interconectadas y cada salida de cada neurona es la suma ponderada de todas las salidas de las neuronas de la capa anterior mas un valor de bías (\autoref{fig:elperceptron}).
 
 \begin{figure}[!h]
@@ -67,7 +67,7 @@ A continuación el proceso: \par
     \item $N_{oy}:$ largo de la matriz de salida.
 \end{itemize}
 
-Las salidas de una determinada capa convolucional se obtiene al desplazar $N_{of}$ filtros de dimensiones $ N_{wx} x N_{wy} x N_{iz}$ por las salidas de la capa anterior. En cada desplazamiento se realiza una suma ponderada de las salidas de la capa anterior por los pesos del filtro.\par
+Las salidas de una determinada capa convolucional se obtiene al desplazar $N_{oz}$ filtros de dimensiones $ N_{wx} x N_{wy} x N_{iz}$ por las salidas de la capa anterior. En cada desplazamiento se realiza una suma ponderada de las salidas de la capa anterior por los pesos del filtro.\par
 
 A continuación se presenta su algoritmo en pseudocódigo.\par
 
